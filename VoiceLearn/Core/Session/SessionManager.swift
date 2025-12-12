@@ -99,20 +99,21 @@ public struct SessionConfig: Codable, Sendable {
 /// - Interruption handling
 /// - Service coordination (VAD, STT, LLM, TTS)
 /// - Context management for long conversations
-public actor SessionManager: ObservableObject {
+@MainActor
+public final class SessionManager: ObservableObject {
     
     // MARK: - Properties
     
     private let logger = Logger(label: "com.voicelearn.session")
     
     /// Current session state
-    @MainActor @Published public private(set) var state: SessionState = .idle
+    @Published public private(set) var state: SessionState = .idle
     
     /// Current user transcript (interim/final)
-    @MainActor @Published public private(set) var userTranscript: String = ""
+    @Published public private(set) var userTranscript: String = ""
     
     /// Current AI response being spoken
-    @MainActor @Published public private(set) var aiResponse: String = ""
+    @Published public private(set) var aiResponse: String = ""
     
     /// Conversation history
     private var conversationHistory: [LLMMessage] = []

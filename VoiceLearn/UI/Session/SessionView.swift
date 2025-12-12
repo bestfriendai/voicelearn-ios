@@ -48,7 +48,9 @@ public struct SessionView: View {
                     SessionControlButton(
                         isActive: viewModel.isSessionActive,
                         isLoading: viewModel.isLoading,
-                        action: viewModel.toggleSession
+                        action: {
+                            await viewModel.toggleSession(appState: appState)
+                        }
                     )
                     .padding(.bottom, 40)
                 }
@@ -326,6 +328,8 @@ struct SessionSettingsView: View {
 
 // MARK: - Session View Model
 
+// MARK: - Session View Model
+
 @MainActor
 class SessionViewModel: ObservableObject {
     @Published var state: SessionState = .idle
@@ -339,39 +343,97 @@ class SessionViewModel: ObservableObject {
     @Published var lastLatency: TimeInterval = 0
     @Published var sessionCost: Decimal = 0
     
+    private var sessionManager: SessionManager?
+    private var subscribers = Set<AnyCancellable>()
+    
     var isSessionActive: Bool {
         state.isActive
     }
     
-    func toggleSession() async {
+    func toggleSession(appState: AppState) async {
         if isSessionActive {
             await stopSession()
         } else {
-            await startSession()
+            await startSession(appState: appState)
         }
     }
     
-    private func startSession() async {
+    private func startSession(appState: AppState) async {
         isLoading = true
         defer { isLoading = false }
         
-        // TODO: Initialize services and start session
-        // This will be connected to SessionManager
+        // 1. Check/Get API Keys
+        guard let deepgramKey = await appState.apiKeys.getKey(.deepgram),
+              let elevenLabsKey = await appState.apiKeys.getKey(.elevenLabs),
+              let anthropicKey = await appState.apiKeys.getKey(.anthropic) else {
+            errorMessage = "Missing required API keys. Please configure Deepgram, ElevenLabs, and Anthropic keys."
+            showError = true
+            return
+        }
         
-        state = .userSpeaking
+        // 2. Initialize Services
+        let sttService = DeepgramSTTService(apiKey: deepgramKey)
+        // Use default voice (Jessica) or configurable one
+        let ttsService = ElevenLabsTTSService(apiKey: elevenLabsKey) 
+        let llmService = AnthropicLLMService(apiKey: anthropicKey)
+        let vadService = SileroVADService()
+        
+        do {
+            // 3. Create SessionManager
+            let manager = try await appState.createSessionManager()
+            self.sessionManager = manager
+            
+            // 4. Bind State
+            bindToSessionManager(manager)
+            
+            // 5. Start Session
+            try await manager.startSession(
+                sttService: sttService,
+                ttsService: ttsService,
+                llmService: llmService,
+                vadService: vadService
+            )
+            
+        } catch {
+            errorMessage = "Failed to start session: \(error.localizedDescription)"
+            showError = true
+            await stopSession()
+        }
     }
     
     private func stopSession() async {
         isLoading = true
         defer { isLoading = false }
         
-        // TODO: Stop session via SessionManager
+        if let manager = sessionManager {
+            await manager.stopSession()
+        }
         
+        sessionManager = nil
+        subscribers.removeAll()
         state = .idle
-        userTranscript = ""
-        aiResponse = ""
+    }
+    
+    private func bindToSessionManager(_ manager: SessionManager) {
+        // Since SessionManager properties are @MainActor, we can access them safely here
+        
+        manager.$state
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$state)
+            
+        manager.$userTranscript
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$userTranscript)
+            
+        manager.$aiResponse
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$aiResponse)
+            
+        // Note: Audio level isn't currently published by SessionManager in this simplified version
+        // We would need to hook into AudioEngine for that, but for now we'll leave it as is.
     }
 }
+
 
 // MARK: - Preview
 

@@ -208,22 +208,24 @@ extension LLMService {
 public enum LLMProvider: String, Codable, Sendable, CaseIterable {
     case openAI = "OpenAI"
     case anthropic = "Anthropic Claude"
+    case selfHosted = "Self-Hosted"
     case localMLX = "Local MLX"
-    
+
     /// Display name for UI
     public var displayName: String {
         rawValue
     }
-    
+
     /// Short identifier
     public var identifier: String {
         switch self {
         case .openAI: return "openai"
         case .anthropic: return "anthropic"
+        case .selfHosted: return "selfhosted"
         case .localMLX: return "mlx"
         }
     }
-    
+
     /// Available models for this provider
     public var availableModels: [String] {
         switch self {
@@ -231,14 +233,28 @@ public enum LLMProvider: String, Codable, Sendable, CaseIterable {
             return ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]
         case .anthropic:
             return ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"]
+        case .selfHosted:
+            return ["qwen2.5:7b", "qwen2.5:3b", "llama3.2:3b", "llama3.2:1b", "mistral:7b"]
         case .localMLX:
             return ["llama-3.2-3b", "mistral-7b"]
         }
     }
-    
+
     /// Whether this provider requires network connectivity
     public var requiresNetwork: Bool {
-        self != .localMLX
+        switch self {
+        case .localMLX: return false
+        case .selfHosted: return true  // Local network, but still network
+        default: return true
+        }
+    }
+
+    /// Whether this provider is free (no API cost)
+    public var isFree: Bool {
+        switch self {
+        case .selfHosted, .localMLX: return true
+        default: return false
+        }
     }
 }
 

@@ -206,6 +206,52 @@ extension RoutingTable {
             "llama-1b-device"   // Smallest on-device
         ]
     )
+
+    /// Self-hosted preferred routing configuration
+    ///
+    /// Prioritizes self-hosted servers for zero-cost inference.
+    /// Falls back to cloud APIs only when self-hosted unavailable.
+    public static let selfHostedPreferred = RoutingTable(
+        defaultRoutes: [
+            // All tasks prefer self-hosted first
+            .tutoringResponse: ["llama-70b-server", "llama-8b-server", "gpt-4o", "gpt-4o-mini"],
+            .understandingCheck: ["llama-70b-server", "llama-8b-server", "gpt-4o", "gpt-4o-mini"],
+            .socraticQuestion: ["llama-70b-server", "llama-8b-server", "gpt-4o"],
+            .misconceptionCorrection: ["llama-70b-server", "llama-8b-server", "gpt-4o"],
+            .tangentExploration: ["llama-70b-server", "llama-8b-server", "gpt-4o-mini"],
+
+            .explanationGeneration: ["llama-8b-server", "llama-70b-server", "gpt-4o-mini"],
+            .exampleGeneration: ["llama-8b-server", "llama-70b-server", "gpt-4o-mini"],
+            .analogyGeneration: ["llama-8b-server", "llama-70b-server", "gpt-4o-mini"],
+            .rephrasing: ["llama-8b-server", "llama-3b-device", "gpt-4o-mini"],
+            .simplification: ["llama-8b-server", "llama-3b-device", "gpt-4o-mini"],
+            .documentSummarization: ["llama-70b-server", "llama-8b-server", "gpt-4o-mini"],
+            .transcriptGeneration: ["llama-70b-server", "llama-8b-server", "gpt-4o-mini"],
+            .sessionSummary: ["llama-8b-server", "llama-3b-device", "gpt-4o-mini"],
+
+            .intentClassification: ["llama-3b-device", "llama-1b-device", "llama-8b-server"],
+            .sentimentAnalysis: ["llama-3b-device", "llama-1b-device", "llama-8b-server"],
+            .topicClassification: ["llama-3b-device", "llama-1b-device", "llama-8b-server"],
+            .glossaryExtraction: ["llama-8b-server", "llama-3b-device", "gpt-4o-mini"],
+            .topicTransition: ["llama-3b-device", "llama-1b-device", "llama-8b-server"],
+
+            .acknowledgment: ["llama-1b-device", "llama-3b-device", "llama-8b-server"],
+            .fillerResponse: ["llama-1b-device", "llama-3b-device", "llama-8b-server"],
+            .navigationConfirmation: ["llama-1b-device", "llama-3b-device", "llama-8b-server"],
+
+            .healthCheck: ["llama-1b-device", "llama-8b-server"],
+            .embeddingGeneration: ["llama-8b-server", "gpt-4o-mini"]
+        ],
+        manualOverrides: [:],
+        globalOverride: nil,
+        autoRoutingRules: [],  // No auto-rules - always prefer self-hosted
+        fallbackChain: [
+            "llama-8b-server",  // Self-hosted first
+            "llama-3b-device",  // On-device
+            "llama-1b-device",  // Smallest on-device
+            "gpt-4o-mini"       // Cloud as last resort
+        ]
+    )
 }
 
 // MARK: - Auto-Routing Rule

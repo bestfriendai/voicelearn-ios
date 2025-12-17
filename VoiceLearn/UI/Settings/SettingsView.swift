@@ -72,11 +72,33 @@ public struct SettingsView: View {
                     Toggle("Enable Interruptions", isOn: $viewModel.enableBargeIn)
                 }
                 
+                // Self-Hosted Servers Section
+                Section {
+                    NavigationLink {
+                        ServerSettingsView()
+                    } label: {
+                        HStack {
+                            Label("Self-Hosted Servers", systemImage: "server.rack")
+                            Spacer()
+                            if viewModel.selfHostedServerCount > 0 {
+                                Text("\(viewModel.healthySelfHostedCount)/\(viewModel.selfHostedServerCount)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Self-Hosted")
+                } footer: {
+                    Text("Configure local servers for zero-cost AI inference.")
+                }
+
                 // LLM Settings Section
                 Section("Language Model") {
                     Picker("Provider", selection: $viewModel.llmProvider) {
                         Text("OpenAI").tag(LLMProvider.openAI)
                         Text("Anthropic").tag(LLMProvider.anthropic)
+                        Text("Self-Hosted").tag(LLMProvider.selfHosted)
                     }
                     
                     Picker("Model", selection: $viewModel.llmModel) {
@@ -119,6 +141,9 @@ public struct SettingsView: View {
                     }
                     Button("Cost Optimized") {
                         viewModel.applyPreset(.costOptimized)
+                    }
+                    Button("Self-Hosted (Free)") {
+                        viewModel.applyPreset(.selfHosted)
                     }
                 }
                 
@@ -319,6 +344,10 @@ class SettingsViewModel: ObservableObject {
     @Published var verboseLogging = false
     @Published var hasSampleCurriculum = false
 
+    // Self-hosted servers
+    @Published var selfHostedServerCount = 0
+    @Published var healthySelfHostedCount = 0
+
     private let curriculumSeeder = SampleCurriculumSeeder()
 
     /// Available models for current provider
@@ -328,15 +357,27 @@ class SettingsViewModel: ObservableObject {
             return ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]
         case .anthropic:
             return ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"]
+        case .selfHosted:
+            return ["qwen2.5:7b", "qwen2.5:3b", "llama3.2:3b", "llama3.2:1b", "mistral:7b"]
         default:
             return ["gpt-4o"]
         }
     }
-    
+
     init() {
         Task {
             await loadKeyStatus()
             await checkSampleCurriculum()
+            await loadServerStatus()
+        }
+    }
+
+    private func loadServerStatus() async {
+        let servers = await ServerConfigManager.shared.getAllServers()
+        let healthy = servers.filter { $0.isEnabled && $0.healthStatus.isUsable }
+        await MainActor.run {
+            selfHostedServerCount = servers.filter { $0.isEnabled }.count
+            healthySelfHostedCount = healthy.count
         }
     }
 
@@ -380,38 +421,50 @@ class SettingsViewModel: ObservableObject {
     }
 
     enum Preset {
-        case balanced, lowLatency, highQuality, costOptimized
+        case balanced, lowLatency, highQuality, costOptimized, selfHosted
     }
-    
+
     func applyPreset(_ preset: Preset) {
         switch preset {
         case .balanced:
+            llmProvider = .openAI
             sampleRate = 48000
             vadThreshold = 0.5
             llmModel = "gpt-4o"
             temperature = 0.7
             maxTokens = 1024
-            
+
         case .lowLatency:
+            llmProvider = .openAI
             sampleRate = 24000
             vadThreshold = 0.4
             llmModel = "gpt-4o-mini"
             temperature = 0.5
             maxTokens = 512
-            
+
         case .highQuality:
+            llmProvider = .openAI
             sampleRate = 48000
             vadThreshold = 0.6
             llmModel = "gpt-4o"
             temperature = 0.8
             maxTokens = 2048
-            
+
         case .costOptimized:
+            llmProvider = .openAI
             sampleRate = 16000
             vadThreshold = 0.5
             llmModel = "gpt-4o-mini"
             temperature = 0.5
             maxTokens = 512
+
+        case .selfHosted:
+            llmProvider = .selfHosted
+            sampleRate = 48000
+            vadThreshold = 0.5
+            llmModel = "qwen2.5:7b"
+            temperature = 0.7
+            maxTokens = 1024
         }
     }
 }

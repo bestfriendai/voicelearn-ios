@@ -24,7 +24,9 @@ public actor AudioEngine: ObservableObject {
     
     private let logger = Logger(label: "com.voicelearn.audio")
     private let engine = AVAudioEngine()
+    #if os(iOS)
     private let session = AVAudioSession.sharedInstance()
+    #endif
     private let playerNode = AVAudioPlayerNode()
 
     private var vadService: any VADService
@@ -104,7 +106,8 @@ public actor AudioEngine: ObservableObject {
             "vadProvider": .string(config.vadProvider.identifier)
         ])
         
-        // Configure audio session
+        // Configure audio session (iOS only)
+        #if os(iOS)
         do {
             try session.setCategory(
                 .playAndRecord,
@@ -117,6 +120,7 @@ public actor AudioEngine: ObservableObject {
         } catch {
             throw AudioEngineError.audioSessionConfigurationFailed(error.localizedDescription)
         }
+        #endif
         
         // Configure voice processing
         if config.enableVoiceProcessing {

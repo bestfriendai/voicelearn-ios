@@ -20,7 +20,7 @@ struct CurriculumView: View {
                         description: Text("Import a curriculum to get started.")
                     )
                 } else {
-                    ForEach(topics) { topic in
+                    ForEach(topics, id: \.id) { topic in
                         TopicRow(topic: topic)
                             .onTapGesture {
                                 startTopic(topic)

@@ -1,7 +1,7 @@
 # GLM-ASR On-Device Implementation - Work in Progress
 
-**Last Updated:** December 13, 2025
-**Status:** In Progress - Paused at Model Download
+**Last Updated:** December 16, 2025
+**Status:** Swift Integration Complete - Awaiting Xcode C++ Interop Configuration
 
 ---
 
@@ -11,210 +11,241 @@ This document tracks the implementation of GLM-ASR-Nano-2512 as an **on-device**
 
 ---
 
-## Current State Summary
+## Current State Summary (December 16)
 
-### What's Been Completed
+### Completed
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Python environment setup | ✅ Complete | Python 3.11 venv with torch, transformers, coremltools, huggingface_hub |
-| Model download started | 🔄 Partial | ~4.5GB downloaded, download stalled/interrupted |
-| Model architecture analysis | ✅ Complete | Understood hybrid Whisper encoder + LLaMA decoder architecture |
-| Build errors fixed | ✅ Complete | STTProviderRouter.swift and PatchPanelService.swift compile cleanly |
+| Task | Status | Output |
+|------|--------|--------|
+| Python environment setup | ✅ | `.venv/` with torch, transformers, coremltools |
+| Model download | ✅ | 4.21 GB `model.safetensors` |
+| Model loads in PyTorch | ✅ | 2.26B params on MPS (Apple Silicon) |
+| Patched for transformers 4.57 | ✅ | Changed `WhisperFlashAttention2` → `WhisperAttention` |
+| Whisper Encoder → CoreML | ✅ | `GLMASRWhisperEncoder.mlpackage` (1.2 GB, 635M params) |
+| Audio Adapter → CoreML | ✅ | `GLMASRAudioAdapter.mlpackage` (56 MB, 29.4M params) |
+| Embed+Head → CoreML | ✅ | `GLMASREmbedHead.mlpackage` (232 MB) |
+| LLM Decoder → GGUF | ✅ | `glm-asr-nano-f16.gguf` (3.0 GB) |
+| Quantized GGUF (Q4_K_M) | ✅ | `glm-asr-nano-q4km.gguf` (935 MB) |
+| llama.cpp built | ✅ | With Metal support for Apple Silicon |
+| GLMASROnDeviceSTTService.swift | ✅ | Service created with CoreML + llama.cpp pipeline |
+| STTProviderRouter updated | ✅ | On-device priority over server |
+| STTProvider enum updated | ✅ | Added `glmASROnDevice` case |
 
-### What's In Progress
+### Awaiting Configuration
 
 | Task | Status | Blocker |
 |------|--------|---------|
-| Download GLM-ASR-Nano model | 🔄 ~95% | Download stalled at 4.52GB, needs resume |
+| llama.cpp Swift integration | ⏸️ | Requires Xcode C++ interop (SWIFT_OBJC_INTEROP_MODE = objcxx) |
 
-### What's Remaining
+### Remaining
 
-| Task | Priority | Complexity |
-|------|----------|------------|
-| Complete model download | High | Low |
-| Convert model to CoreML format | High | High |
-| Create GLMASROnDeviceSTTService.swift | High | Medium |
-| Add `.ultra` device tier for iPhone 17 | Medium | Low |
-| Update STTProviderRouter to prefer on-device | Medium | Low |
-| Integrate CoreML model into Xcode project | Medium | Medium |
-| Test on MacBook M4 Max | Medium | Low |
-| Test on iPhone 17 Pro Max | High | Low |
+| Task | Priority | Notes |
+|------|----------|-------|
+| Configure Xcode C++ interop | High | Enable LLAMA_AVAILABLE flag in build settings |
+| Test end-to-end inference | High | Validate transcription quality |
+| Add `.ultra` device tier | Medium | iPhone 17 Pro/Max detection |
+| Implement mel spectrogram with vDSP | Medium | Current implementation is simplified |
 
 ---
 
-## Technical Details
-
-### Model Architecture (GLM-ASR-Nano-2512)
+## Models Created
 
 ```
-Audio Input (16kHz) → Whisper Encoder (32 layers) → MLP Adapter → LLaMA Decoder (28 layers) → Text
+models/glm-asr-nano/
+├── model.safetensors              (4.21 GB) - Original PyTorch weights
+├── GLMASRWhisperEncoder.mlpackage (1.2 GB)  - Audio → embeddings (CoreML)
+├── GLMASRAudioAdapter.mlpackage   (56 MB)   - Dimension adaptation (CoreML)
+├── GLMASREmbedHead.mlpackage      (232 MB)  - Token embed + output head (CoreML)
+├── GLMASRConvEncoder.mlpackage    (10 MB)   - Conv layers only (test)
+├── glm-asr-nano-f16.gguf          (3.0 GB)  - LLM decoder (F16 GGUF)
+├── glm-asr-nano-q4km.gguf         (935 MB)  - LLM decoder (Q4_K_M quantized)
+└── modeling_audio.py              (patched) - WhisperAttention fix
 ```
 
-**Key specifications:**
-- Parameters: 1.5B
-- Model size: ~4.5GB (FP16), target ~750MB (INT4)
-- Input: 128 mel bins, 16kHz audio
-- Architecture: `GlmasrModel` (custom, extends LlamaForCausalLM)
-- License: MIT (full commercial use)
-
-**Files in model directory:**
-- `config.json` - Model configuration
-- `modeling_glmasr.py` - Main model class
-- `modeling_audio.py` - Whisper encoder with RoPE
-- `configuration_glmasr.py` - Config class
-- `inference.py` - Inference helper
-- `tokenizer.json` - Tokenizer (6.5MB)
-- `model.safetensors` - Weights (~4.5GB) - INCOMPLETE
-
-### CoreML Conversion Strategy
-
-1. **Export to ONNX first** (intermediate format)
-   - Trace the model with sample audio input
-   - Handle dynamic shapes for streaming
-
-2. **Convert ONNX to CoreML**
-   - Use `coremltools.convert()`
-   - Apply INT4 quantization for size reduction
-
-3. **Considerations:**
-   - Model uses Flash Attention 2 - may need standard attention for CoreML
-   - RoPE (Rotary Position Embeddings) - verify CoreML support
-   - Streaming requires chunked processing
-
-### Files Modified During This Session
-
-1. **`VoiceLearn/Services/STT/STTProviderRouter.swift`**
-   - Added `@preconcurrency import AVFoundation` for Sendable compliance
-   - Added cached protocol properties (`_metrics`, `_costPerHour`, `_isStreaming`)
-   - Removed test-only MockHealthMonitor code
-   - Fixed actor isolation issues in async property access
-
-2. **`VoiceLearn/Core/Routing/PatchPanelService.swift`**
-   - Fixed actor isolation in logger autoclosure (line 79-80)
-
----
-
-## Environment Setup (Already Done)
-
-### Python Virtual Environment
-
-Location: `/Users/ramerman/dev/voicelearn-ios/.venv`
-
-```bash
-# Activate environment
-cd /Users/ramerman/dev/voicelearn-ios
-source .venv/bin/activate
-
-# Installed packages
-pip list | grep -E "torch|transformers|coremltools|huggingface"
-```
-
-### Model Download Location
+### Pipeline Architecture
 
 ```
-/Users/ramerman/dev/voicelearn-ios/models/glm-asr-nano/
-├── config.json              (3.0 KB)
-├── configuration_glmasr.py  (1.3 KB)
-├── inference.py             (5.7 KB)
-├── modeling_audio.py        (18 KB)
-├── modeling_glmasr.py       (5.6 KB)
-├── tokenizer.json           (6.5 MB)
-├── tokenizer_config.json    (3.7 KB)
-├── README.md                (2.0 KB)
-├── chat_template.jinja      (334 B)
-└── .cache/huggingface/download/
-    └── *.incomplete         (4.52 GB - STALLED)
+Audio (16kHz)
+    ↓
+[Mel Spectrogram] (128 x 3000)
+    ↓
+┌─────────────────────────────────────┐
+│ GLMASRWhisperEncoder.mlpackage      │  ← CoreML ✅
+│ (635M params, 1.2 GB)               │
+└─────────────────────────────────────┘
+    ↓ (1 x 1500 x 1280)
+┌─────────────────────────────────────┐
+│ GLMASRAudioAdapter.mlpackage        │  ← CoreML ✅
+│ (29M params, 56 MB)                 │
+└─────────────────────────────────────┘
+    ↓ (1 x 375 x 2048) + BOA/EOA tokens
+┌─────────────────────────────────────┐
+│ LLM Decoder (28 layers)             │  ← GGUF ✅ (llama.cpp)
+│ (1.47B params, 935 MB Q4_K_M)       │
+└─────────────────────────────────────┘
+    ↓
+┌─────────────────────────────────────┐
+│ GLMASREmbedHead.mlpackage           │  ← CoreML ✅
+│ (232 MB)                            │
+└─────────────────────────────────────┘
+    ↓
+Text tokens → Transcript
 ```
 
 ---
 
-## Next Steps (Resume Tomorrow)
+## LLM Decoder Conversion Options
 
-### Step 1: Complete Model Download
+The 1.5B parameter LLaMA-based decoder failed direct CoreML conversion due to:
+- Dynamic attention mask shapes
+- `torch.jit.trace` issues with transformer attention
 
-```bash
-cd /Users/ramerman/dev/voicelearn-ios
-source .venv/bin/activate
+### Alternative Approaches
 
-python3 -c "
-from huggingface_hub import hf_hub_download
-model_file = hf_hub_download(
-    repo_id='zai-org/GLM-ASR-Nano-2512',
-    filename='model.safetensors',
-    local_dir='./models/glm-asr-nano',
-    local_dir_use_symlinks=False,
-    resume_download=True
-)
-print(f'Downloaded: {model_file}')
-"
+1. **MLX (Apple's ML Framework)**
+   - Native Apple Silicon support
+   - Good for LLMs on Mac
+   - Installed: `mlx==0.30.0`, `mlx-lm==0.29.1`
+   - Challenge: Custom model architecture needs manual implementation
+
+2. **llama.cpp with GGUF**
+   - Convert to GGUF format
+   - Use llama.cpp for inference
+   - Well-tested with LLaMA architectures
+   - Challenge: Need to integrate C++ library into Swift
+
+3. **Split Transformer Layers**
+   - Convert each transformer block separately
+   - Chain them in Swift
+   - More complex but may work
+
+4. **Use Server Fallback for Decoder**
+   - Run encoder on-device (fast, Neural Engine)
+   - Send embeddings to server for decoding
+   - Hybrid approach - still reduces latency
+
+---
+
+## Technical Notes
+
+### Patched File: `modeling_audio.py`
+
+Changed line 7:
+```python
+# Before (incompatible with transformers 4.57):
+from transformers.models.whisper.modeling_whisper import WhisperEncoder, WhisperEncoderLayer, WhisperFlashAttention2
+
+# After:
+from transformers.models.whisper.modeling_whisper import WhisperEncoder, WhisperEncoderLayer, WhisperAttention
 ```
 
-### Step 2: Verify Model Loads
+And line 74:
+```python
+# Before:
+class WhisperRoPEFlashAttn(WhisperFlashAttention2):
+
+# After:
+class WhisperRoPEFlashAttn(WhisperAttention):
+```
+
+### Model Verification
 
 ```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
+# Model loads and runs on Apple Silicon MPS
 model = AutoModelForCausalLM.from_pretrained(
     './models/glm-asr-nano',
     trust_remote_code=True,
-    torch_dtype='float16'
+    torch_dtype=torch.float16,
+    device_map='mps'
 )
-print(f"Model loaded: {sum(p.numel() for p in model.parameters())/1e9:.2f}B params")
+# Output: 2.26B parameters loaded successfully
 ```
 
-### Step 3: CoreML Conversion
+---
 
-This is the complex part - will need to:
-1. Create a traced export wrapper
-2. Handle the audio input preprocessing
-3. Export encoder and decoder separately (recommended for streaming)
-4. Apply INT4 quantization
+## Environment
 
-### Step 4: Create Swift Service
+### Python Virtual Environment
 
-Create `VoiceLearn/Services/STT/GLMASROnDeviceSTTService.swift`:
-- Implement `STTService` protocol
-- Load CoreML model
-- Handle audio buffering and chunked inference
-- Return `AsyncStream<STTResult>`
+```bash
+cd /Users/ramerman/dev/voicelearn-ios
+source .venv/bin/activate
 
-### Step 5: Update Routing
+# Key packages:
+# torch==2.9.1
+# transformers==4.57.3
+# coremltools==9.0
+# mlx==0.30.0
+# accelerate, torchaudio, safetensors
+```
 
-Modify `STTProviderRouter.swift` to:
-- Check device tier
-- Prefer on-device for `.ultra` tier (iPhone 17 Pro/Max)
-- Fall back to server/Deepgram otherwise
+### Installed Tools
+
+- PyTorch 2.9.1 with MPS support
+- CoreML Tools 9.0
+- MLX 0.30.0 (Apple's ML framework)
+- ONNX + ONNX Runtime
 
 ---
 
-## Related Documentation
+## Next Steps
 
-- [GLM_ASR_NANO_2512.md](../GLM_ASR_NANO_2512.md) - Model overview and specs
-- [GLM_ASR_SERVER_TRD.md](../GLM_ASR_SERVER_TRD.md) - Server implementation (fallback)
-- [GLM_ASR_IMPLEMENTATION_PROGRESS.md](../GLM_ASR_IMPLEMENTATION_PROGRESS.md) - Previous progress tracking
+### Option A: Hybrid Approach (Recommended)
+1. Use CoreML for encoder + adapter (on-device, Neural Engine)
+2. Use server for decoder (existing GLMASRSTTService)
+3. Create hybrid service that combines both
 
----
+### Option B: Full On-Device with MLX
+1. Implement GLM-ASR model in MLX
+2. Load weights from safetensors
+3. Run entirely on Apple Silicon GPU
 
-## Questions/Decisions Pending
-
-1. **Streaming approach**: Should we use sliding window or full-utterance processing?
-2. **Quantization level**: INT4 (~750MB) vs INT8 (~1.5GB) - tradeoff accuracy vs size
-3. **Model bundling**: Include in app bundle or download on first launch?
-4. **Thermal management**: How aggressive should fallback to server be?
+### Option C: llama.cpp Integration
+1. Convert decoder to GGUF format
+2. Integrate llama.cpp via Swift/C++ bridge
+3. Chain with CoreML encoder
 
 ---
 
 ## Session Notes
 
 **December 13, 2025:**
-- Started fresh implementation of on-device GLM-ASR
-- Discovered existing implementation was server-first (backwards from intent)
-- Set up Python environment successfully
-- Model download started but stalled at ~95%
-- Analyzed model architecture - hybrid Whisper+LLaMA design
-- Fixed Swift 6 concurrency build errors
-- Paused for the night - will resume tomorrow
+- Started on-device implementation
+- Set up Python environment
+- Model download stalled at 95%
+
+**December 16, 2025 (Morning):**
+- Completed model download (4.21 GB)
+- Patched model for transformers 4.57 compatibility
+- Successfully converted Whisper encoder to CoreML (1.2 GB)
+- Successfully converted audio adapter to CoreML (56 MB)
+- Successfully converted embed+head to CoreML (232 MB)
+- LLM decoder CoreML conversion blocked - dynamic attention issues
+
+**December 16, 2025 (Afternoon):**
+- Converted LLM decoder to GGUF format (3.0 GB F16)
+- Quantized to Q4_K_M for iPhone (935 MB - 68% size reduction)
+- Built llama.cpp with Metal support
+- Created `GLMASROnDeviceSTTService.swift` with full pipeline
+- Updated `STTProviderRouter` to prioritize on-device inference
+- Added `glmASROnDevice` case to `STTProvider` enum
+- Swift package builds successfully
+- **Blocker**: llama.cpp Swift integration requires Xcode C++ interop configuration
+
+**Total On-Device Model Size:** ~2.2 GB
+- CoreML models: ~1.5 GB (encoder + adapter + embed/head)
+- GGUF decoder: ~935 MB (Q4_K_M quantized)
+
+---
+
+## Next Steps to Enable llama.cpp
+
+1. Open project in Xcode
+2. Go to Build Settings
+3. Set `SWIFT_OBJC_INTEROP_MODE = objcxx`
+4. Add `-DLLAMA_AVAILABLE` to Swift Compiler Custom Flags
+5. Uncomment llama.cpp dependency in Package.swift
+6. Build and test
 
 ---
 

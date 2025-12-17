@@ -6,11 +6,21 @@
 import SwiftUI
 import Combine
 
+#if os(macOS)
+import AppKit
+#endif
+
 /// Main session view for voice conversations
 public struct SessionView: View {
     @EnvironmentObject private var appState: AppState
     @StateObject private var viewModel = SessionViewModel()
-    
+
+    #if os(iOS)
+    private static let backgroundGradientColors: [Color] = [Color(.systemBackground), Color(.systemGray6)]
+    #else
+    private static let backgroundGradientColors: [Color] = [Color(NSColor.windowBackgroundColor), Color(NSColor.controlBackgroundColor)]
+    #endif
+
     public init() { }
     
     public var body: some View {
@@ -18,7 +28,7 @@ public struct SessionView: View {
             ZStack {
                 // Background gradient
                 LinearGradient(
-                    colors: [Color(.systemBackground), Color(.systemGray6)],
+                    colors: Self.backgroundGradientColors,
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -57,6 +67,7 @@ public struct SessionView: View {
                 .padding(.horizontal, 20)
             }
             .navigationTitle("Voice Session")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -66,7 +77,7 @@ public struct SessionView: View {
                         Image(systemName: "gear")
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarLeading) {
                     if viewModel.isSessionActive {
                         MetricsBadge(
@@ -76,6 +87,7 @@ public struct SessionView: View {
                     }
                 }
             }
+            #endif
             .sheet(isPresented: $viewModel.showSettings) {
                 SessionSettingsView()
             }
@@ -178,7 +190,11 @@ struct TranscriptBubble: View {
                 .padding(.vertical, 12)
                 .background {
                     RoundedRectangle(cornerRadius: 16)
+                        #if os(iOS)
                         .fill(isUser ? Color.blue : Color(.systemGray5))
+                        #else
+                        .fill(isUser ? Color.blue : Color(NSColor.controlBackgroundColor))
+                        #endif
                 }
                 .foregroundStyle(isUser ? .white : .primary)
             
@@ -396,7 +412,9 @@ struct SessionSettingsView: View {
                 }
             }
             .navigationTitle("Session Settings")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Reset") {

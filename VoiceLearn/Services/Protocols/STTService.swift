@@ -127,6 +127,7 @@ public enum STTProvider: String, Codable, Sendable, CaseIterable {
     case openAIWhisper = "OpenAI Whisper"
     case appleSpeech = "Apple Speech (On-Device)"
     case glmASRNano = "GLM-ASR-Nano (Self-Hosted)"
+    case glmASROnDevice = "GLM-ASR-Nano (On-Device)"
 
     /// Display name for UI
     public var displayName: String {
@@ -141,13 +142,14 @@ public enum STTProvider: String, Codable, Sendable, CaseIterable {
         case .openAIWhisper: return "whisper"
         case .appleSpeech: return "apple"
         case .glmASRNano: return "glm-asr"
+        case .glmASROnDevice: return "glm-asr-ondevice"
         }
     }
 
     /// Whether this provider requires network connectivity
     public var requiresNetwork: Bool {
         switch self {
-        case .appleSpeech:
+        case .appleSpeech, .glmASROnDevice:
             return false
         default:
             return true
@@ -162,12 +164,23 @@ public enum STTProvider: String, Codable, Sendable, CaseIterable {
         case .openAIWhisper: return Decimal(string: "0.36")!  // $0.006/min
         case .appleSpeech: return 0                           // Free (on-device)
         case .glmASRNano: return 0                            // Self-hosted
+        case .glmASROnDevice: return 0                        // On-device
         }
     }
 
     /// Whether this provider is self-hosted
     public var isSelfHosted: Bool {
         self == .glmASRNano
+    }
+
+    /// Whether this provider runs entirely on-device
+    public var isOnDevice: Bool {
+        switch self {
+        case .appleSpeech, .glmASROnDevice:
+            return true
+        default:
+            return false
+        }
     }
 }
 

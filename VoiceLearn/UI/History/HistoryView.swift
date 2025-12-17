@@ -5,6 +5,9 @@
 
 import SwiftUI
 import CoreData
+#if os(iOS)
+import UIKit
+#endif
 
 /// Session history view showing past conversations
 public struct HistoryView: View {
@@ -22,6 +25,7 @@ public struct HistoryView: View {
                 }
             }
             .navigationTitle("History")
+            #if os(iOS)
             .toolbar {
                 if !viewModel.sessions.isEmpty {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -38,6 +42,7 @@ public struct HistoryView: View {
                     }
                 }
             }
+            #endif
             .confirmationDialog(
                 "Clear History",
                 isPresented: $viewModel.showClearConfirmation,
@@ -50,17 +55,20 @@ public struct HistoryView: View {
             } message: {
                 Text("This will permanently delete all session history.")
             }
+            #if os(iOS)
             .sheet(isPresented: $viewModel.showExportSheet) {
                 if let url = viewModel.exportURL {
                     ShareSheet(items: [url])
                 }
             }
+            #endif
         }
     }
 }
 
 // MARK: - Share Sheet
 
+#if os(iOS)
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
 
@@ -70,6 +78,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+#endif
 
 // MARK: - Empty State
 
@@ -102,7 +111,9 @@ struct SessionListView: View {
                 }
             }
         }
+        #if os(iOS)
         .listStyle(.insetGrouped)
+        #endif
     }
     
     private var groupedSessions: [(Date, [SessionSummary])] {
@@ -190,6 +201,7 @@ struct SessionDetailView: View {
             .padding()
         }
         .navigationTitle("Session Details")
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -201,6 +213,7 @@ struct SessionDetailView: View {
                 }
             }
         }
+        #endif
     }
 }
 

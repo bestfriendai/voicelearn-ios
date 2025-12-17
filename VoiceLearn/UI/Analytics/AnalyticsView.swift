@@ -38,6 +38,7 @@ public struct AnalyticsView: View {
                 // Initial load
                 await viewModel.refresh(telemetry: appState.telemetry)
             }
+            #if os(iOS)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if let exportURL = viewModel.exportURL {
@@ -55,6 +56,7 @@ public struct AnalyticsView: View {
                     }
                 }
             }
+            #endif
         }
     }
 }

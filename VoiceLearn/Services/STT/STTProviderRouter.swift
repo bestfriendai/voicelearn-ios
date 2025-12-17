@@ -15,14 +15,19 @@ import Logging
 /// Routes STT requests to appropriate provider with automatic failover
 ///
 /// This router implements the STTService protocol and transparently
-/// routes requests to either GLM-ASR (primary) or Deepgram (fallback)
-/// based on health status.
+/// routes requests based on device capability and health status.
+///
+/// Priority order:
+/// 1. On-Device GLM-ASR (if device supports it and models loaded)
+/// 2. Server GLM-ASR (if healthy)
+/// 3. Deepgram (fallback)
 public actor STTProviderRouter: STTService {
 
     // MARK: - Properties
 
     private let logger = Logger(label: "com.voicelearn.stt.router")
 
+    private let onDeviceService: GLMASROnDeviceSTTService?
     private let glmASRService: any STTService
     private let deepgramService: any STTService
     private let healthMonitor: GLMASRHealthMonitor
@@ -30,6 +35,7 @@ public actor STTProviderRouter: STTService {
     private var activeProvider: any STTService
     private var healthStatus: GLMASRHealthMonitor.HealthStatus = .healthy
     private var healthMonitorTask: Task<Void, Never>?
+    private var onDeviceAvailable: Bool = false
 
     // MARK: - Cached Protocol Properties
     // These are cached to satisfy the non-async protocol requirements
@@ -40,7 +46,9 @@ public actor STTProviderRouter: STTService {
 
     /// Current provider identifier for debugging/telemetry
     public var currentProviderIdentifier: String {
-        if healthStatus == .unhealthy {
+        if onDeviceAvailable {
+            return "glm-asr-ondevice"
+        } else if healthStatus == .unhealthy {
             return "deepgram"
         }
         return "glm-asr"
@@ -74,24 +82,51 @@ public actor STTProviderRouter: STTService {
 
     /// Initialize STT provider router
     /// - Parameters:
-    ///   - glmASRService: Primary GLM-ASR service
+    ///   - onDeviceService: On-device GLM-ASR service (optional, for supported devices)
+    ///   - glmASRService: Server-based GLM-ASR service
     ///   - deepgramService: Fallback Deepgram service
-    ///   - healthMonitor: Health monitor for GLM-ASR
+    ///   - healthMonitor: Health monitor for server GLM-ASR
     public init(
+        onDeviceService: GLMASROnDeviceSTTService? = nil,
         glmASRService: any STTService,
         deepgramService: any STTService,
         healthMonitor: GLMASRHealthMonitor
     ) {
+        self.onDeviceService = onDeviceService
         self.glmASRService = glmASRService
         self.deepgramService = deepgramService
         self.healthMonitor = healthMonitor
-        self.activeProvider = glmASRService
 
-        logger.info("STTProviderRouter initialized")
+        // Default to on-device if available, otherwise server GLM-ASR
+        if let onDevice = onDeviceService, GLMASROnDeviceSTTService.isDeviceSupported {
+            self.activeProvider = onDevice
+            self.onDeviceAvailable = true
+        } else {
+            self.activeProvider = glmASRService
+        }
 
-        // Start health monitoring
+        logger.info("STTProviderRouter initialized (on-device: \(onDeviceService != nil))")
+
+        // Start health monitoring for server fallback
         Task {
             await self.startHealthMonitoring()
+            // Try to load on-device models in background
+            if let onDevice = onDeviceService {
+                await self.tryLoadOnDeviceModels(onDevice)
+            }
+        }
+    }
+
+    /// Attempt to load on-device models
+    private func tryLoadOnDeviceModels(_ service: GLMASROnDeviceSTTService) async {
+        do {
+            try await service.loadModels()
+            onDeviceAvailable = true
+            activeProvider = service
+            logger.info("On-device GLM-ASR models loaded successfully")
+        } catch {
+            logger.warning("Failed to load on-device models: \(error). Using server fallback.")
+            onDeviceAvailable = false
         }
     }
 
@@ -166,14 +201,34 @@ public actor STTProviderRouter: STTService {
     }
 
     private func selectProvider() -> any STTService {
+        // Priority 1: On-device if available and models loaded
+        if onDeviceAvailable, let onDevice = onDeviceService {
+            logger.debug("Selecting on-device GLM-ASR")
+            return onDevice
+        }
+
+        // Priority 2: Server GLM-ASR if healthy
         switch healthStatus {
         case .healthy, .degraded:
-            logger.debug("Selecting GLM-ASR (status: \(healthStatus))")
+            logger.debug("Selecting server GLM-ASR (status: \(healthStatus))")
             return glmASRService
         case .unhealthy:
             logger.debug("Selecting Deepgram (GLM-ASR unhealthy)")
             return deepgramService
         }
+    }
+
+    /// Force switch to server mode (e.g., for thermal throttling)
+    public func switchToServerMode() {
+        onDeviceAvailable = false
+        activeProvider = selectProvider()
+        logger.info("Switched to server mode")
+    }
+
+    /// Try to re-enable on-device mode
+    public func tryEnableOnDeviceMode() async {
+        guard let onDevice = onDeviceService else { return }
+        await tryLoadOnDeviceModels(onDevice)
     }
 }
 

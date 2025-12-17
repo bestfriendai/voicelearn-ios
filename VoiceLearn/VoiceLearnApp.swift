@@ -56,13 +56,62 @@ struct VoiceLearnApp: App {
     }
 }
 
+// MARK: - Launch Screen View
+
+/// Simple splash screen shown while app initializes
+struct LaunchScreenView: View {
+    var body: some View {
+        ZStack {
+            Color(.systemBackground)
+                .ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 80))
+                    .foregroundStyle(.blue)
+
+                Text("VoiceLearn")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .padding(.top, 10)
+
+                Text("Loading...")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
 /// Root content view with tab navigation
 struct ContentView: View {
     @EnvironmentObject private var appState: AppState
     @State private var debugTestResult: String = ""
     @State private var isTestingLLM: Bool = false
+    @State private var isLoading: Bool = true
 
     var body: some View {
+        ZStack {
+            if isLoading {
+                LaunchScreenView()
+            } else {
+                mainContent
+            }
+        }
+        .task {
+            // Give UI a moment to initialize and show splash
+            try? await Task.sleep(for: .milliseconds(500))
+            withAnimation(.easeOut(duration: 0.3)) {
+                isLoading = false
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
         TabView {
             // Debug LLM test view on first tab in DEBUG builds
             #if DEBUG

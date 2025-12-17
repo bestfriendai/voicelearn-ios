@@ -456,41 +456,110 @@ struct SessionSettingsView: View {
 
 @MainActor
 class SessionSettingsModel: ObservableObject {
+    private let defaults = UserDefaults.standard
+
     // Audio
-    @Published var sampleRate: Double = 48000
-    @Published var bufferSize: UInt32 = 1024
-    @Published var enableVoiceProcessing = true
-    @Published var enableEchoCancellation = true
-    @Published var enableNoiseSuppression = true
+    @Published var sampleRate: Double {
+        didSet { defaults.set(sampleRate, forKey: "sampleRate") }
+    }
+    @Published var bufferSize: UInt32 {
+        didSet { defaults.set(Int(bufferSize), forKey: "bufferSize") }
+    }
+    @Published var enableVoiceProcessing: Bool {
+        didSet { defaults.set(enableVoiceProcessing, forKey: "enableVoiceProcessing") }
+    }
+    @Published var enableEchoCancellation: Bool {
+        didSet { defaults.set(enableEchoCancellation, forKey: "enableEchoCancellation") }
+    }
+    @Published var enableNoiseSuppression: Bool {
+        didSet { defaults.set(enableNoiseSuppression, forKey: "enableNoiseSuppression") }
+    }
 
     // VAD
-    @Published var vadProvider: VADProvider = .silero
-    @Published var vadThreshold: Float = 0.5
-    @Published var enableBargeIn = true
-    @Published var bargeInThreshold: Float = 0.7
+    @Published var vadProvider: VADProvider {
+        didSet { defaults.set(vadProvider.rawValue, forKey: "vadProvider") }
+    }
+    @Published var vadThreshold: Float {
+        didSet { defaults.set(vadThreshold, forKey: "vadThreshold") }
+    }
+    @Published var enableBargeIn: Bool {
+        didSet { defaults.set(enableBargeIn, forKey: "enableBargeIn") }
+    }
+    @Published var bargeInThreshold: Float {
+        didSet { defaults.set(bargeInThreshold, forKey: "bargeInThreshold") }
+    }
 
     // TTS
-    @Published var ttsProvider: TTSProvider = .elevenLabsFlash
-    @Published var speakingRate: Float = 1.0
-    @Published var volume: Float = 1.0
+    @Published var ttsProvider: TTSProvider {
+        didSet { defaults.set(ttsProvider.rawValue, forKey: "ttsProvider") }
+    }
+    @Published var speakingRate: Float {
+        didSet { defaults.set(speakingRate, forKey: "speakingRate") }
+    }
+    @Published var volume: Float {
+        didSet { defaults.set(volume, forKey: "volume") }
+    }
 
     // LLM
-    @Published var llmProvider: LLMProvider = .anthropic {
+    @Published var llmProvider: LLMProvider {
         didSet {
+            defaults.set(llmProvider.rawValue, forKey: "llmProvider")
             // Update model when provider changes
             if !llmProvider.availableModels.contains(llmModel) {
                 llmModel = llmProvider.availableModels.first ?? ""
             }
         }
     }
-    @Published var llmModel: String = "claude-3-5-sonnet-20241022"
-    @Published var temperature: Float = 0.7
-    @Published var maxTokens: Int = 1024
+    @Published var llmModel: String {
+        didSet { defaults.set(llmModel, forKey: "llmModel") }
+    }
+    @Published var temperature: Float {
+        didSet { defaults.set(temperature, forKey: "temperature") }
+    }
+    @Published var maxTokens: Int {
+        didSet { defaults.set(maxTokens, forKey: "maxTokens") }
+    }
 
     // Session
-    @Published var enableCostTracking = true
-    @Published var autoSaveTranscript = true
-    @Published var maxDuration: TimeInterval = 5400
+    @Published var enableCostTracking: Bool {
+        didSet { defaults.set(enableCostTracking, forKey: "enableCostTracking") }
+    }
+    @Published var autoSaveTranscript: Bool {
+        didSet { defaults.set(autoSaveTranscript, forKey: "autoSaveTranscript") }
+    }
+    @Published var maxDuration: TimeInterval {
+        didSet { defaults.set(maxDuration, forKey: "maxDuration") }
+    }
+
+    init() {
+        // Load saved values or use defaults
+        self.sampleRate = defaults.object(forKey: "sampleRate") as? Double ?? 48000
+        self.bufferSize = UInt32(defaults.object(forKey: "bufferSize") as? Int ?? 1024)
+        self.enableVoiceProcessing = defaults.object(forKey: "enableVoiceProcessing") as? Bool ?? true
+        self.enableEchoCancellation = defaults.object(forKey: "enableEchoCancellation") as? Bool ?? true
+        self.enableNoiseSuppression = defaults.object(forKey: "enableNoiseSuppression") as? Bool ?? true
+
+        self.vadProvider = defaults.string(forKey: "vadProvider")
+            .flatMap { VADProvider(rawValue: $0) } ?? .silero
+        self.vadThreshold = defaults.object(forKey: "vadThreshold") as? Float ?? 0.5
+        self.enableBargeIn = defaults.object(forKey: "enableBargeIn") as? Bool ?? true
+        self.bargeInThreshold = defaults.object(forKey: "bargeInThreshold") as? Float ?? 0.7
+
+        self.ttsProvider = defaults.string(forKey: "ttsProvider")
+            .flatMap { TTSProvider(rawValue: $0) } ?? .appleTTS
+        self.speakingRate = defaults.object(forKey: "speakingRate") as? Float ?? 1.0
+        self.volume = defaults.object(forKey: "volume") as? Float ?? 1.0
+
+        self.llmProvider = defaults.string(forKey: "llmProvider")
+            .flatMap { LLMProvider(rawValue: $0) } ?? .localMLX
+        self.llmModel = defaults.string(forKey: "llmModel") ?? "ministral-3b (on-device)"
+        self.temperature = defaults.object(forKey: "temperature") as? Float ?? 0.7
+        self.maxTokens = defaults.object(forKey: "maxTokens") as? Int ?? 1024
+
+        self.enableCostTracking = defaults.object(forKey: "enableCostTracking") as? Bool ?? true
+        self.autoSaveTranscript = defaults.object(forKey: "autoSaveTranscript") as? Bool ?? true
+        self.maxDuration = defaults.object(forKey: "maxDuration") as? TimeInterval ?? 5400
+    }
 
     func resetToDefaults() {
         sampleRate = 48000
@@ -502,11 +571,11 @@ class SessionSettingsModel: ObservableObject {
         vadThreshold = 0.5
         enableBargeIn = true
         bargeInThreshold = 0.7
-        ttsProvider = .elevenLabsFlash
+        ttsProvider = .appleTTS
         speakingRate = 1.0
         volume = 1.0
-        llmProvider = .anthropic
-        llmModel = "claude-3-5-sonnet-20241022"
+        llmProvider = .localMLX
+        llmModel = "ministral-3b (on-device)"
         temperature = 0.7
         maxTokens = 1024
         enableCostTracking = true

@@ -131,6 +131,44 @@ VoiceLearn/
 - **Persistence**: Core Data
 - **Testing**: XCTest (no mocks, real implementations)
 
+## Curriculum System (VLCF)
+
+VoiceLearn includes a comprehensive curriculum format specification: the **VoiceLearn Curriculum Format (VLCF)**. This is a JSON-based standard designed specifically for conversational AI tutoring.
+
+### Key Features
+
+- **Voice-native**: Content optimized for text-to-speech delivery
+- **Standards-based**: Built on IEEE LOM, LRMI, SCORM, xAPI, QTI, and more
+- **Tutoring-first**: Stopping points, comprehension checks, misconception handling
+- **AI-enrichable**: Designed for automated content enhancement
+
+### Curriculum Documentation
+
+| Document | Description |
+|----------|-------------|
+| [curriculum/README.md](curriculum/README.md) | **START HERE** - Complete overview |
+| [curriculum/spec/VLCF_SPECIFICATION.md](curriculum/spec/VLCF_SPECIFICATION.md) | Human-readable specification |
+| [curriculum/spec/vlcf-schema.json](curriculum/spec/vlcf-schema.json) | JSON Schema (Draft 2020-12) |
+| [curriculum/spec/STANDARDS_TRACEABILITY.md](curriculum/spec/STANDARDS_TRACEABILITY.md) | Field-by-field standards mapping |
+
+### Import System
+
+VLCF includes a pluggable import architecture for converting external curriculum formats:
+
+| Importer | Source | Target Audience |
+|----------|--------|-----------------|
+| CK-12 | FlexBooks (EPUB) | K-12 education |
+| Fast.ai | Jupyter notebooks | Collegiate AI/ML |
+| AI Enrichment | Raw text | Any (sparse → rich) |
+
+See [curriculum/importers/](curriculum/importers/) for specifications.
+
+### Future Direction
+
+VLCF may be spun off as a standalone project to enable adoption by other tutoring systems. The specification is designed for academic review and potential standardization.
+
+---
+
 ## Project Vision
 
 ### Open Source Core

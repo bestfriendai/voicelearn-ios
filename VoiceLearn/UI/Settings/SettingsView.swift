@@ -477,7 +477,7 @@ class SettingsViewModel: ObservableObject {
     @Published var llmProvider: LLMProvider {
         didSet { UserDefaults.standard.set(llmProvider.rawValue, forKey: "llmProvider") }
     }
-    @AppStorage("llmModel") var llmModel = "gpt-4o"
+    @AppStorage("llmModel") var llmModel = "llama3.2:3b"
     @AppStorage("temperature") var temperature: Double = 0.7
     @AppStorage("maxTokens") var maxTokens = 1024
 

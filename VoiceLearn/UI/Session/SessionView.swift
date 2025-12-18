@@ -875,7 +875,21 @@ class SessionViewModel: ObservableObject {
             llmService = OpenAILLMService(apiKey: apiKey)
         case .selfHosted:
             // Use SelfHostedLLMService to connect to Ollama server
-            let llmModelSetting = UserDefaults.standard.string(forKey: "llmModel") ?? "llama3.2:3b"
+            var llmModelSetting = UserDefaults.standard.string(forKey: "llmModel") ?? "llama3.2:3b"
+
+            // If the model setting looks like an OpenAI model, use discovered models or fallback
+            let openAIModels = ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"]
+            if openAIModels.contains(llmModelSetting) {
+                // Get discovered models from server config
+                let discoveredModels = await ServerConfigManager.shared.getAllDiscoveredModels()
+                if !discoveredModels.isEmpty {
+                    llmModelSetting = discoveredModels.first!
+                    logger.info("Overriding OpenAI model with discovered server model: \(llmModelSetting)")
+                } else {
+                    llmModelSetting = "llama3.2:3b" // Safe fallback
+                    logger.warning("No discovered models, using fallback: \(llmModelSetting)")
+                }
+            }
 
             // Use configured server IP if available, otherwise fall back to localhost (simulator only)
             if selfHostedEnabled && !serverIP.isEmpty {

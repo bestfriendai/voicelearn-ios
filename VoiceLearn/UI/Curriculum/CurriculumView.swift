@@ -12,6 +12,9 @@ struct CurriculumView: View {
     @State private var curriculumName: String?
     @State private var isLoading = false
     @State private var selectedTopic: Topic?
+    @State private var showingImportOptions = false
+    @State private var importError: String?
+    @State private var showingError = false
 
     private static let logger = Logger(label: "com.voicelearn.curriculum.view")
 
@@ -24,11 +27,21 @@ struct CurriculumView: View {
         NavigationStack {
             List {
                 if topics.isEmpty && !isLoading {
-                    ContentUnavailableView(
-                        "No Curriculum Loaded",
-                        systemImage: "book.closed",
-                        description: Text("Import a curriculum to get started.")
-                    )
+                    VStack(spacing: 20) {
+                        ContentUnavailableView(
+                            "No Curriculum Loaded",
+                            systemImage: "book.closed",
+                            description: Text("Import a curriculum to get started.")
+                        )
+
+                        Button {
+                            showingImportOptions = true
+                        } label: {
+                            Label("Import Curriculum", systemImage: "square.and.arrow.down")
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .listRowBackground(Color.clear)
                 } else {
                     if let name = curriculumName {
                         Section {
@@ -56,6 +69,28 @@ struct CurriculumView: View {
                 }
             }
             .navigationTitle("Curriculum")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Button {
+                            showingImportOptions = true
+                        } label: {
+                            Label("Import Curriculum", systemImage: "square.and.arrow.down")
+                        }
+
+                        if !topics.isEmpty {
+                            Divider()
+                            Button(role: .destructive) {
+                                Task { await deleteCurriculum() }
+                            } label: {
+                                Label("Delete Curriculum", systemImage: "trash")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
             .onAppear {
                 Self.logger.info("CurriculumView onAppear")
             }
@@ -80,45 +115,57 @@ struct CurriculumView: View {
                         }
                 }
             }
+            .confirmationDialog("Import Curriculum", isPresented: $showingImportOptions) {
+                Button("Load Sample (PyTorch Fundamentals)") {
+                    Task { await loadSampleCurriculum() }
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Choose how to import a curriculum")
+            }
+            .alert("Import Error", isPresented: $showingError) {
+                Button("OK") { }
+            } message: {
+                Text(importError ?? "Unknown error")
+            }
         }
     }
 
+    @MainActor
+    private func loadSampleCurriculum() async {
+        isLoading = true
+        Self.logger.info("Loading sample curriculum")
+        do {
+            let seeder = SampleCurriculumSeeder()
+            try seeder.seedPyTorchCurriculum()
+            Self.logger.info("Sample curriculum seeded successfully")
+            await loadCurriculumAndTopics()
+        } catch {
+            Self.logger.error("Failed to seed curriculum: \(error)")
+            importError = error.localizedDescription
+            showingError = true
+            isLoading = false
+        }
+    }
+
+    private func deleteCurriculum() async {
+        do {
+            let seeder = SampleCurriculumSeeder()
+            try seeder.deleteSampleCurriculum()
+            topics = []
+            curriculumName = nil
+        } catch {
+            importError = error.localizedDescription
+            showingError = true
+        }
+    }
+
+    @MainActor
     private func loadCurriculumAndTopics() async {
         isLoading = true
         Self.logger.info("loadCurriculumAndTopics START")
 
-        // First, try to load first available curriculum from Core Data
-        await loadFirstCurriculum()
-
-        // Then load topics from the active curriculum
-        guard let engine = appState.curriculum else {
-            Self.logger.warning("No curriculum engine available")
-            await MainActor.run {
-                self.isLoading = false
-            }
-            return
-        }
-
-        let loadedTopics = await engine.getTopics()
-        let name = await engine.activeCurriculum?.name
-
-        await MainActor.run {
-            self.topics = loadedTopics
-            self.curriculumName = name
-            self.isLoading = false
-        }
-        Self.logger.info("loadCurriculumAndTopics COMPLETE - \(loadedTopics.count) topics")
-    }
-
-    @MainActor
-    private func loadFirstCurriculum() async {
-        guard let engine = appState.curriculum else { return }
-
-        // Check if we already have an active curriculum
-        let hasActive = await engine.activeCurriculum != nil
-        if hasActive { return }
-
-        // Load first available curriculum
+        // Load curriculum directly from Core Data (no engine required)
         let context = PersistenceController.shared.viewContext
         let request = Curriculum.fetchRequest()
         request.fetchLimit = 1
@@ -126,12 +173,32 @@ struct CurriculumView: View {
 
         do {
             let results = try context.fetch(request)
-            if let firstCurriculum = results.first, let id = firstCurriculum.id {
-                try await engine.loadCurriculum(id)
+            if let curriculum = results.first {
+                Self.logger.info("Found curriculum: \(curriculum.name ?? "unknown")")
+
+                // Get topics from the curriculum's relationship
+                var topicsList: [Topic] = []
+                if let orderedSet = curriculum.topics {
+                    topicsList = orderedSet.array as? [Topic] ?? []
+                }
+                let sortedTopics = topicsList.sorted { $0.orderIndex < $1.orderIndex }
+
+                self.topics = sortedTopics
+                self.curriculumName = curriculum.name
+                Self.logger.info("Loaded \(sortedTopics.count) topics")
+            } else {
+                Self.logger.info("No curriculum found in database")
+                self.topics = []
+                self.curriculumName = nil
             }
         } catch {
             Self.logger.error("Failed to load curriculum: \(error)")
+            self.topics = []
+            self.curriculumName = nil
         }
+
+        self.isLoading = false
+        Self.logger.info("loadCurriculumAndTopics COMPLETE")
     }
 }
 

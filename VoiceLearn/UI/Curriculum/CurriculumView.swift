@@ -6,6 +6,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 import CoreData
+import Logging
 
 struct CurriculumView: View {
     @EnvironmentObject var appState: AppState
@@ -19,8 +20,14 @@ struct CurriculumView: View {
     @State private var selectedTopic: Topic?
 
     private let curriculumSeeder = SampleCurriculumSeeder()
+    private static let logger = Logger(label: "com.voicelearn.curriculum.view")
+
+    init() {
+        Self.logger.info("CurriculumView init() called")
+    }
 
     var body: some View {
+        let _ = Self.logger.debug("CurriculumView body computed")
         NavigationStack {
             List {
                 if topics.isEmpty && !isLoading {
@@ -85,7 +92,9 @@ struct CurriculumView: View {
                 }
             }
             .task {
+                Self.logger.info(".task modifier STARTED")
                 await loadCurriculumAndTopics()
+                Self.logger.info(".task modifier COMPLETED")
             }
             .refreshable {
                 await loadCurriculumAndTopics()
@@ -162,11 +171,15 @@ struct CurriculumView: View {
     @MainActor
     private func loadCurriculumAndTopics() async {
         isLoading = true
-        print("DEBUG: loadCurriculumAndTopics called")
+        Self.logger.info("loadCurriculumAndTopics START")
 
         // Perform Core Data fetch on a background context to avoid blocking main thread
+        Self.logger.debug("About to create Task.detached")
         let result = await Task.detached(priority: .userInitiated) { () -> (name: String?, topicIDs: [NSManagedObjectID]) in
+            // Note: Can't use logger inside Task.detached easily, using print for now
+            print("DEBUG: Inside Task.detached (background)")
             let backgroundContext = PersistenceController.shared.newBackgroundContext()
+            print("DEBUG: Got background context")
 
             return await backgroundContext.perform {
                 do {
@@ -203,16 +216,20 @@ struct CurriculumView: View {
                 }
             }
         }.value
+        Self.logger.info("Task.detached completed")
 
         // Now fetch the actual Topic objects on the main context using the IDs
+        Self.logger.debug("About to fetch topics from viewContext, count: \(result.topicIDs.count)")
         let viewContext = PersistenceController.shared.viewContext
         let fetchedTopics: [Topic] = result.topicIDs.compactMap { objectID in
             try? viewContext.existingObject(with: objectID) as? Topic
         }
+        Self.logger.debug("Fetched \(fetchedTopics.count) topics from viewContext")
 
         self.topics = fetchedTopics
         self.curriculumName = result.name
         self.isLoading = false
+        Self.logger.info("loadCurriculumAndTopics COMPLETE")
         // Note: CurriculumEngine.loadCurriculum() is called when starting a session,
         // not when viewing the curriculum list (avoids actor isolation deadlock)
     }

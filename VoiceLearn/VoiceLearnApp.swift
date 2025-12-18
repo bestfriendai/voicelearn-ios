@@ -12,8 +12,33 @@ struct VoiceLearnApp: App {
     /// Application state container
     @StateObject private var appState = AppState()
 
+    /// Get the build date from the app bundle's executable
+    private static func getBuildDate() -> String {
+        guard let executablePath = Bundle.main.executablePath,
+              let attributes = try? FileManager.default.attributesOfItem(atPath: executablePath),
+              let modDate = attributes[.modificationDate] as? Date else {
+            return "unknown"
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter.string(from: modDate)
+    }
+
     /// Configure logging on app launch
     init() {
+        // Log app version immediately at startup for debugging
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+        let buildDate = Self.getBuildDate()
+        // Unique build ID - change this each time to verify new build is running
+        let buildID = "CURRICULUM_FIX_20251217_C"
+        print("=======================================================")
+        print("VoiceLearn App Starting")
+        print("Version: \(appVersion) (Build \(buildNumber))")
+        print("Build Date: \(buildDate)")
+        print("Build ID: \(buildID)")
+        print("=======================================================")
+
         // Configure remote logging server
         // For simulator: localhost works automatically
         // For device: set the IP of your Mac running log_server.py

@@ -274,6 +274,14 @@ public struct SettingsView: View {
                         Label("Provider Connectivity", systemImage: "network")
                     }
 
+                    #if DEBUG
+                    NavigationLink {
+                        DebugConversationTestView()
+                    } label: {
+                        Label("Conversation Test", systemImage: "text.bubble")
+                    }
+                    #endif
+
                     Toggle("Debug Mode", isOn: $viewModel.debugMode)
                     Toggle("Verbose Logging", isOn: $viewModel.verboseLogging)
 

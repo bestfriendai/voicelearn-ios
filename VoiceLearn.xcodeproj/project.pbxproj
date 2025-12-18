@@ -22,6 +22,7 @@
 		2049AFC61933FA56A87B1B16 /* LLMTaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3FB5E0280E27A09D5A38E04 /* LLMTaskType.swift */; };
 		258B8E396E2A216A916FEF7C /* AudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0FE012EAB2DF6CAB3A1F56B /* AudioEngine.swift */; };
 		28865C61A3BE75C3B0B2A4C1 /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C3ADA6BBB45F55E3A80A9B /* ServerSettingsView.swift */; };
+		297C76CDF47CC24210E07E63 /* DebugConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B44F033CD785EAF43C173FA /* DebugConversationViewModel.swift */; };
 		33FF23ECEC4817E42018C4F6 /* TranscriptEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D163A8B7A48C1652E19C6B6D /* TranscriptEntry+CoreDataClass.swift */; };
 		34AAE979FCBAF1B670CD49A2 /* OpenAIEmbeddingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FC2289A12508DE51EA8F66 /* OpenAIEmbeddingServiceTests.swift */; };
 		379A987FAA1EA545F12E6A90 /* AppleTTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA3D04DFB23B4F1E9FA82ED /* AppleTTSService.swift */; };
@@ -84,6 +85,7 @@
 		E5D418DA141E14B8F59D496F /* DeepgramTTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F47CEED72DFFD39384E43C /* DeepgramTTSService.swift */; };
 		E6002B3D9EDF1E4CDC6AF6F6 /* ElevenLabsTTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDECFDD641B04BF76BFF029D /* ElevenLabsTTSService.swift */; };
 		E7B357A2E6130D80AA78BF30 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49EDE072EDEE61B790BD8DD5 /* LaunchScreen.storyboard */; };
+		E8B4C42332732723F3C3DC26 /* DebugConversationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */; };
 		EA5172B75096ABB7DE2C0DF3 /* DocumentProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84372C34CDB567D72A2D878 /* DocumentProcessorTests.swift */; };
 		EAF380F5CA177133BA9446F8 /* APIProviderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43236963494E1BB36053A947 /* APIProviderDetailView.swift */; };
 		F0A24FCEEB540AE0010195C9 /* STTProviderRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3B47E47DB31A33003803B6 /* STTProviderRouterTests.swift */; };
@@ -144,6 +146,7 @@
 		6FFA7F1BC8578438E8C65E54 /* VoiceLearnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLearnTests.swift; sourceTree = "<group>"; };
 		71599E323CA773F8A514E7D3 /* CurriculumEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumEngineTests.swift; sourceTree = "<group>"; };
 		7246BE33512BCC042E23B833 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugConversationTestView.swift; sourceTree = "<group>"; };
 		792F0BB33A7D5172ED835540 /* AudioEngineConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineConfig.swift; sourceTree = "<group>"; };
 		796649153218922464580B05 /* ProgressTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTrackerTests.swift; sourceTree = "<group>"; };
 		7BC9A77AD90256DCFB70FA93 /* TopicProgress+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TopicProgress+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -153,6 +156,7 @@
 		870651B4721B440C51FF2B25 /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
 		8937651F15BB51C3D6444444 /* AudioEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineTests.swift; sourceTree = "<group>"; };
 		8998E9A5A77C8479C6840EC9 /* STTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = STTService.swift; sourceTree = "<group>"; };
+		8B44F033CD785EAF43C173FA /* DebugConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugConversationViewModel.swift; sourceTree = "<group>"; };
 		91E410B5773BC939BEA1C800 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9223C07C58411F6BB3AE7182 /* VoiceLearnTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = VoiceLearnTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9693B0FF6F177A8F54F08D6F /* GLMASRSTTServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMASRSTTServiceTests.swift; sourceTree = "<group>"; };
@@ -276,6 +280,15 @@
 				91E410B5773BC939BEA1C800 /* Info.plist */,
 			);
 			path = VoiceLearnTests;
+			sourceTree = "<group>";
+		};
+		370DB5B4C5777A345AEF93FF /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */,
+				8B44F033CD785EAF43C173FA /* DebugConversationViewModel.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		3DB245B9DBD67324DA4767C5 /* Protocols */ = {
@@ -484,6 +497,7 @@
 			children = (
 				7385AE00EA9EA85F92CFB18D /* Analytics */,
 				4BBA5D733888E35C447F26D9 /* Curriculum */,
+				370DB5B4C5777A345AEF93FF /* Debug */,
 				985282E3997BDD639437D900 /* History */,
 				8E3D00E03D15BE14A985A0A3 /* Session */,
 				449FBF1CB7FA22E89F4A6EBA /* Settings */,
@@ -715,6 +729,8 @@
 				C75E49C4ACFF9A7A2BD87413 /* CurriculumEngine.swift in Sources */,
 				01E12BE332E2E3ED3B56C918 /* CurriculumModels.swift in Sources */,
 				51597A37F8C2CF4DF8F8D9AB /* CurriculumView.swift in Sources */,
+				E8B4C42332732723F3C3DC26 /* DebugConversationTestView.swift in Sources */,
+				297C76CDF47CC24210E07E63 /* DebugConversationViewModel.swift in Sources */,
 				41B2ED1A4802336BD4E0DEB8 /* DeepgramSTTService.swift in Sources */,
 				E5D418DA141E14B8F59D496F /* DeepgramTTSService.swift in Sources */,
 				96DED764A3FBFAD05D0BD1BE /* Document+CoreDataClass.swift in Sources */,

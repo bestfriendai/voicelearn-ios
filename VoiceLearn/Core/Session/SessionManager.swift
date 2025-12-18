@@ -508,8 +508,31 @@ public final class SessionManager: ObservableObject {
         }
     }
     
+    // MARK: - Debug Injection
+
+    #if DEBUG
+    /// Debug: Inject text as if user spoke it (bypasses STT)
+    /// Use this for testing AI responses without voice input
+    public func injectUserUtterance(_ text: String) async {
+        guard state.isActive else {
+            logger.warning("Cannot inject utterance - session not active")
+            return
+        }
+
+        logger.info("[DEBUG] Injecting utterance: \(text.prefix(50))...")
+
+        // Update transcript display
+        await MainActor.run {
+            self.userTranscript = text
+        }
+
+        // Process through normal pipeline
+        await processUserUtterance(text)
+    }
+    #endif
+
     // MARK: - Utterance Processing
-    
+
     private func processUserUtterance(_ transcript: String) async {
         logger.info("Processing user utterance: \(transcript.prefix(50))...")
         

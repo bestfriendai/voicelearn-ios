@@ -72,25 +72,77 @@ public struct SettingsView: View {
                     Toggle("Enable Interruptions", isOn: $viewModel.enableBargeIn)
                 }
 
-                // Self-Hosted Servers Section
+                // Self-Hosted Server Section
                 Section {
-                    NavigationLink {
-                        ServerSettingsView()
-                    } label: {
+                    Toggle("Enable Self-Hosted Server", isOn: $viewModel.selfHostedEnabled)
+
+                    if viewModel.selfHostedEnabled {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Server IP or Hostname")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            TextField("e.g., 192.168.1.100 or macbook.local", text: $viewModel.primaryServerIP)
+                                .textFieldStyle(.roundedBorder)
+                                .autocorrectionDisabled()
+                                #if os(iOS)
+                                .textInputAutocapitalization(.never)
+                                .keyboardType(.URL)
+                                #endif
+                        }
+
                         HStack {
-                            Label("Self-Hosted Servers", systemImage: "server.rack")
+                            Text("Connection")
                             Spacer()
-                            if viewModel.selfHostedServerCount > 0 {
-                                Text("\(viewModel.healthySelfHostedCount)/\(viewModel.selfHostedServerCount)")
+                            Circle()
+                                .fill(viewModel.serverConnectionStatus.color)
+                                .frame(width: 10, height: 10)
+                            Text(viewModel.serverConnectionStatus.label)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if viewModel.serverConnectionStatus == .connected && !viewModel.serverCapabilitiesSummary.isEmpty {
+                            HStack {
+                                Text("Capabilities")
+                                Spacer()
+                                Text(viewModel.serverCapabilitiesSummary)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.green)
+                            }
+                        }
+
+                        Button {
+                            Task { await viewModel.checkServerConnection() }
+                        } label: {
+                            HStack {
+                                Image(systemName: "arrow.clockwise")
+                                Text("Refresh Connection")
+                            }
+                        }
+                        .disabled(viewModel.primaryServerIP.isEmpty)
+
+                        NavigationLink {
+                            ServerSettingsView()
+                        } label: {
+                            HStack {
+                                Label("Advanced Server Config", systemImage: "server.rack")
+                                Spacer()
+                                if viewModel.selfHostedServerCount > 0 {
+                                    Text("\(viewModel.healthySelfHostedCount)/\(viewModel.selfHostedServerCount)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
                 } header: {
-                    Text("Self-Hosted")
+                    Text("Self-Hosted Server")
                 } footer: {
-                    Text("Configure local servers for zero-cost AI inference.")
+                    if viewModel.selfHostedEnabled {
+                        Text("This IP will be used for LLM, TTS, and optionally logging.")
+                    } else {
+                        Text("Enable to use your Mac as an AI server for zero-cost inference.")
+                    }
                 }
 
                 // STT Settings Section
@@ -215,20 +267,35 @@ public struct SettingsView: View {
                     Toggle("Verbose Logging", isOn: $viewModel.verboseLogging)
 
                     // Remote logging configuration
-                    VStack(alignment: .leading) {
-                        Text("Remote Log Server IP")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        TextField("e.g., 192.168.1.100", text: $viewModel.logServerIP)
-                            .textFieldStyle(.roundedBorder)
-                            .autocorrectionDisabled()
-                            #if os(iOS)
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.numbersAndPunctuation)
-                            #endif
-                    }
-
                     Toggle("Remote Logging", isOn: $viewModel.remoteLoggingEnabled)
+
+                    if viewModel.remoteLoggingEnabled {
+                        Toggle("Use Same IP as Server", isOn: $viewModel.logServerUsesSameIP)
+                            .disabled(!viewModel.selfHostedEnabled || viewModel.primaryServerIP.isEmpty)
+
+                        if !viewModel.logServerUsesSameIP || !viewModel.selfHostedEnabled {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Log Server IP")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                TextField("e.g., 192.168.1.100", text: $viewModel.logServerIP)
+                                    .textFieldStyle(.roundedBorder)
+                                    .autocorrectionDisabled()
+                                    #if os(iOS)
+                                    .textInputAutocapitalization(.never)
+                                    .keyboardType(.numbersAndPunctuation)
+                                    #endif
+                            }
+                        } else {
+                            HStack {
+                                Text("Log Server")
+                                Spacer()
+                                Text(viewModel.effectiveLogServerIP)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
 
                     Button("Load Sample Curriculum") {
                         Task { await viewModel.loadSampleCurriculum() }
@@ -417,9 +484,16 @@ class SettingsViewModel: ObservableObject {
     // Self-hosted servers
     @Published var selfHostedServerCount = 0
     @Published var healthySelfHostedCount = 0
+    @AppStorage("selfHostedEnabled") var selfHostedEnabled: Bool = false
+    @AppStorage("primaryServerIP") var primaryServerIP: String = ""
+    @Published var serverConnectionStatus: ServerConnectionStatus = .notConfigured
+    @Published var discoveredModels: [String] = []
+    @Published var discoveredVoices: [String] = []
+    @Published var serverCapabilitiesSummary: String = ""
 
     // Remote Logging
     @AppStorage("logServerIP") var logServerIP: String = ""
+    @AppStorage("logServerUsesSameIP") var logServerUsesSameIP: Bool = true
     @Published var remoteLoggingEnabled: Bool = true {
         didSet {
             if remoteLoggingEnabled {
@@ -427,7 +501,16 @@ class SettingsViewModel: ObservableObject {
             } else {
                 RemoteLogging.disable()
             }
+            updateLogServerConfiguration()
         }
+    }
+
+    /// The effective log server IP (uses primary server IP if sharing is enabled)
+    var effectiveLogServerIP: String {
+        if logServerUsesSameIP && selfHostedEnabled && !primaryServerIP.isEmpty {
+            return primaryServerIP
+        }
+        return logServerIP
     }
 
     private let curriculumSeeder = SampleCurriculumSeeder()
@@ -470,7 +553,11 @@ class SettingsViewModel: ObservableObject {
         case .anthropic:
             return ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"]
         case .selfHosted:
-            return ["qwen2.5:7b", "qwen2.5:3b", "llama3.2:3b", "llama3.2:1b", "mistral:7b"]
+            // Use discovered models if available, otherwise fall back to defaults
+            if !discoveredModels.isEmpty {
+                return discoveredModels
+            }
+            return ["qwen2.5:32b", "qwen2.5:7b", "llama3.2:3b", "mistral:7b"]
         case .localMLX:
             return ["ministral-3b (on-device)"]
         }
@@ -521,6 +608,60 @@ class SettingsViewModel: ObservableObject {
             await checkSampleCurriculum()
         } catch {
             print("Failed to delete sample curriculum: \(error)")
+        }
+    }
+
+    /// Update the remote logging configuration with the effective IP
+    private func updateLogServerConfiguration() {
+        let ip = effectiveLogServerIP
+        if remoteLoggingEnabled && !ip.isEmpty {
+            RemoteLogging.configure(serverIP: ip)
+        }
+    }
+
+    /// Check server connection when IP changes
+    func checkServerConnection() async {
+        guard selfHostedEnabled, !primaryServerIP.isEmpty else {
+            serverConnectionStatus = .notConfigured
+            discoveredModels = []
+            discoveredVoices = []
+            serverCapabilitiesSummary = ""
+            return
+        }
+
+        serverConnectionStatus = .checking
+
+        // Try Ollama health check first (port 11434)
+        guard let url = URL(string: "http://\(primaryServerIP):11434/api/version") else {
+            serverConnectionStatus = .failed
+            return
+        }
+
+        do {
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 5
+
+            let (_, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse,
+               httpResponse.statusCode == 200 {
+                serverConnectionStatus = .connected
+
+                // Discover capabilities
+                let capabilities = await ServerConfigManager.shared.discoverCapabilities(host: primaryServerIP)
+                discoveredModels = capabilities.llmModels
+                discoveredVoices = capabilities.ttsVoices
+                serverCapabilitiesSummary = capabilities.summary
+
+                // Auto-select first discovered model if current model not in list
+                if !discoveredModels.isEmpty && !discoveredModels.contains(llmModel) {
+                    llmModel = discoveredModels[0]
+                }
+            } else {
+                serverConnectionStatus = .failed
+            }
+        } catch {
+            serverConnectionStatus = .failed
         }
     }
 
@@ -575,6 +716,33 @@ class SettingsViewModel: ObservableObject {
 
 extension APIKeyManager.KeyType: Identifiable {
     public var id: String { rawValue }
+}
+
+// MARK: - Server Connection Status
+
+enum ServerConnectionStatus {
+    case notConfigured
+    case checking
+    case connected
+    case failed
+
+    var color: Color {
+        switch self {
+        case .notConfigured: return .secondary
+        case .checking: return .orange
+        case .connected: return .green
+        case .failed: return .red
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .notConfigured: return "Not configured"
+        case .checking: return "Checking..."
+        case .connected: return "Connected"
+        case .failed: return "Failed"
+        }
+    }
 }
 
 // MARK: - Diagnostics View

@@ -206,10 +206,12 @@ public actor SelfHostedLLMService: LLMService {
                                    let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                                    let choices = json["choices"] as? [[String: Any]],
                                    let firstChoice = choices.first,
-                                   let delta = firstChoice["delta"] as? [String: Any],
-                                   let content = delta["content"] as? String {
+                                   let delta = firstChoice["delta"] as? [String: Any] {
 
-                                    if isFirst {
+                                    // Content may be nil for role-only deltas
+                                    let content = delta["content"] as? String ?? ""
+
+                                    if isFirst && !content.isEmpty {
                                         let ttft = Date().timeIntervalSince(startTime)
                                         self.ttftValues.append(ttft)
                                         self.logger.debug("TTFT: \(String(format: "%.3f", ttft))s")

@@ -20,6 +20,8 @@ public struct ServerConfig: Codable, Identifiable, Sendable {
     public var healthStatus: ServerHealthStatus
     public var serverType: ServerType
     public var discoveredServices: [DiscoveredService]
+    public var discoveredModels: [String]
+    public var discoveredVoices: [String]
 
     public init(
         id: UUID = UUID(),
@@ -30,7 +32,9 @@ public struct ServerConfig: Codable, Identifiable, Sendable {
         lastHealthCheck: Date? = nil,
         healthStatus: ServerHealthStatus = .unknown,
         serverType: ServerType = .voicelearnGateway,
-        discoveredServices: [DiscoveredService] = []
+        discoveredServices: [DiscoveredService] = [],
+        discoveredModels: [String] = [],
+        discoveredVoices: [String] = []
     ) {
         self.id = id
         self.name = name
@@ -41,6 +45,8 @@ public struct ServerConfig: Codable, Identifiable, Sendable {
         self.healthStatus = healthStatus
         self.serverType = serverType
         self.discoveredServices = discoveredServices
+        self.discoveredModels = discoveredModels
+        self.discoveredVoices = discoveredVoices
     }
 
     /// Full URL to the server
@@ -495,6 +501,102 @@ public actor ServerConfigManager {
         }
     }
 
+    // MARK: - Capability Discovery
+
+    /// Discover available models on an Ollama server
+    public func discoverOllamaModels(host: String, port: Int = 11434) async -> [String] {
+        guard let url = URL(string: "http://\(host):\(port)/api/tags") else {
+            return []
+        }
+
+        do {
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 5
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                return []
+            }
+
+            // Parse Ollama /api/tags response: { "models": [{ "name": "qwen2.5:32b", ... }] }
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let models = json["models"] as? [[String: Any]] {
+                return models.compactMap { $0["name"] as? String }
+            }
+        } catch {
+            logger.debug("Failed to discover Ollama models: \(error.localizedDescription)")
+        }
+
+        return []
+    }
+
+    /// Discover available voices on a Piper TTS server
+    public func discoverPiperVoices(host: String, port: Int = 11402) async -> [String] {
+        guard let url = URL(string: "http://\(host):\(port)/voices") else {
+            return []
+        }
+
+        do {
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 5
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                return []
+            }
+
+            // Parse Piper /voices response: { "voices": [{ "id": "nova", "name": "Nova" }] }
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let voices = json["voices"] as? [[String: Any]] {
+                return voices.compactMap { $0["id"] as? String }
+            }
+        } catch {
+            logger.debug("Failed to discover Piper voices: \(error.localizedDescription)")
+        }
+
+        return []
+    }
+
+    /// Full capability discovery for a given host (checks all known services)
+    public func discoverCapabilities(host: String) async -> ServerCapabilities {
+        async let ollamaModels = discoverOllamaModels(host: host, port: 11434)
+        async let piperVoices = discoverPiperVoices(host: host, port: 11402)
+
+        let models = await ollamaModels
+        let voices = await piperVoices
+
+        logger.info("Discovered capabilities on \(host): \(models.count) models, \(voices.count) voices")
+
+        return ServerCapabilities(
+            llmModels: models,
+            ttsVoices: voices,
+            hasOllama: !models.isEmpty,
+            hasPiperTTS: !voices.isEmpty
+        )
+    }
+
+    /// Get all discovered LLM models across all healthy servers
+    public func getAllDiscoveredModels() -> [String] {
+        var models = Set<String>()
+        for server in servers.values where server.healthStatus.isUsable {
+            models.formUnion(server.discoveredModels)
+        }
+        return Array(models).sorted()
+    }
+
+    /// Get all discovered TTS voices across all healthy servers
+    public func getAllDiscoveredVoices() -> [String] {
+        var voices = Set<String>()
+        for server in servers.values where server.healthStatus.isUsable {
+            voices.formUnion(server.discoveredVoices)
+        }
+        return Array(voices).sorted()
+    }
+
     // MARK: - Persistence
 
     /// Save configurations to UserDefaults
@@ -603,6 +705,31 @@ public actor ServerConfigManager {
     /// Check if any self-hosted server is available
     public var hasAvailableServer: Bool {
         !getHealthyLLMServers().isEmpty
+    }
+}
+
+// MARK: - Server Capabilities
+
+/// Discovered capabilities from a server
+public struct ServerCapabilities: Sendable {
+    public let llmModels: [String]
+    public let ttsVoices: [String]
+    public let hasOllama: Bool
+    public let hasPiperTTS: Bool
+
+    public var isEmpty: Bool {
+        llmModels.isEmpty && ttsVoices.isEmpty
+    }
+
+    public var summary: String {
+        var parts: [String] = []
+        if hasOllama {
+            parts.append("\(llmModels.count) LLM model(s)")
+        }
+        if hasPiperTTS {
+            parts.append("\(ttsVoices.count) TTS voice(s)")
+        }
+        return parts.isEmpty ? "No services found" : parts.joined(separator: ", ")
     }
 }
 

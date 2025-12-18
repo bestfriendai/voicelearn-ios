@@ -122,7 +122,7 @@ struct ContentView: View {
                 if isTestingLLM {
                     ProgressView("Testing LLM...")
                 } else {
-                    Button("Test On-Device LLM") {
+                    Button("Test LLM") {
                         Task {
                             await testOnDeviceLLM()
                         }
@@ -183,14 +183,17 @@ struct ContentView: View {
         isTestingLLM = true
         debugTestResult = "Testing LLM...\n"
 
-        let llmService = OnDeviceLLMService()
+        // Use SelfHostedLLMService to connect to local Ollama server for testing
+        let llmService = SelfHostedLLMService.ollama(model: "qwen2.5:32b")
 
         let messages = [
             LLMMessage(role: .system, content: "You are a helpful assistant. Be brief."),
             LLMMessage(role: .user, content: "Hello! Say hi in one sentence.")
         ]
 
-        let config = LLMConfig.default
+        // Use a config with empty model to let the service use its configured model
+        var config = LLMConfig.default
+        config.model = ""  // Let SelfHostedLLMService use its configured model (llama3.2:3b)
 
         do {
             debugTestResult += "[DEBUG] Calling streamCompletion...\n"
@@ -322,13 +325,9 @@ public class AppState: ObservableObject {
         await patchPanel.setEndpointStatus("llama-70b-server", status: .unavailable)
         await patchPanel.setEndpointStatus("llama-8b-server", status: .unavailable)
 
-        // Check if on-device LLM models are available
-        let hasOnDeviceLLM = OnDeviceLLMService.areModelsAvailable
-        if hasOnDeviceLLM {
-            await patchPanel.setEndpointStatus("llama-3b-device", status: .available)
-        } else {
-            await patchPanel.setEndpointStatus("llama-3b-device", status: .unavailable)
-        }
+        // On-device LLM currently unavailable (API incompatible), mark as unavailable
+        // Using SelfHostedLLMService (Ollama) instead
+        await patchPanel.setEndpointStatus("llama-3b-device", status: .unavailable)
         // 1B model not currently bundled
         await patchPanel.setEndpointStatus("llama-1b-device", status: .unavailable)
     }

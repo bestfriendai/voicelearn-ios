@@ -6,6 +6,7 @@
 import Foundation
 @preconcurrency import AVFoundation
 import Combine
+import CoreData
 import Logging
 
 // MARK: - Session State
@@ -128,6 +129,7 @@ public final class SessionManager: ObservableObject {
     private var llmService: (any LLMService)?
     private var telemetry: TelemetryEngine
     private var curriculum: CurriculumEngine?
+    private var persistenceController: PersistenceController
     
     /// Configuration
     private var config: SessionConfig
@@ -153,11 +155,13 @@ public final class SessionManager: ObservableObject {
     public init(
         config: SessionConfig = .default,
         telemetry: TelemetryEngine,
-        curriculum: CurriculumEngine? = nil
+        curriculum: CurriculumEngine? = nil,
+        persistenceController: PersistenceController = .shared
     ) {
         self.config = config
         self.telemetry = telemetry
         self.curriculum = curriculum
+        self.persistenceController = persistenceController
         logger.info("SessionManager initialized")
     }
     
@@ -241,6 +245,9 @@ public final class SessionManager: ObservableObject {
         // End telemetry
         await telemetry.endSession()
 
+        // Persist session to Core Data before clearing state
+        await persistSessionToStorage()
+
         // Clear state
         conversationHistory.removeAll()
         silenceStartTime = nil
@@ -255,6 +262,77 @@ public final class SessionManager: ObservableObject {
         await setState(.idle)
 
         logger.info("Session stopped")
+    }
+
+    // MARK: - Session Persistence
+
+    /// Persist the current session to Core Data storage
+    private func persistSessionToStorage() async {
+        guard let startTime = sessionStartTime else {
+            logger.warning("No session start time, cannot persist session")
+            return
+        }
+
+        // Only persist if there's actual conversation content (more than just system prompt)
+        let hasContent = conversationHistory.count > 1
+        guard hasContent else {
+            logger.info("No conversation content to persist")
+            return
+        }
+
+        let endTime = Date()
+        let duration = endTime.timeIntervalSince(startTime)
+
+        // Create a copy of conversation history for the background task
+        let historySnapshot = conversationHistory
+        let configSnapshot = config
+
+        logger.info("Persisting session with \(historySnapshot.count) messages, duration: \(duration)s")
+
+        do {
+            let context = persistenceController.viewContext
+
+            // Create Session entity
+            let session = Session(context: context)
+            session.id = UUID()
+            session.startTime = startTime
+            session.endTime = endTime
+            session.duration = duration
+
+            // Encode config to Data
+            if let configData = try? JSONEncoder().encode(configSnapshot) {
+                session.config = configData
+            }
+
+            // Create TranscriptEntry entities for each message
+            var transcriptEntries: [TranscriptEntry] = []
+            for (index, message) in historySnapshot.enumerated() {
+                // Skip system prompts in transcript
+                if message.role == .system {
+                    continue
+                }
+
+                let entry = TranscriptEntry(context: context)
+                entry.id = UUID()
+                entry.content = message.content
+                entry.role = message.role.rawValue
+                // Estimate timestamp based on order (we don't track exact message times)
+                entry.timestamp = startTime.addingTimeInterval(Double(index) * 5.0)
+                entry.session = session
+                transcriptEntries.append(entry)
+            }
+
+            // Set the transcript relationship
+            session.transcript = NSOrderedSet(array: transcriptEntries)
+
+            // Save to Core Data
+            try persistenceController.save()
+
+            logger.info("Session persisted successfully with \(transcriptEntries.count) transcript entries")
+
+        } catch {
+            logger.error("Failed to persist session: \(error.localizedDescription)")
+        }
     }
     
     // MARK: - State Management

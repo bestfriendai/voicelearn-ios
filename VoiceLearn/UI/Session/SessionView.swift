@@ -613,14 +613,17 @@ class SessionViewModel: ObservableObject {
 
         debugTestResult = "Testing LLM..."
 
-        let llmService = OnDeviceLLMService()
+        // Use SelfHostedLLMService to connect to local Ollama server for testing
+        let llmService = SelfHostedLLMService.ollama(model: "llama3.2:3b")
 
         let messages = [
             LLMMessage(role: .system, content: "You are a helpful assistant. Be brief."),
             LLMMessage(role: .user, content: "Hello! Say hi in one sentence.")
         ]
 
-        let config = LLMConfig.default
+        // Use a config with empty model to let the service use its configured model
+        var config = LLMConfig.default
+        config.model = ""  // Let SelfHostedLLMService use its configured model (llama3.2:3b)
 
         do {
             print("[DEBUG] Calling streamCompletion...")
@@ -741,17 +744,10 @@ class SessionViewModel: ObservableObject {
         logger.info("LLM provider setting: \(llmProviderSetting.rawValue)")
         switch llmProviderSetting {
         case .localMLX:
-            let modelsAvailable = OnDeviceLLMService.areModelsAvailable
-            logger.info("OnDeviceLLMService.areModelsAvailable: \(modelsAvailable)")
-            if modelsAvailable {
-                logger.info("Using OnDeviceLLMService")
-                llmService = OnDeviceLLMService()
-            } else {
-                // Fall back to MockLLMService when on-device models aren't available
-                // This enables testing without requiring large model files
-                logger.warning("On-device LLM not available, using MockLLMService for testing")
-                llmService = MockLLMService()
-            }
+            // On-device LLM not currently available (API incompatible), fall back to self-hosted
+            logger.info("localMLX selected - falling back to SelfHostedLLMService (Ollama)")
+            let llmModelSetting = UserDefaults.standard.string(forKey: "llmModel") ?? "llama3.2:3b"
+            llmService = SelfHostedLLMService.ollama(model: llmModelSetting)
         case .anthropic:
             guard let apiKey = await appState.apiKeys.getKey(.anthropic) else {
                 errorMessage = "Anthropic API key not configured. Please add it in Settings or switch to on-device mode."
@@ -767,9 +763,11 @@ class SessionViewModel: ObservableObject {
             }
             llmService = OpenAILLMService(apiKey: apiKey)
         case .selfHosted:
-            // Self-hosted LLM not yet implemented, fall back to mock
-            logger.warning("Self-hosted LLM not yet implemented, using MockLLMService")
-            llmService = MockLLMService()
+            // Use SelfHostedLLMService to connect to local Ollama server
+            let llmModelSetting = UserDefaults.standard.string(forKey: "llmModel") ?? "llama3.2:3b"
+            logger.info("Using SelfHostedLLMService with model: \(llmModelSetting)")
+            // For simulator, use localhost; for device, you'd configure the server IP
+            llmService = SelfHostedLLMService.ollama(model: llmModelSetting)
         }
 
         do {

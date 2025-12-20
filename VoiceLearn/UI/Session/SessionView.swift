@@ -183,6 +183,26 @@ struct TranscriptView: View {
     let userTranscript: String
     let aiResponse: String
 
+    /// Check if user transcript is already in history (to avoid duplication)
+    private var isUserTranscriptInHistory: Bool {
+        guard !userTranscript.isEmpty else { return false }
+        // Check if the last user message in history matches current transcript
+        if let lastUserMessage = conversationHistory.last(where: { $0.isUser }) {
+            return lastUserMessage.text == userTranscript
+        }
+        return false
+    }
+
+    /// Check if AI response is already in history (to avoid duplication)
+    private var isAIResponseInHistory: Bool {
+        guard !aiResponse.isEmpty else { return false }
+        // Check if the last AI message in history matches current response
+        if let lastAIMessage = conversationHistory.last(where: { !$0.isUser }) {
+            return lastAIMessage.text == aiResponse
+        }
+        return false
+    }
+
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -196,8 +216,8 @@ struct TranscriptView: View {
                         .id(message.id)
                     }
 
-                    // Show current in-progress messages (not yet in history)
-                    if !userTranscript.isEmpty {
+                    // Show current in-progress messages (only if not already in history)
+                    if !userTranscript.isEmpty && !isUserTranscriptInHistory {
                         TranscriptBubble(
                             text: userTranscript,
                             isUser: true
@@ -205,7 +225,7 @@ struct TranscriptView: View {
                         .id("currentUser")
                     }
 
-                    if !aiResponse.isEmpty {
+                    if !aiResponse.isEmpty && !isAIResponseInHistory {
                         TranscriptBubble(
                             text: aiResponse,
                             isUser: false
@@ -435,7 +455,7 @@ struct SessionSettingsView: View {
                     if settings.ttsProvider == .selfHosted || settings.ttsProvider == .vibeVoice {
                         Picker("Voice", selection: $settings.ttsVoice) {
                             ForEach(settings.availableVoices, id: \.self) { voice in
-                                Text(voice).tag(voice)
+                                Text(settings.voiceDisplayName(voice)).tag(voice)
                             }
                         }
                     }
@@ -555,9 +575,34 @@ class SessionSettingsModel: ObservableObject {
         didSet { defaults.set(volume, forKey: "volume") }
     }
 
-    /// Available TTS voices (OpenAI-compatible voices work with Piper and VibeVoice)
+    /// Available TTS voices - includes both OpenAI-compatible and native VibeVoice voices
     var availableVoices: [String] {
-        ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
+        // OpenAI-compatible aliases + native VibeVoice voices
+        ["alloy", "echo", "fable", "nova", "onyx", "shimmer",
+         "Carter", "Davis", "Emma", "Frank", "Grace", "Mike", "Samuel"]
+    }
+
+    /// Voice display names with gender and description
+    /// Covers both OpenAI-compatible aliases and native VibeVoice voices
+    func voiceDisplayName(_ voiceId: String) -> String {
+        switch voiceId.lowercased() {
+        // OpenAI-compatible aliases (map to VibeVoice voices)
+        case "alloy": return "Alloy → Carter - Male, Neutral"
+        case "echo": return "Echo → Davis - Male, Warm"
+        case "fable": return "Fable → Emma - Female, Storyteller"
+        case "nova": return "Nova → Grace - Female, Friendly"
+        case "onyx": return "Onyx → Frank - Male, Deep"
+        case "shimmer": return "Shimmer → Mike - Male, Expressive"
+        // Native VibeVoice voices
+        case "carter": return "Carter - Male, Neutral"
+        case "davis": return "Davis - Male, Warm"
+        case "emma": return "Emma - Female, Storyteller"
+        case "frank": return "Frank - Male, Deep"
+        case "grace": return "Grace - Female, Friendly"
+        case "mike": return "Mike - Male, Expressive"
+        case "samuel": return "Samuel - Male, Indian Accent"
+        default: return voiceId.capitalized
+        }
     }
 
     // LLM
@@ -827,10 +872,15 @@ class SessionViewModel: ObservableObject {
     }
     
     func toggleSession(appState: AppState) async {
+        logger.info("toggleSession called - isSessionActive: \(isSessionActive), state: \(state.rawValue)")
         if isSessionActive {
+            logger.info("Stopping session...")
             await stopSession()
+            logger.info("Session stopped - state is now: \(state.rawValue)")
         } else {
+            logger.info("Starting session...")
             await startSession(appState: appState)
+            logger.info("Session started - state is now: \(state.rawValue)")
         }
     }
     

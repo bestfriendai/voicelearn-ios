@@ -165,9 +165,19 @@ public actor TelemetryEngine: ObservableObject {
     
     /// Published metrics for UI observation
     @MainActor @Published public private(set) var currentMetricsPublished = SessionMetrics()
-    
+
+    /// Published device metrics for UI observation
+    @MainActor @Published public private(set) var deviceMetrics = DeviceMetrics()
+
+    /// Device metrics sampling task
+    private var deviceMetricsSamplingTask: Task<Void, Never>?
+
+    /// Device metrics history (for averaging)
+    private var deviceMetricsHistory: [DeviceMetrics] = []
+    private let maxMetricsHistory = 60 // Keep 1 minute of samples at 1/sec
+
     // MARK: - Initialization
-    
+
     public init() {
         logger.info("TelemetryEngine initialized")
     }
@@ -286,7 +296,85 @@ public actor TelemetryEngine: ObservableObject {
         metrics = SessionMetrics()
         events.removeAll()
         sessionStartTime = nil
+        deviceMetricsHistory.removeAll()
         logger.info("TelemetryEngine reset")
+    }
+
+    // MARK: - Device Metrics
+
+    /// Start sampling device metrics periodically
+    public func startDeviceMetricsSampling(interval: TimeInterval = 1.0) {
+        stopDeviceMetricsSampling()
+
+        logger.info("Starting device metrics sampling at \(interval)s interval")
+
+        deviceMetricsSamplingTask = Task {
+            while !Task.isCancelled {
+                let sample = DeviceMetricsCollector.sample()
+
+                // Store in history
+                deviceMetricsHistory.append(sample)
+                if deviceMetricsHistory.count > maxMetricsHistory {
+                    deviceMetricsHistory.removeFirst()
+                }
+
+                // Log if under stress
+                if sample.isUnderStress {
+                    logger.warning("Device under stress: CPU=\(String(format: "%.1f", sample.cpuUsage))%, Memory=\(sample.memoryUsedString), Thermal=\(sample.thermalStateString)")
+                }
+
+                // Publish to UI
+                await MainActor.run {
+                    deviceMetrics = sample
+                }
+
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+            }
+        }
+    }
+
+    /// Stop sampling device metrics
+    public func stopDeviceMetricsSampling() {
+        deviceMetricsSamplingTask?.cancel()
+        deviceMetricsSamplingTask = nil
+    }
+
+    /// Get average device metrics over recent history
+    public func getAverageDeviceMetrics() -> DeviceMetrics {
+        guard !deviceMetricsHistory.isEmpty else {
+            return DeviceMetrics()
+        }
+
+        let avgCPU = deviceMetricsHistory.map { $0.cpuUsage }.reduce(0, +) / Double(deviceMetricsHistory.count)
+        let avgMemory = deviceMetricsHistory.map { $0.memoryUsed }.reduce(0, +) / UInt64(deviceMetricsHistory.count)
+        let worstThermal = deviceMetricsHistory.map { $0.thermalState.rawValue }.max() ?? 0
+
+        return DeviceMetrics(
+            cpuUsage: avgCPU,
+            memoryUsed: avgMemory,
+            memoryTotal: deviceMetricsHistory.first?.memoryTotal ?? 0,
+            thermalState: ProcessInfo.ThermalState(rawValue: worstThermal) ?? .nominal,
+            timestamp: Date()
+        )
+    }
+
+    /// Get peak device metrics over recent history
+    public func getPeakDeviceMetrics() -> DeviceMetrics {
+        guard !deviceMetricsHistory.isEmpty else {
+            return DeviceMetrics()
+        }
+
+        let peakCPU = deviceMetricsHistory.map { $0.cpuUsage }.max() ?? 0
+        let peakMemory = deviceMetricsHistory.map { $0.memoryUsed }.max() ?? 0
+        let worstThermal = deviceMetricsHistory.map { $0.thermalState.rawValue }.max() ?? 0
+
+        return DeviceMetrics(
+            cpuUsage: peakCPU,
+            memoryUsed: peakMemory,
+            memoryTotal: deviceMetricsHistory.first?.memoryTotal ?? 0,
+            thermalState: ProcessInfo.ThermalState(rawValue: worstThermal) ?? .nominal,
+            timestamp: Date()
+        )
     }
     
     /// Export metrics as a snapshot for persistence/analysis
@@ -363,6 +451,142 @@ public struct QualityMetrics: Codable, Sendable {
     public let networkDegradations: Int
 }
 
+// MARK: - Device Metrics
+
+/// Real-time device health metrics
+public struct DeviceMetrics: Sendable {
+    /// CPU usage percentage (0-100)
+    public let cpuUsage: Double
+
+    /// Memory usage in bytes
+    public let memoryUsed: UInt64
+
+    /// Total memory in bytes
+    public let memoryTotal: UInt64
+
+    /// Memory usage percentage (0-100)
+    public var memoryUsagePercent: Double {
+        memoryTotal > 0 ? Double(memoryUsed) / Double(memoryTotal) * 100 : 0
+    }
+
+    /// Thermal state
+    public let thermalState: ProcessInfo.ThermalState
+
+    /// Timestamp of sample
+    public let timestamp: Date
+
+    public init(
+        cpuUsage: Double = 0,
+        memoryUsed: UInt64 = 0,
+        memoryTotal: UInt64 = 0,
+        thermalState: ProcessInfo.ThermalState = .nominal,
+        timestamp: Date = Date()
+    ) {
+        self.cpuUsage = cpuUsage
+        self.memoryUsed = memoryUsed
+        self.memoryTotal = memoryTotal
+        self.thermalState = thermalState
+        self.timestamp = timestamp
+    }
+
+    /// Thermal state as human-readable string
+    public var thermalStateString: String {
+        switch thermalState {
+        case .nominal: return "Normal"
+        case .fair: return "Fair"
+        case .serious: return "Serious"
+        case .critical: return "Critical"
+        @unknown default: return "Unknown"
+        }
+    }
+
+    /// Memory used as human-readable string
+    public var memoryUsedString: String {
+        ByteCountFormatter.string(fromByteCount: Int64(memoryUsed), countStyle: .memory)
+    }
+
+    /// Whether device is under stress
+    public var isUnderStress: Bool {
+        cpuUsage > 80 || memoryUsagePercent > 85 || thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue
+    }
+}
+
+// MARK: - Device Metrics Collector
+
+/// Collects device health metrics using system APIs
+public struct DeviceMetricsCollector: Sendable {
+
+    /// Sample current device metrics
+    public static func sample() -> DeviceMetrics {
+        return DeviceMetrics(
+            cpuUsage: getCPUUsage(),
+            memoryUsed: getMemoryUsage(),
+            memoryTotal: getMemoryTotal(),
+            thermalState: ProcessInfo.processInfo.thermalState,
+            timestamp: Date()
+        )
+    }
+
+    /// Get CPU usage percentage (0-100)
+    private static func getCPUUsage() -> Double {
+        var totalUsageOfCPU: Double = 0.0
+        var threadsList = UnsafeMutablePointer(mutating: [thread_act_t]())
+        var threadsCount = mach_msg_type_number_t(0)
+        let threadsResult = withUnsafeMutablePointer(to: &threadsList) {
+            $0.withMemoryRebound(to: thread_act_array_t?.self, capacity: 1) {
+                task_threads(mach_task_self_, $0, &threadsCount)
+            }
+        }
+
+        guard threadsResult == KERN_SUCCESS else {
+            return 0
+        }
+
+        for index in 0..<threadsCount {
+            var threadInfo = thread_basic_info()
+            var threadInfoCount = mach_msg_type_number_t(THREAD_INFO_MAX)
+            let infoResult = withUnsafeMutablePointer(to: &threadInfo) {
+                $0.withMemoryRebound(to: integer_t.self, capacity: Int(threadInfoCount)) {
+                    thread_info(threadsList[Int(index)], thread_flavor_t(THREAD_BASIC_INFO), $0, &threadInfoCount)
+                }
+            }
+
+            guard infoResult == KERN_SUCCESS else { continue }
+
+            let threadBasicInfo = threadInfo
+            if threadBasicInfo.flags & TH_FLAGS_IDLE == 0 {
+                totalUsageOfCPU += Double(threadBasicInfo.cpu_usage) / Double(TH_USAGE_SCALE) * 100.0
+            }
+        }
+
+        vm_deallocate(mach_task_self_, vm_address_t(bitPattern: threadsList), vm_size_t(Int(threadsCount) * MemoryLayout<thread_t>.stride))
+
+        return min(totalUsageOfCPU, 100.0)
+    }
+
+    /// Get memory used by this process in bytes
+    private static func getMemoryUsage() -> UInt64 {
+        var taskInfo = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info>.size) / 4
+        let result: kern_return_t = withUnsafeMutablePointer(to: &taskInfo) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+            }
+        }
+
+        guard result == KERN_SUCCESS else {
+            return 0
+        }
+
+        return taskInfo.phys_footprint
+    }
+
+    /// Get total physical memory
+    private static func getMemoryTotal() -> UInt64 {
+        return ProcessInfo.processInfo.physicalMemory
+    }
+}
+
 // MARK: - Array Extensions for Statistics
 
 extension Array where Element == TimeInterval {
@@ -375,7 +599,7 @@ extension Array where Element == TimeInterval {
             ? (sorted[mid] + sorted[mid - 1]) / 2
             : sorted[mid]
     }
-    
+
     /// Calculate percentile (0-100)
     public func percentile(_ p: Int) -> TimeInterval {
         guard !isEmpty else { return 0 }

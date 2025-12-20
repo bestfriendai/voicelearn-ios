@@ -218,7 +218,7 @@ public struct SettingsView: View {
                             // Use discovered voices if available, otherwise show default OpenAI-compatible voices
                             let voices = viewModel.discoveredVoices.isEmpty ? viewModel.defaultTTSVoices : viewModel.discoveredVoices
                             ForEach(voices, id: \.self) { voice in
-                                Text(voice).tag(voice)
+                                Text(viewModel.voiceDisplayName(voice)).tag(voice)
                             }
                         }
                     }
@@ -287,6 +287,12 @@ public struct SettingsView: View {
                     }
 
                     NavigationLink {
+                        DeviceMetricsView()
+                    } label: {
+                        Label("Device Health Monitor", systemImage: "heart.text.square")
+                    }
+
+                    NavigationLink {
                         AudioTestView()
                     } label: {
                         Label("Audio Pipeline Test", systemImage: "waveform")
@@ -296,6 +302,12 @@ public struct SettingsView: View {
                         ProviderTestView()
                     } label: {
                         Label("Provider Connectivity", systemImage: "network")
+                    }
+
+                    NavigationLink {
+                        TTSPlaybackTuningView()
+                    } label: {
+                        Label("TTS Playback Tuning", systemImage: "slider.horizontal.3")
                     }
 
                     #if DEBUG
@@ -501,13 +513,20 @@ class SettingsViewModel: ObservableObject {
     @AppStorage("enableBargeIn") var enableBargeIn = true
 
     // STT - Default to on-device
+    // Use a private backing store to avoid double-updates during didSet
     @Published var sttProvider: STTProvider {
-        didSet { UserDefaults.standard.set(sttProvider.rawValue, forKey: "sttProvider") }
+        didSet {
+            guard sttProvider != oldValue else { return }
+            UserDefaults.standard.set(sttProvider.rawValue, forKey: "sttProvider")
+        }
     }
 
     // LLM - Default to on-device
     @Published var llmProvider: LLMProvider {
-        didSet { UserDefaults.standard.set(llmProvider.rawValue, forKey: "llmProvider") }
+        didSet {
+            guard llmProvider != oldValue else { return }
+            UserDefaults.standard.set(llmProvider.rawValue, forKey: "llmProvider")
+        }
     }
     @AppStorage("llmModel") var llmModel = "llama3.2:3b"
     @AppStorage("temperature") var temperature: Double = 0.7
@@ -515,7 +534,10 @@ class SettingsViewModel: ObservableObject {
 
     // TTS - Default to on-device
     @Published var ttsProvider: TTSProvider {
-        didSet { UserDefaults.standard.set(ttsProvider.rawValue, forKey: "ttsProvider") }
+        didSet {
+            guard ttsProvider != oldValue else { return }
+            UserDefaults.standard.set(ttsProvider.rawValue, forKey: "ttsProvider")
+        }
     }
     @AppStorage("speakingRate") var speakingRate: Double = 1.0
     @AppStorage("ttsVoice") var ttsVoice: String = "nova"
@@ -548,9 +570,35 @@ class SettingsViewModel: ObservableObject {
         }
     }
 
-    /// Default TTS voices (OpenAI-compatible) - used when server voices not discovered
+    /// Default TTS voices - includes both OpenAI-compatible and native VibeVoice voices
+    /// Used when server voices not discovered (fallback)
     var defaultTTSVoices: [String] {
-        ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
+        // OpenAI-compatible aliases + native VibeVoice voices
+        ["alloy", "echo", "fable", "nova", "onyx", "shimmer",
+         "Carter", "Davis", "Emma", "Frank", "Grace", "Mike", "Samuel"]
+    }
+
+    /// Voice display names with gender and description
+    /// Covers both OpenAI-compatible aliases and native VibeVoice voices
+    func voiceDisplayName(_ voiceId: String) -> String {
+        switch voiceId.lowercased() {
+        // OpenAI-compatible aliases (map to VibeVoice voices)
+        case "alloy": return "Alloy → Carter - Male, Neutral"
+        case "echo": return "Echo → Davis - Male, Warm"
+        case "fable": return "Fable → Emma - Female, Storyteller"
+        case "nova": return "Nova → Grace - Female, Friendly"
+        case "onyx": return "Onyx → Frank - Male, Deep"
+        case "shimmer": return "Shimmer → Mike - Male, Expressive"
+        // Native VibeVoice voices
+        case "carter": return "Carter - Male, Neutral"
+        case "davis": return "Davis - Male, Warm"
+        case "emma": return "Emma - Female, Storyteller"
+        case "frank": return "Frank - Male, Deep"
+        case "grace": return "Grace - Female, Friendly"
+        case "mike": return "Mike - Male, Expressive"
+        case "samuel": return "Samuel - Male, Indian Accent"
+        default: return voiceId.capitalized
+        }
     }
 
     // Remote Logging
@@ -579,7 +627,7 @@ class SettingsViewModel: ObservableObject {
     private let curriculumSeeder = SampleCurriculumSeeder()
 
     init() {
-        // Load persisted provider settings
+        // Load persisted provider settings synchronously (fast UserDefaults reads)
         if let sttRaw = UserDefaults.standard.string(forKey: "sttProvider"),
            let stt = STTProvider(rawValue: sttRaw) {
             self.sttProvider = stt
@@ -604,10 +652,16 @@ class SettingsViewModel: ObservableObject {
         // Load remote logging setting (defaults to true)
         self.remoteLoggingEnabled = UserDefaults.standard.object(forKey: "remoteLoggingEnabled") as? Bool ?? true
 
-        Task {
-            await loadKeyStatus()
-            await checkSampleCurriculum()
-            await loadServerStatus()
+        // Defer async loading to after view appears to prevent init-time lag
+        // Each task loads data independently and updates UI atomically
+        Task.detached(priority: .userInitiated) { [weak self] in
+            await self?.loadKeyStatus()
+        }
+        Task.detached(priority: .background) { [weak self] in
+            await self?.checkSampleCurriculum()
+        }
+        Task.detached(priority: .background) { [weak self] in
+            await self?.loadServerStatus()
         }
     }
 
@@ -1557,6 +1611,261 @@ class ProviderTestViewModel: ObservableObject {
         openAI = .testing
         try? await Task.sleep(for: .milliseconds(700))
         openAI = .success(latency: 0.22)
+    }
+}
+
+// MARK: - TTS Playback Tuning View
+
+/// Settings view for tuning TTS playback behavior to eliminate audio gaps
+struct TTSPlaybackTuningView: View {
+    @StateObject private var viewModel = TTSPlaybackTuningViewModel()
+
+    var body: some View {
+        List {
+            // Preset Selection
+            Section {
+                Picker("Preset", selection: $viewModel.selectedPreset) {
+                    ForEach(TTSPlaybackPreset.allCases, id: \.self) { preset in
+                        Text(preset.rawValue).tag(preset)
+                    }
+                }
+                .onChange(of: viewModel.selectedPreset) { _, newValue in
+                    viewModel.applyPreset(newValue)
+                }
+            } header: {
+                Text("Quick Settings")
+            } footer: {
+                Text("Choose a preset or customize individual settings below.")
+            }
+
+            // Prefetching Settings
+            Section {
+                Toggle("Enable Prefetching", isOn: $viewModel.enablePrefetch)
+                    .onChange(of: viewModel.enablePrefetch) { _, _ in viewModel.markCustom() }
+
+                if viewModel.enablePrefetch {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("Lookahead Time")
+                            Spacer()
+                            Text("\(viewModel.prefetchLookahead, specifier: "%.1f")s")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                        Slider(value: $viewModel.prefetchLookahead, in: 0.5...3.0, step: 0.1)
+                            .onChange(of: viewModel.prefetchLookahead) { _, _ in viewModel.markCustom() }
+                    }
+
+                    Stepper(value: $viewModel.prefetchQueueDepth, in: 1...3) {
+                        HStack {
+                            Text("Queue Depth")
+                            Spacer()
+                            Text("\(viewModel.prefetchQueueDepth) sentence\(viewModel.prefetchQueueDepth == 1 ? "" : "s")")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onChange(of: viewModel.prefetchQueueDepth) { _, _ in viewModel.markCustom() }
+                }
+            } header: {
+                Text("Prefetching")
+            } footer: {
+                Text("Prefetching synthesizes upcoming sentences while the current one plays, reducing gaps.")
+            }
+
+            // Timing Settings
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Inter-Sentence Silence")
+                        Spacer()
+                        Text("\(viewModel.interSentenceSilenceMs)ms")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                    Slider(value: Binding(
+                        get: { Double(viewModel.interSentenceSilenceMs) },
+                        set: { viewModel.interSentenceSilenceMs = Int($0) }
+                    ), in: 0...500, step: 25)
+                        .onChange(of: viewModel.interSentenceSilenceMs) { _, _ in viewModel.markCustom() }
+                }
+            } header: {
+                Text("Timing")
+            } footer: {
+                Text("Add intentional pauses between sentences. Set to 0 for natural flow.")
+            }
+
+            // Advanced Settings
+            Section {
+                Toggle("Multi-Buffer Scheduling", isOn: $viewModel.enableMultiBuffer)
+                    .onChange(of: viewModel.enableMultiBuffer) { _, _ in viewModel.markCustom() }
+
+                if viewModel.enableMultiBuffer {
+                    Stepper(value: $viewModel.scheduledBufferCount, in: 1...4) {
+                        HStack {
+                            Text("Buffer Count")
+                            Spacer()
+                            Text("\(viewModel.scheduledBufferCount) buffer\(viewModel.scheduledBufferCount == 1 ? "" : "s")")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onChange(of: viewModel.scheduledBufferCount) { _, _ in viewModel.markCustom() }
+                }
+            } header: {
+                Text("Advanced")
+            } footer: {
+                Text("Multi-buffer scheduling keeps audio buffers queued ahead in the player.")
+            }
+
+            // Reset Button
+            Section {
+                Button("Reset to Default") {
+                    viewModel.applyPreset(.default)
+                }
+            }
+        }
+        .navigationTitle("TTS Playback")
+        .onDisappear {
+            viewModel.save()
+        }
+    }
+}
+
+// MARK: - TTS Playback Tuning ViewModel
+
+@MainActor
+class TTSPlaybackTuningViewModel: ObservableObject {
+    @Published var selectedPreset: TTSPlaybackPreset = .default
+    @Published var enablePrefetch: Bool = true
+    @Published var prefetchLookahead: Double = 1.5
+    @Published var prefetchQueueDepth: Int = 1
+    @Published var interSentenceSilenceMs: Int = 0
+    @Published var enableMultiBuffer: Bool = true
+    @Published var scheduledBufferCount: Int = 2
+
+    private let defaults = UserDefaults.standard
+
+    // UserDefaults keys
+    private enum Keys {
+        static let preset = "tts_playback_preset"
+        static let enablePrefetch = "tts_playback_enable_prefetch"
+        static let prefetchLookahead = "tts_playback_prefetch_lookahead"
+        static let prefetchQueueDepth = "tts_playback_prefetch_queue_depth"
+        static let interSentenceSilenceMs = "tts_playback_inter_sentence_silence_ms"
+        static let enableMultiBuffer = "tts_playback_enable_multi_buffer"
+        static let scheduledBufferCount = "tts_playback_scheduled_buffer_count"
+    }
+
+    init() {
+        load()
+    }
+
+    func load() {
+        if let presetString = defaults.string(forKey: Keys.preset),
+           let preset = TTSPlaybackPreset(rawValue: presetString) {
+            selectedPreset = preset
+        }
+
+        if defaults.object(forKey: Keys.enablePrefetch) != nil {
+            enablePrefetch = defaults.bool(forKey: Keys.enablePrefetch)
+        }
+
+        let lookahead = defaults.double(forKey: Keys.prefetchLookahead)
+        if lookahead > 0 {
+            prefetchLookahead = lookahead
+        }
+
+        let queueDepth = defaults.integer(forKey: Keys.prefetchQueueDepth)
+        if queueDepth > 0 {
+            prefetchQueueDepth = queueDepth
+        }
+
+        interSentenceSilenceMs = defaults.integer(forKey: Keys.interSentenceSilenceMs)
+
+        if defaults.object(forKey: Keys.enableMultiBuffer) != nil {
+            enableMultiBuffer = defaults.bool(forKey: Keys.enableMultiBuffer)
+        }
+
+        let bufferCount = defaults.integer(forKey: Keys.scheduledBufferCount)
+        if bufferCount > 0 {
+            scheduledBufferCount = bufferCount
+        }
+    }
+
+    func save() {
+        defaults.set(selectedPreset.rawValue, forKey: Keys.preset)
+        defaults.set(enablePrefetch, forKey: Keys.enablePrefetch)
+        defaults.set(prefetchLookahead, forKey: Keys.prefetchLookahead)
+        defaults.set(prefetchQueueDepth, forKey: Keys.prefetchQueueDepth)
+        defaults.set(interSentenceSilenceMs, forKey: Keys.interSentenceSilenceMs)
+        defaults.set(enableMultiBuffer, forKey: Keys.enableMultiBuffer)
+        defaults.set(scheduledBufferCount, forKey: Keys.scheduledBufferCount)
+    }
+
+    func applyPreset(_ preset: TTSPlaybackPreset) {
+        selectedPreset = preset
+        guard let config = preset.config else { return }  // Custom - don't change values
+
+        enablePrefetch = config.enablePrefetch
+        prefetchLookahead = config.prefetchLookaheadSeconds
+        prefetchQueueDepth = config.prefetchQueueDepth
+        interSentenceSilenceMs = config.interSentenceSilenceMs
+        enableMultiBuffer = config.enableMultiBufferScheduling
+        scheduledBufferCount = config.scheduledBufferCount
+
+        save()
+    }
+
+    func markCustom() {
+        if selectedPreset != .custom {
+            selectedPreset = .custom
+        }
+    }
+
+    /// Get the current config based on settings
+    func currentConfig() -> TTSPlaybackConfig {
+        TTSPlaybackConfig(
+            enablePrefetch: enablePrefetch,
+            prefetchLookaheadSeconds: prefetchLookahead,
+            prefetchQueueDepth: prefetchQueueDepth,
+            interSentenceSilenceMs: interSentenceSilenceMs,
+            enableMultiBufferScheduling: enableMultiBuffer,
+            scheduledBufferCount: scheduledBufferCount
+        )
+    }
+
+    /// Load TTS playback config from UserDefaults (static helper for SessionManager)
+    static func loadConfig() -> TTSPlaybackConfig {
+        let defaults = UserDefaults.standard
+
+        let enablePrefetch = defaults.object(forKey: Keys.enablePrefetch) != nil
+            ? defaults.bool(forKey: Keys.enablePrefetch)
+            : true
+
+        let lookahead = defaults.double(forKey: Keys.prefetchLookahead)
+        let prefetchLookahead = lookahead > 0 ? lookahead : 1.5
+
+        let queueDepth = defaults.integer(forKey: Keys.prefetchQueueDepth)
+        let prefetchQueueDepth = queueDepth > 0 ? queueDepth : 1
+
+        let interSentenceSilenceMs = defaults.integer(forKey: Keys.interSentenceSilenceMs)
+
+        let enableMultiBuffer = defaults.object(forKey: Keys.enableMultiBuffer) != nil
+            ? defaults.bool(forKey: Keys.enableMultiBuffer)
+            : true
+
+        let bufferCount = defaults.integer(forKey: Keys.scheduledBufferCount)
+        let scheduledBufferCount = bufferCount > 0 ? bufferCount : 2
+
+        return TTSPlaybackConfig(
+            enablePrefetch: enablePrefetch,
+            prefetchLookaheadSeconds: prefetchLookahead,
+            prefetchQueueDepth: prefetchQueueDepth,
+            interSentenceSilenceMs: interSentenceSilenceMs,
+            enableMultiBufferScheduling: enableMultiBuffer,
+            scheduledBufferCount: scheduledBufferCount
+        )
     }
 }
 

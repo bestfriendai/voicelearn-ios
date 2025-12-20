@@ -32,6 +32,104 @@ public enum SessionState: String, Sendable {
     }
 }
 
+// MARK: - TTS Playback Configuration
+
+/// Configuration for TTS playback behavior - tunable settings for eliminating audio gaps
+public struct TTSPlaybackConfig: Codable, Sendable {
+    /// Enable prefetching next sentence while current plays
+    public var enablePrefetch: Bool
+
+    /// Minimum lookahead time in seconds (how far ahead to start prefetch)
+    /// Lower = less memory, higher = smoother playback
+    public var prefetchLookaheadSeconds: TimeInterval
+
+    /// Number of sentences to prefetch ahead (1-3 recommended)
+    public var prefetchQueueDepth: Int
+
+    /// Silence duration between sentences in ms (0 = no gap, natural flow)
+    public var interSentenceSilenceMs: Int
+
+    /// Enable multi-buffer scheduling in AudioEngine
+    public var enableMultiBufferScheduling: Bool
+
+    /// Number of buffers to keep scheduled ahead
+    public var scheduledBufferCount: Int
+
+    public static let `default` = TTSPlaybackConfig(
+        enablePrefetch: true,
+        prefetchLookaheadSeconds: 1.5,
+        prefetchQueueDepth: 1,
+        interSentenceSilenceMs: 0,
+        enableMultiBufferScheduling: true,
+        scheduledBufferCount: 2
+    )
+
+    /// Minimal latency preset (aggressive prefetch)
+    public static let lowLatency = TTSPlaybackConfig(
+        enablePrefetch: true,
+        prefetchLookaheadSeconds: 2.0,
+        prefetchQueueDepth: 2,
+        interSentenceSilenceMs: 0,
+        enableMultiBufferScheduling: true,
+        scheduledBufferCount: 3
+    )
+
+    /// Conservative preset (less aggressive, saves resources)
+    public static let conservative = TTSPlaybackConfig(
+        enablePrefetch: true,
+        prefetchLookaheadSeconds: 1.0,
+        prefetchQueueDepth: 1,
+        interSentenceSilenceMs: 100,
+        enableMultiBufferScheduling: false,
+        scheduledBufferCount: 1
+    )
+
+    /// Disabled preset (original behavior, for debugging)
+    public static let disabled = TTSPlaybackConfig(
+        enablePrefetch: false,
+        prefetchLookaheadSeconds: 0,
+        prefetchQueueDepth: 0,
+        interSentenceSilenceMs: 0,
+        enableMultiBufferScheduling: false,
+        scheduledBufferCount: 1
+    )
+
+    public init(
+        enablePrefetch: Bool = true,
+        prefetchLookaheadSeconds: TimeInterval = 1.5,
+        prefetchQueueDepth: Int = 1,
+        interSentenceSilenceMs: Int = 0,
+        enableMultiBufferScheduling: Bool = true,
+        scheduledBufferCount: Int = 2
+    ) {
+        self.enablePrefetch = enablePrefetch
+        self.prefetchLookaheadSeconds = prefetchLookaheadSeconds
+        self.prefetchQueueDepth = prefetchQueueDepth
+        self.interSentenceSilenceMs = interSentenceSilenceMs
+        self.enableMultiBufferScheduling = enableMultiBufferScheduling
+        self.scheduledBufferCount = scheduledBufferCount
+    }
+}
+
+/// TTS Playback preset options for UI picker
+public enum TTSPlaybackPreset: String, CaseIterable, Sendable {
+    case `default` = "Default"
+    case lowLatency = "Low Latency"
+    case conservative = "Conservative"
+    case disabled = "Disabled"
+    case custom = "Custom"
+
+    public var config: TTSPlaybackConfig? {
+        switch self {
+        case .default: return .default
+        case .lowLatency: return .lowLatency
+        case .conservative: return .conservative
+        case .disabled: return .disabled
+        case .custom: return nil  // Custom means use individual settings
+        }
+    }
+}
+
 // MARK: - Session Configuration
 
 /// Configuration for a voice session
@@ -56,21 +154,25 @@ public struct SessionConfig: Codable, Sendable {
     
     /// Enable interruption handling
     public var enableInterruptions: Bool
-    
+
+    /// TTS playback configuration (prefetching, buffer scheduling)
+    public var ttsPlayback: TTSPlaybackConfig
+
     public static let `default` = SessionConfig(
         audio: .default,
         llm: .default,
         voice: .default,
         systemPrompt: """
-            You are a helpful AI tutor engaged in a voice conversation. 
-            Keep responses concise and conversational. 
+            You are a helpful AI tutor engaged in a voice conversation.
+            Keep responses concise and conversational.
             Ask follow-up questions to check understanding.
             """,
         enableCostTracking: true,
         maxDuration: 5400, // 90 minutes
-        enableInterruptions: true
+        enableInterruptions: true,
+        ttsPlayback: .default
     )
-    
+
     public init(
         audio: AudioEngineConfig = .default,
         llm: LLMConfig = .default,
@@ -78,7 +180,8 @@ public struct SessionConfig: Codable, Sendable {
         systemPrompt: String = "",
         enableCostTracking: Bool = true,
         maxDuration: TimeInterval = 5400,
-        enableInterruptions: Bool = true
+        enableInterruptions: Bool = true,
+        ttsPlayback: TTSPlaybackConfig = .default
     ) {
         self.audio = audio
         self.llm = llm
@@ -87,6 +190,7 @@ public struct SessionConfig: Codable, Sendable {
         self.enableCostTracking = enableCostTracking
         self.maxDuration = maxDuration
         self.enableInterruptions = enableInterruptions
+        self.ttsPlayback = ttsPlayback
     }
 }
 
@@ -156,6 +260,11 @@ public final class SessionManager: ObservableObject {
     private var sentenceBuffer: String = ""
     private var ttsQueueTask: Task<Void, Never>?
     private var isLLMStreamingComplete: Bool = false
+
+    /// TTS Prefetching state
+    private var prefetchedAudioCache: [String: TTSAudioChunk] = [:]  // sentence -> audio chunk
+    private var prefetchTasks: [String: Task<TTSAudioChunk?, Never>] = [:]  // sentence -> prefetch task
+    private var currentPrefetchCount: Int = 0
     
     // MARK: - Initialization
     
@@ -165,11 +274,47 @@ public final class SessionManager: ObservableObject {
         curriculum: CurriculumEngine? = nil,
         persistenceController: PersistenceController = .shared
     ) {
-        self.config = config
+        // Start with provided config and override TTS playback with saved settings
+        var mutableConfig = config
+        mutableConfig.ttsPlayback = Self.loadTTSPlaybackConfig()
+        self.config = mutableConfig
         self.telemetry = telemetry
         self.curriculum = curriculum
         self.persistenceController = persistenceController
-        logger.info("SessionManager initialized")
+        logger.info("SessionManager initialized with TTS config: prefetch=\(mutableConfig.ttsPlayback.enablePrefetch), lookahead=\(mutableConfig.ttsPlayback.prefetchLookaheadSeconds)s")
+    }
+
+    /// Load TTS playback configuration from UserDefaults
+    private static func loadTTSPlaybackConfig() -> TTSPlaybackConfig {
+        let defaults = UserDefaults.standard
+
+        let enablePrefetch = defaults.object(forKey: "tts_playback_enable_prefetch") != nil
+            ? defaults.bool(forKey: "tts_playback_enable_prefetch")
+            : true
+
+        let lookahead = defaults.double(forKey: "tts_playback_prefetch_lookahead")
+        let prefetchLookahead = lookahead > 0 ? lookahead : 1.5
+
+        let queueDepth = defaults.integer(forKey: "tts_playback_prefetch_queue_depth")
+        let prefetchQueueDepth = queueDepth > 0 ? queueDepth : 1
+
+        let interSentenceSilenceMs = defaults.integer(forKey: "tts_playback_inter_sentence_silence_ms")
+
+        let enableMultiBuffer = defaults.object(forKey: "tts_playback_enable_multi_buffer") != nil
+            ? defaults.bool(forKey: "tts_playback_enable_multi_buffer")
+            : true
+
+        let bufferCount = defaults.integer(forKey: "tts_playback_scheduled_buffer_count")
+        let scheduledBufferCount = bufferCount > 0 ? bufferCount : 2
+
+        return TTSPlaybackConfig(
+            enablePrefetch: enablePrefetch,
+            prefetchLookaheadSeconds: prefetchLookahead,
+            prefetchQueueDepth: prefetchQueueDepth,
+            interSentenceSilenceMs: interSentenceSilenceMs,
+            enableMultiBufferScheduling: enableMultiBuffer,
+            scheduledBufferCount: scheduledBufferCount
+        )
     }
     
     // MARK: - Session Lifecycle
@@ -190,8 +335,8 @@ public final class SessionManager: ObservableObject {
         systemPrompt: String? = nil,
         lectureMode: Bool = false
     ) async throws {
-        guard await state == .idle else {
-            logger.warning("Cannot start session: not in idle state")
+        guard state == .idle else {
+            logger.warning("Cannot start session: not in idle state (current state: \(state.rawValue))")
             return
         }
 
@@ -224,8 +369,9 @@ public final class SessionManager: ObservableObject {
             LLMMessage(role: .system, content: effectiveSystemPrompt)
         ]
         
-        // Start telemetry session
+        // Start telemetry session with device metrics sampling
         await telemetry.startSession()
+        await telemetry.startDeviceMetricsSampling()
         sessionStartTime = Date()
 
         // Initialize silence tracking
@@ -282,7 +428,8 @@ public final class SessionManager: ObservableObject {
         await audioEngine?.stop()
         try? await sttService?.stopStreaming()
 
-        // End telemetry
+        // End telemetry and stop device metrics sampling
+        await telemetry.stopDeviceMetricsSampling()
         await telemetry.endSession()
 
         // Persist session to Core Data before clearing state
@@ -794,6 +941,9 @@ public final class SessionManager: ObservableObject {
                 let sentence = ttsSentenceQueue.removeFirst()
                 logger.info("🔊 Processing TTS for: \"\(sentence.prefix(50))...\" (\(ttsSentenceQueue.count) remaining in queue)")
 
+                // Start prefetching upcoming sentences while we play the current one
+                startPrefetchingIfNeeded()
+
                 // Record TTFB on first sentence
                 if isFirstSentence {
                     isFirstSentence = false
@@ -813,6 +963,9 @@ public final class SessionManager: ObservableObject {
 
             logger.info("🔊 TTS queue processor finished - all sentences played")
 
+            // Clear prefetch state
+            clearPrefetchState()
+
             // Record end-to-end latency
             if let turnStart = currentTurnStartTime {
                 let e2e = Date().timeIntervalSince(turnStart)
@@ -822,26 +975,146 @@ public final class SessionManager: ObservableObject {
 
             // Ready for next user turn
             await telemetry.recordEvent(.aiFinishedSpeaking)
-            logger.info("AI finished speaking, transitioning to userSpeaking state")
+            logger.info("AI finished speaking")
+
+            // Add a brief cooldown before accepting new speech
+            // This prevents echo/feedback from the just-finished TTS being picked up as user speech
+            logger.info("🔇 Cooldown period before accepting new speech...")
+            try? await Task.sleep(nanoseconds: 500_000_000) // 500ms cooldown
 
             // Reset silence tracking for new turn
             hasDetectedSpeech = false
             silenceStartTime = nil
 
-            await setState(.userSpeaking)
+            // Clear current transcript for new turn (conversation history already saved)
+            await MainActor.run {
+                userTranscript = ""
+            }
 
-            // NOTE: We no longer clear userTranscript and aiResponse here
-            // The transcript should persist for the user to see the conversation history
+            await setState(.userSpeaking)
+            logger.info("Ready for user to speak")
+
+            // NOTE: aiResponse is NOT cleared so user can still see the AI's last response
         }
     }
 
-    /// Synthesize and play a single sentence
+    /// Prefetch TTS audio for a sentence (does not play, just caches)
+    private func prefetchSentence(_ text: String) async -> TTSAudioChunk? {
+        guard let ttsService = ttsService else {
+            logger.warning("🔊 Prefetch: TTS service is nil")
+            return nil
+        }
+
+        logger.info("🔊 Prefetch: Starting for \"\(text.prefix(30))...\"")
+        let startTime = Date()
+
+        do {
+            let stream = try await ttsService.synthesize(text: text)
+            for await chunk in stream {
+                if chunk.isLast {
+                    let elapsed = Date().timeIntervalSince(startTime)
+                    logger.info("🔊 Prefetch: Completed in \(String(format: "%.3f", elapsed))s for \"\(text.prefix(30))...\"")
+                    return chunk  // Return the full audio chunk
+                }
+            }
+        } catch {
+            logger.error("🔊 Prefetch: Failed for \"\(text.prefix(30))...\": \(error.localizedDescription)")
+        }
+        return nil
+    }
+
+    /// Start prefetching for upcoming sentences in the queue
+    private func startPrefetchingIfNeeded() {
+        guard config.ttsPlayback.enablePrefetch else { return }
+
+        let maxPrefetch = config.ttsPlayback.prefetchQueueDepth
+        let sentencesToPrefetch = Array(ttsSentenceQueue.prefix(maxPrefetch + 1).dropFirst())  // Skip current, take next N
+
+        for sentence in sentencesToPrefetch {
+            // Skip if already cached or being prefetched
+            if prefetchedAudioCache[sentence] != nil || prefetchTasks[sentence] != nil {
+                continue
+            }
+
+            // Start prefetch task
+            logger.info("🔊 Prefetch: Queueing prefetch for \"\(sentence.prefix(30))...\"")
+            prefetchTasks[sentence] = Task {
+                let chunk = await prefetchSentence(sentence)
+                // Cache the result when done
+                if let chunk = chunk {
+                    await MainActor.run {
+                        prefetchedAudioCache[sentence] = chunk
+                    }
+                }
+                return chunk
+            }
+        }
+    }
+
+    /// Clear prefetch state (call when stopping session or after AI finishes)
+    private func clearPrefetchState() {
+        // Cancel any pending prefetch tasks
+        for (_, task) in prefetchTasks {
+            task.cancel()
+        }
+        prefetchTasks.removeAll()
+        prefetchedAudioCache.removeAll()
+        currentPrefetchCount = 0
+    }
+
+    /// Synthesize and play a single sentence (uses prefetched audio if available)
     private func synthesizeAndPlaySentence(_ text: String) async {
         guard let ttsService = ttsService else {
             logger.error("TTS service is nil - cannot synthesize sentence")
             return
         }
 
+        // Check if we have prefetched audio for this sentence
+        if let cachedChunk = prefetchedAudioCache[text] {
+            logger.info("🔊 Using prefetched audio for \"\(text.prefix(30))...\"")
+            prefetchedAudioCache.removeValue(forKey: text)
+            prefetchTasks.removeValue(forKey: text)
+
+            if let audioEngine = audioEngine {
+                do {
+                    try await audioEngine.playAudio(cachedChunk)
+                } catch {
+                    logger.error("Failed to play prefetched audio: \(error.localizedDescription)")
+                }
+            }
+
+            // Add inter-sentence silence if configured
+            if config.ttsPlayback.interSentenceSilenceMs > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(config.ttsPlayback.interSentenceSilenceMs) * 1_000_000)
+            }
+            return
+        }
+
+        // Wait for prefetch task if it's in progress
+        if let prefetchTask = prefetchTasks[text] {
+            logger.info("🔊 Waiting for in-progress prefetch for \"\(text.prefix(30))...\"")
+            if let chunk = await prefetchTask.value {
+                prefetchedAudioCache.removeValue(forKey: text)
+                prefetchTasks.removeValue(forKey: text)
+
+                if let audioEngine = audioEngine {
+                    do {
+                        try await audioEngine.playAudio(chunk)
+                    } catch {
+                        logger.error("Failed to play prefetched audio: \(error.localizedDescription)")
+                    }
+                }
+
+                // Add inter-sentence silence if configured
+                if config.ttsPlayback.interSentenceSilenceMs > 0 {
+                    try? await Task.sleep(nanoseconds: UInt64(config.ttsPlayback.interSentenceSilenceMs) * 1_000_000)
+                }
+                return
+            }
+        }
+
+        // No cached audio - synthesize and play directly (fallback)
+        logger.info("🔊 No prefetch available, synthesizing directly for \"\(text.prefix(30))...\"")
         do {
             let stream = try await ttsService.synthesize(text: text)
 
@@ -856,6 +1129,11 @@ public final class SessionManager: ObservableObject {
             }
         } catch {
             logger.error("Failed to synthesize sentence: \(error.localizedDescription)")
+        }
+
+        // Add inter-sentence silence if configured
+        if config.ttsPlayback.interSentenceSilenceMs > 0 {
+            try? await Task.sleep(nanoseconds: UInt64(config.ttsPlayback.interSentenceSilenceMs) * 1_000_000)
         }
     }
 

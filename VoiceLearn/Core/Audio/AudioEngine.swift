@@ -48,6 +48,9 @@ public actor AudioEngine: ObservableObject {
 
     /// Current playback format (set when first chunk arrives)
     private var playbackFormat: AVAudioFormat?
+
+    /// Continuation for waiting on playback completion
+    private var playbackCompletionContinuation: CheckedContinuation<Void, Never>?
     
     /// Current configuration
     public private(set) var config: AudioEngineConfig
@@ -296,13 +299,20 @@ public actor AudioEngine: ObservableObject {
         isPlaying = false
         playbackFormat = nil
 
+        // Resume any waiting continuation so callers don't hang
+        if let continuation = playbackCompletionContinuation {
+            playbackCompletionContinuation = nil
+            continuation.resume()
+        }
+
         await telemetry.recordEvent(.ttsPlaybackInterrupted)
     }
 
-    /// Play audio buffer (for TTS output)
+    /// Play audio buffer (for TTS output) and wait for playback to complete
     ///
     /// Handles streaming TTS chunks by queueing them for sequential playback.
     /// Automatically handles format conversion when needed.
+    /// For chunks marked as isLast, this method blocks until playback finishes.
     public func playAudio(_ chunk: TTSAudioChunk) async throws {
         logger.debug("Playing TTS chunk", metadata: [
             "sequence": .stringConvertible(chunk.sequenceNumber),
@@ -335,6 +345,9 @@ public actor AudioEngine: ObservableObject {
             if isPlaying {
                 playerNode.stop()
                 pendingBuffers.removeAll()
+                // Cancel any pending completion wait
+                playbackCompletionContinuation?.resume()
+                playbackCompletionContinuation = nil
             }
 
             // Reconnect player node with correct format if needed
@@ -354,8 +367,13 @@ public actor AudioEngine: ObservableObject {
             await telemetry.recordEvent(.ttsPlaybackStarted)
         }
 
-        // Schedule buffer for playback
-        playerNode.scheduleBuffer(buffer) { [weak self] in
+        // For the last chunk, we'll wait for playback to complete
+        let shouldWait = chunk.isLast
+
+        // Schedule buffer for playback with completion callback
+        // Using completionCallbackType: .dataPlayedBack ensures callback fires when audio
+        // actually finishes playing, not just when buffer is consumed/scheduled
+        playerNode.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
             Task {
                 await self?.handleBufferCompletion(isLastChunk: chunk.isLast)
             }
@@ -365,6 +383,18 @@ public actor AudioEngine: ObservableObject {
         if !playerNode.isPlaying {
             playerNode.play()
         }
+
+        // If this is the last chunk, wait for playback to complete
+        // We set up the continuation here - the callback will resume it when audio finishes
+        // Note: This is safe because the audio playback takes non-trivial time (hundreds of ms)
+        // and the continuation is set before the callback can reasonably fire
+        if shouldWait {
+            logger.debug("Waiting for TTS audio to finish playing...")
+            await withCheckedContinuation { continuation in
+                self.playbackCompletionContinuation = continuation
+            }
+            logger.debug("TTS audio playback finished")
+        }
     }
 
     /// Handle completion of a buffer playback
@@ -372,6 +402,13 @@ public actor AudioEngine: ObservableObject {
         if isLastChunk {
             isPlaying = false
             playbackFormat = nil
+
+            // Resume any waiting continuation
+            if let continuation = playbackCompletionContinuation {
+                playbackCompletionContinuation = nil
+                continuation.resume()
+            }
+
             await telemetry.recordEvent(.ttsPlaybackCompleted)
             logger.debug("TTS playback completed")
         }

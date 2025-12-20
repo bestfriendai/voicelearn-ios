@@ -87,6 +87,7 @@
 		E6002B3D9EDF1E4CDC6AF6F6 /* ElevenLabsTTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDECFDD641B04BF76BFF029D /* ElevenLabsTTSService.swift */; };
 		E7B357A2E6130D80AA78BF30 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 49EDE072EDEE61B790BD8DD5 /* LaunchScreen.storyboard */; };
 		E8B4C42332732723F3C3DC26 /* DebugConversationTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */; };
+		7D2EC8A1F682FF40F6FB643F /* DeviceMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24F4807F758EF430FF974DF /* DeviceMetricsView.swift */; };
 		EA5172B75096ABB7DE2C0DF3 /* DocumentProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84372C34CDB567D72A2D878 /* DocumentProcessorTests.swift */; };
 		EAF380F5CA177133BA9446F8 /* APIProviderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43236963494E1BB36053A947 /* APIProviderDetailView.swift */; };
 		F0A24FCEEB540AE0010195C9 /* STTProviderRouterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3B47E47DB31A33003803B6 /* STTProviderRouterTests.swift */; };
@@ -148,6 +149,7 @@
 		71599E323CA773F8A514E7D3 /* CurriculumEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumEngineTests.swift; sourceTree = "<group>"; };
 		7246BE33512BCC042E23B833 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugConversationTestView.swift; sourceTree = "<group>"; };
+		B24F4807F758EF430FF974DF /* DeviceMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMetricsView.swift; sourceTree = "<group>"; };
 		792F0BB33A7D5172ED835540 /* AudioEngineConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEngineConfig.swift; sourceTree = "<group>"; };
 		796649153218922464580B05 /* ProgressTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTrackerTests.swift; sourceTree = "<group>"; };
 		7BC9A77AD90256DCFB70FA93 /* TopicProgress+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TopicProgress+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 			children = (
 				77FD95984C5DA7F06EFCAFDF /* DebugConversationTestView.swift */,
 				8B44F033CD785EAF43C173FA /* DebugConversationViewModel.swift */,
+				B24F4807F758EF430FF974DF /* DeviceMetricsView.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -734,6 +737,7 @@
 				51597A37F8C2CF4DF8F8D9AB /* CurriculumView.swift in Sources */,
 				E8B4C42332732723F3C3DC26 /* DebugConversationTestView.swift in Sources */,
 				297C76CDF47CC24210E07E63 /* DebugConversationViewModel.swift in Sources */,
+				7D2EC8A1F682FF40F6FB643F /* DeviceMetricsView.swift in Sources */,
 				41B2ED1A4802336BD4E0DEB8 /* DeepgramSTTService.swift in Sources */,
 				E5D418DA141E14B8F59D496F /* DeepgramTTSService.swift in Sources */,
 				96DED764A3FBFAD05D0BD1BE /* Document+CoreDataClass.swift in Sources */,

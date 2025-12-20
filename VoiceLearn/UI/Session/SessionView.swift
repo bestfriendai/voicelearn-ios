@@ -51,6 +51,7 @@ public struct SessionView: View {
                     
                     // Transcript display
                     TranscriptView(
+                        conversationHistory: viewModel.conversationHistory,
                         userTranscript: viewModel.userTranscript,
                         aiResponse: viewModel.aiResponse
                     )
@@ -178,27 +179,62 @@ struct SessionStatusView: View {
 // MARK: - Transcript View
 
 struct TranscriptView: View {
+    let conversationHistory: [ConversationMessage]
     let userTranscript: String
     let aiResponse: String
-    
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if !userTranscript.isEmpty {
-                    TranscriptBubble(
-                        text: userTranscript,
-                        isUser: true
-                    )
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // Show full conversation history
+                    ForEach(conversationHistory) { message in
+                        TranscriptBubble(
+                            text: message.text,
+                            isUser: message.isUser
+                        )
+                        .id(message.id)
+                    }
+
+                    // Show current in-progress messages (not yet in history)
+                    if !userTranscript.isEmpty {
+                        TranscriptBubble(
+                            text: userTranscript,
+                            isUser: true
+                        )
+                        .id("currentUser")
+                    }
+
+                    if !aiResponse.isEmpty {
+                        TranscriptBubble(
+                            text: aiResponse,
+                            isUser: false
+                        )
+                        .id("currentAI")
+                    }
+
+                    // Invisible anchor for auto-scrolling
+                    Color.clear
+                        .frame(height: 1)
+                        .id("bottom")
                 }
-                
-                if !aiResponse.isEmpty {
-                    TranscriptBubble(
-                        text: aiResponse,
-                        isUser: false
-                    )
+                .padding()
+            }
+            .onChange(of: conversationHistory.count) { _, _ in
+                withAnimation(.easeOut(duration: 0.3)) {
+                    proxy.scrollTo("bottom", anchor: .bottom)
                 }
             }
-            .padding()
+            .onChange(of: aiResponse) { _, _ in
+                withAnimation(.easeOut(duration: 0.1)) {
+                    proxy.scrollTo("bottom", anchor: .bottom)
+                }
+            }
+            .onChange(of: userTranscript) { _, _ in
+                withAnimation(.easeOut(duration: 0.1)) {
+                    proxy.scrollTo("bottom", anchor: .bottom)
+                }
+            }
         }
         .background {
             RoundedRectangle(cornerRadius: 16)
@@ -395,6 +431,15 @@ struct SessionSettingsView: View {
                         }
                     }
 
+                    // Voice picker for self-hosted TTS providers
+                    if settings.ttsProvider == .selfHosted || settings.ttsProvider == .vibeVoice {
+                        Picker("Voice", selection: $settings.ttsVoice) {
+                            ForEach(settings.availableVoices, id: \.self) { voice in
+                                Text(voice).tag(voice)
+                            }
+                        }
+                    }
+
                     VStack(alignment: .leading) {
                         Text("Speaking Rate: \(settings.speakingRate, specifier: "%.1f")x")
                         Slider(value: $settings.speakingRate, in: 0.5...2.0, step: 0.1)
@@ -500,11 +545,19 @@ class SessionSettingsModel: ObservableObject {
     @Published var ttsProvider: TTSProvider {
         didSet { defaults.set(ttsProvider.rawValue, forKey: "ttsProvider") }
     }
+    @Published var ttsVoice: String {
+        didSet { defaults.set(ttsVoice, forKey: "ttsVoice") }
+    }
     @Published var speakingRate: Float {
         didSet { defaults.set(speakingRate, forKey: "speakingRate") }
     }
     @Published var volume: Float {
         didSet { defaults.set(volume, forKey: "volume") }
+    }
+
+    /// Available TTS voices (OpenAI-compatible voices work with Piper and VibeVoice)
+    var availableVoices: [String] {
+        ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
     }
 
     // LLM
@@ -554,6 +607,7 @@ class SessionSettingsModel: ObservableObject {
 
         self.ttsProvider = defaults.string(forKey: "ttsProvider")
             .flatMap { TTSProvider(rawValue: $0) } ?? .appleTTS
+        self.ttsVoice = defaults.string(forKey: "ttsVoice") ?? "nova"
         self.speakingRate = defaults.object(forKey: "speakingRate") as? Float ?? 1.0
         self.volume = defaults.object(forKey: "volume") as? Float ?? 1.0
 
@@ -579,6 +633,7 @@ class SessionSettingsModel: ObservableObject {
         enableBargeIn = true
         bargeInThreshold = 0.7
         ttsProvider = .appleTTS
+        ttsVoice = "nova"
         speakingRate = 1.0
         volume = 1.0
         llmProvider = .localMLX
@@ -589,6 +644,16 @@ class SessionSettingsModel: ObservableObject {
         autoSaveTranscript = true
         maxDuration = 5400
     }
+}
+
+// MARK: - Conversation Message Model
+
+/// A single message in the conversation history
+struct ConversationMessage: Identifiable {
+    let id = UUID()
+    let text: String
+    let isUser: Bool
+    let timestamp: Date
 }
 
 // MARK: - Session View Model
@@ -606,6 +671,13 @@ class SessionViewModel: ObservableObject {
     @Published var lastLatency: TimeInterval = 0
     @Published var sessionCost: Decimal = 0
     @Published var debugTestResult: String = ""
+
+    /// Full conversation history for display
+    @Published var conversationHistory: [ConversationMessage] = []
+
+    /// Track last known transcripts to detect changes
+    private var lastUserTranscript: String = ""
+    private var lastAiResponse: String = ""
 
     private let logger = Logger(label: "com.voicelearn.session.viewmodel")
     private var sessionManager: SessionManager?
@@ -827,13 +899,23 @@ class SessionViewModel: ObservableObject {
             logger.info("Using AppleTTSService")
             ttsService = AppleTTSService()
         case .selfHosted:
-            // Use SelfHostedTTSService to connect to Piper server
+            // Use SelfHostedTTSService to connect to Piper server (22050 Hz)
             let ttsVoiceSetting = UserDefaults.standard.string(forKey: "ttsVoice") ?? "nova"
             if selfHostedEnabled && !serverIP.isEmpty {
                 logger.info("Using self-hosted TTS (Piper) at \(serverIP):11402 with voice: \(ttsVoiceSetting)")
                 ttsService = SelfHostedTTSService.piper(host: serverIP, voice: ttsVoiceSetting)
             } else {
                 logger.warning("Self-hosted TTS selected but no server IP configured - falling back to Apple TTS")
+                ttsService = AppleTTSService()
+            }
+        case .vibeVoice:
+            // Use SelfHostedTTSService to connect to VibeVoice server (24000 Hz)
+            let ttsVoiceSetting = UserDefaults.standard.string(forKey: "ttsVoice") ?? "nova"
+            if selfHostedEnabled && !serverIP.isEmpty {
+                logger.info("Using self-hosted TTS (VibeVoice) at \(serverIP):8880 with voice: \(ttsVoiceSetting)")
+                ttsService = SelfHostedTTSService.vibeVoice(host: serverIP, voice: ttsVoiceSetting)
+            } else {
+                logger.warning("VibeVoice TTS selected but no server IP configured - falling back to Apple TTS")
                 ttsService = AppleTTSService()
             }
         case .elevenLabsFlash, .elevenLabsTurbo:
@@ -958,27 +1040,62 @@ class SessionViewModel: ObservableObject {
     private func stopSession() async {
         isLoading = true
         defer { isLoading = false }
-        
+
         if let manager = sessionManager {
             await manager.stopSession()
         }
-        
+
         sessionManager = nil
         subscribers.removeAll()
         state = .idle
+
+        // Clear conversation history when session ends
+        conversationHistory.removeAll()
+        lastUserTranscript = ""
+        lastAiResponse = ""
     }
-    
+
     private func bindToSessionManager(_ manager: SessionManager) {
         // Since SessionManager properties are @MainActor, we can access them safely here
-        
+
         manager.$state
             .receive(on: DispatchQueue.main)
-            .assign(to: &$state)
-            
+            .sink { [weak self] newState in
+                guard let self = self else { return }
+                let oldState = self.state
+                self.state = newState
+
+                // When transitioning from aiSpeaking to userSpeaking, the AI turn is complete
+                // Add the AI response to conversation history if we have one
+                if oldState == .aiSpeaking && newState == .userSpeaking {
+                    if !self.aiResponse.isEmpty && self.aiResponse != self.lastAiResponse {
+                        self.conversationHistory.append(ConversationMessage(
+                            text: self.aiResponse,
+                            isUser: false,
+                            timestamp: Date()
+                        ))
+                        self.lastAiResponse = self.aiResponse
+                    }
+                }
+
+                // When transitioning from userSpeaking to processing/aiThinking, add user transcript
+                if oldState == .userSpeaking && (newState == .processingUserUtterance || newState == .aiThinking) {
+                    if !self.userTranscript.isEmpty && self.userTranscript != self.lastUserTranscript {
+                        self.conversationHistory.append(ConversationMessage(
+                            text: self.userTranscript,
+                            isUser: true,
+                            timestamp: Date()
+                        ))
+                        self.lastUserTranscript = self.userTranscript
+                    }
+                }
+            }
+            .store(in: &subscribers)
+
         manager.$userTranscript
             .receive(on: DispatchQueue.main)
             .assign(to: &$userTranscript)
-            
+
         manager.$aiResponse
             .receive(on: DispatchQueue.main)
             .assign(to: &$aiResponse)

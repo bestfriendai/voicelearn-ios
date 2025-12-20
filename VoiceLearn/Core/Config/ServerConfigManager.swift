@@ -73,6 +73,7 @@ public enum ServerType: String, Codable, Sendable, CaseIterable {
     case ollama = "ollama"                  // Ollama LLM server
     case whisperServer = "whisper"          // Whisper STT server
     case piperServer = "piper"              // Piper TTS server
+    case vibeVoiceServer = "vibevoice"      // VibeVoice TTS server (Microsoft VibeVoice-Realtime-0.5B)
     case llamaCpp = "llama.cpp"             // llama.cpp server
     case vllm = "vllm"                      // vLLM server
     case custom = "custom"                  // Custom OpenAI-compatible
@@ -83,6 +84,7 @@ public enum ServerType: String, Codable, Sendable, CaseIterable {
         case .ollama: return "Ollama"
         case .whisperServer: return "Whisper"
         case .piperServer: return "Piper TTS"
+        case .vibeVoiceServer: return "VibeVoice TTS"
         case .llamaCpp: return "llama.cpp"
         case .vllm: return "vLLM"
         case .custom: return "Custom Server"
@@ -95,6 +97,7 @@ public enum ServerType: String, Codable, Sendable, CaseIterable {
         case .ollama: return 11434
         case .whisperServer: return 11401
         case .piperServer: return 11402
+        case .vibeVoiceServer: return 8880
         case .llamaCpp: return 8080
         case .vllm: return 8000
         case .custom: return 8080
@@ -561,21 +564,54 @@ public actor ServerConfigManager {
         return []
     }
 
+    /// Discover available voices on a VibeVoice TTS server
+    public func discoverVibeVoiceVoices(host: String, port: Int = 8880) async -> [String] {
+        guard let url = URL(string: "http://\(host):\(port)/v1/audio/voices") else {
+            return []
+        }
+
+        do {
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 5
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode == 200 else {
+                return []
+            }
+
+            // Parse VibeVoice /v1/audio/voices response: { "voices": [{ "voice_id": "nova", "name": "nova" }] }
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let voices = json["voices"] as? [[String: Any]] {
+                return voices.compactMap { $0["voice_id"] as? String }
+            }
+        } catch {
+            logger.debug("Failed to discover VibeVoice voices: \(error.localizedDescription)")
+        }
+
+        return []
+    }
+
     /// Full capability discovery for a given host (checks all known services)
     public func discoverCapabilities(host: String) async -> ServerCapabilities {
         async let ollamaModels = discoverOllamaModels(host: host, port: 11434)
         async let piperVoices = discoverPiperVoices(host: host, port: 11402)
+        async let vibeVoiceVoices = discoverVibeVoiceVoices(host: host, port: 8880)
 
         let models = await ollamaModels
-        let voices = await piperVoices
+        let piper = await piperVoices
+        let vibeVoice = await vibeVoiceVoices
 
-        logger.info("Discovered capabilities on \(host): \(models.count) models, \(voices.count) voices")
+        logger.info("Discovered capabilities on \(host): \(models.count) LLM models, \(piper.count) Piper voices, \(vibeVoice.count) VibeVoice voices")
 
         return ServerCapabilities(
             llmModels: models,
-            ttsVoices: voices,
+            piperVoices: piper,
+            vibeVoiceVoices: vibeVoice,
             hasOllama: !models.isEmpty,
-            hasPiperTTS: !voices.isEmpty
+            hasPiperTTS: !piper.isEmpty,
+            hasVibeVoiceTTS: !vibeVoice.isEmpty
         )
     }
 
@@ -713,12 +749,19 @@ public actor ServerConfigManager {
 /// Discovered capabilities from a server
 public struct ServerCapabilities: Sendable {
     public let llmModels: [String]
-    public let ttsVoices: [String]
+    public let piperVoices: [String]
+    public let vibeVoiceVoices: [String]
     public let hasOllama: Bool
     public let hasPiperTTS: Bool
+    public let hasVibeVoiceTTS: Bool
+
+    /// All TTS voices (combined from Piper and VibeVoice)
+    public var ttsVoices: [String] {
+        piperVoices + vibeVoiceVoices
+    }
 
     public var isEmpty: Bool {
-        llmModels.isEmpty && ttsVoices.isEmpty
+        llmModels.isEmpty && piperVoices.isEmpty && vibeVoiceVoices.isEmpty
     }
 
     public var summary: String {
@@ -727,7 +770,10 @@ public struct ServerCapabilities: Sendable {
             parts.append("\(llmModels.count) LLM model(s)")
         }
         if hasPiperTTS {
-            parts.append("\(ttsVoices.count) TTS voice(s)")
+            parts.append("Piper TTS")
+        }
+        if hasVibeVoiceTTS {
+            parts.append("VibeVoice TTS")
         }
         return parts.isEmpty ? "No services found" : parts.joined(separator: ", ")
     }

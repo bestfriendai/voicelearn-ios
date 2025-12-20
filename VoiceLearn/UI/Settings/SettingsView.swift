@@ -205,17 +205,39 @@ public struct SettingsView: View {
                     Picker("Provider", selection: $viewModel.ttsProvider) {
                         Text("Apple TTS (On-Device)").tag(TTSProvider.appleTTS)
                         if viewModel.selfHostedEnabled {
-                            Text("Self-Hosted (Piper)").tag(TTSProvider.selfHosted)
+                            Text("Piper (22kHz)").tag(TTSProvider.selfHosted)
+                            Text("VibeVoice (24kHz)").tag(TTSProvider.vibeVoice)
                         }
                         Text("ElevenLabs").tag(TTSProvider.elevenLabsFlash)
                         Text("Deepgram Aura").tag(TTSProvider.deepgramAura2)
                     }
 
-                    if viewModel.ttsProvider == .selfHosted && !viewModel.discoveredVoices.isEmpty {
+                    // Voice picker for self-hosted TTS providers
+                    if viewModel.ttsProvider == .selfHosted || viewModel.ttsProvider == .vibeVoice {
                         Picker("Voice", selection: $viewModel.ttsVoice) {
-                            ForEach(viewModel.discoveredVoices, id: \.self) { voice in
+                            // Use discovered voices if available, otherwise show default OpenAI-compatible voices
+                            let voices = viewModel.discoveredVoices.isEmpty ? viewModel.defaultTTSVoices : viewModel.discoveredVoices
+                            ForEach(voices, id: \.self) { voice in
                                 Text(voice).tag(voice)
                             }
+                        }
+                    }
+
+                    // Show TTS provider info
+                    if viewModel.ttsProvider == .selfHosted || viewModel.ttsProvider == .vibeVoice {
+                        HStack {
+                            Text("Port")
+                            Spacer()
+                            Text("\(viewModel.ttsProvider.defaultPort)")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                        HStack {
+                            Text("Sample Rate")
+                            Spacer()
+                            Text("\(Int(viewModel.ttsProvider.sampleRate)) Hz")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
                         }
                     }
 
@@ -228,7 +250,9 @@ public struct SettingsView: View {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundStyle(.green)
-                            Text(viewModel.ttsProvider == .selfHosted ? "Uses self-hosted server - Free" : "Works offline - Free")
+                            Text(viewModel.ttsProvider == .selfHosted ? "Uses Piper server - Free" :
+                                 viewModel.ttsProvider == .vibeVoice ? "Uses VibeVoice server - Free" :
+                                 "Works offline - Free")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -508,8 +532,26 @@ class SettingsViewModel: ObservableObject {
     @AppStorage("primaryServerIP") var primaryServerIP: String = ""
     @Published var serverConnectionStatus: ServerConnectionStatus = .notConfigured
     @Published var discoveredModels: [String] = []
-    @Published var discoveredVoices: [String] = []
+    @Published var discoveredPiperVoices: [String] = []
+    @Published var discoveredVibeVoiceVoices: [String] = []
     @Published var serverCapabilitiesSummary: String = ""
+
+    /// Get discovered voices for the currently selected TTS provider
+    var discoveredVoices: [String] {
+        switch ttsProvider {
+        case .selfHosted:
+            return discoveredPiperVoices
+        case .vibeVoice:
+            return discoveredVibeVoiceVoices
+        default:
+            return []
+        }
+    }
+
+    /// Default TTS voices (OpenAI-compatible) - used when server voices not discovered
+    var defaultTTSVoices: [String] {
+        ["alloy", "echo", "fable", "nova", "onyx", "shimmer"]
+    }
 
     // Remote Logging
     @AppStorage("logServerIP") var logServerIP: String = ""
@@ -648,7 +690,8 @@ class SettingsViewModel: ObservableObject {
         guard selfHostedEnabled, !primaryServerIP.isEmpty else {
             serverConnectionStatus = .notConfigured
             discoveredModels = []
-            discoveredVoices = []
+            discoveredPiperVoices = []
+            discoveredVibeVoiceVoices = []
             serverCapabilitiesSummary = ""
             return
         }
@@ -671,10 +714,11 @@ class SettingsViewModel: ObservableObject {
                httpResponse.statusCode == 200 {
                 serverConnectionStatus = .connected
 
-                // Discover capabilities
+                // Discover capabilities (checks Ollama, Piper, and VibeVoice)
                 let capabilities = await ServerConfigManager.shared.discoverCapabilities(host: primaryServerIP)
                 discoveredModels = capabilities.llmModels
-                discoveredVoices = capabilities.ttsVoices
+                discoveredPiperVoices = capabilities.piperVoices
+                discoveredVibeVoiceVoices = capabilities.vibeVoiceVoices
                 serverCapabilitiesSummary = capabilities.summary
 
                 // Auto-select first discovered model if current model not in list

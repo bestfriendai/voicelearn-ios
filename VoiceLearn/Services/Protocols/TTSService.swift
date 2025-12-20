@@ -244,6 +244,7 @@ public enum TTSProvider: String, Codable, Sendable, CaseIterable {
     case playHT = "PlayHT"
     case appleTTS = "Apple TTS (On-Device)"
     case selfHosted = "Self-Hosted (Piper)"
+    case vibeVoice = "Self-Hosted (VibeVoice)"
 
     /// Display name for UI
     public var displayName: String {
@@ -259,6 +260,7 @@ public enum TTSProvider: String, Codable, Sendable, CaseIterable {
         case .playHT: return "playht"
         case .appleTTS: return "apple"
         case .selfHosted: return "piper"
+        case .vibeVoice: return "vibevoice"
         }
     }
 
@@ -267,7 +269,7 @@ public enum TTSProvider: String, Codable, Sendable, CaseIterable {
         switch self {
         case .appleTTS:
             return false
-        case .selfHosted:
+        case .selfHosted, .vibeVoice:
             return true  // Requires local network to self-hosted server
         default:
             return true
@@ -277,10 +279,28 @@ public enum TTSProvider: String, Codable, Sendable, CaseIterable {
     /// Whether this provider requires an API key
     public var requiresAPIKey: Bool {
         switch self {
-        case .appleTTS, .selfHosted:
+        case .appleTTS, .selfHosted, .vibeVoice:
             return false
         default:
             return true
+        }
+    }
+
+    /// Default port for self-hosted providers
+    public var defaultPort: Int {
+        switch self {
+        case .selfHosted: return 11402  // Piper
+        case .vibeVoice: return 8880    // VibeVoice
+        default: return 0
+        }
+    }
+
+    /// Default sample rate for this provider
+    public var sampleRate: Double {
+        switch self {
+        case .selfHosted: return 22050  // Piper outputs 22050 Hz
+        case .vibeVoice: return 24000   // VibeVoice outputs 24000 Hz
+        default: return 24000
         }
     }
 }

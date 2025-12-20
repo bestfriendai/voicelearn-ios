@@ -149,6 +149,13 @@ public final class SessionManager: ObservableObject {
     private var hasDetectedSpeech: Bool = false
     private let silenceThreshold: TimeInterval = 1.5  // seconds of silence before completing utterance
     private var pendingUtteranceTask: Task<Void, Never>?
+
+    /// Sentence-level TTS streaming
+    private var ttsSentenceQueue: [String] = []
+    private var isTTSPlaying: Bool = false
+    private var sentenceBuffer: String = ""
+    private var ttsQueueTask: Task<Void, Never>?
+    private var isLLMStreamingComplete: Bool = false
     
     // MARK: - Initialization
     
@@ -207,8 +214,9 @@ public final class SessionManager: ObservableObject {
 
         try await audioEngine?.configure(config: config.audio)
 
-        // Configure TTS voice
-        await ttsService.configure(config.voice)
+        // Note: TTS voice is already configured when ttsService is created in SessionView
+        // Do NOT call ttsService.configure(config.voice) here as config.voice defaults to "default"
+        // which would overwrite the properly configured voice ID
 
         // Initialize conversation with system prompt (use override if provided)
         let effectiveSystemPrompt = systemPrompt ?? config.systemPrompt
@@ -256,12 +264,19 @@ public final class SessionManager: ObservableObject {
     public func stopSession() async {
         logger.info("Stopping session")
 
-        // Cancel all streaming tasks
+        // Cancel all streaming tasks first
         sttStreamTask?.cancel()
+        sttStreamTask = nil
         llmStreamTask?.cancel()
+        llmStreamTask = nil
         ttsStreamTask?.cancel()
+        ttsStreamTask = nil
+        ttsQueueTask?.cancel()
+        ttsQueueTask = nil
         pendingUtteranceTask?.cancel()
+        pendingUtteranceTask = nil
         audioSubscription?.cancel()
+        audioSubscription = nil
 
         // Stop services
         await audioEngine?.stop()
@@ -273,11 +288,21 @@ public final class SessionManager: ObservableObject {
         // Persist session to Core Data before clearing state
         await persistSessionToStorage()
 
-        // Clear state
+        // Clear all state
         conversationHistory.removeAll()
         silenceStartTime = nil
         hasDetectedSpeech = false
-        pendingUtteranceTask = nil
+        ttsSentenceQueue.removeAll()
+        sentenceBuffer = ""
+        isTTSPlaying = false
+        isLLMStreamingComplete = false
+
+        // Clear service references so they can be re-created on next session
+        audioEngine = nil
+        sttService = nil
+        ttsService = nil
+        llmService = nil
+
         await MainActor.run {
             userTranscript = ""
             aiResponse = ""
@@ -286,7 +311,7 @@ public final class SessionManager: ObservableObject {
 
         await setState(.idle)
 
-        logger.info("Session stopped")
+        logger.info("Session stopped - all services and state cleared")
     }
 
     // MARK: - Session Persistence
@@ -328,6 +353,16 @@ public final class SessionManager: ObservableObject {
             if let configData = try? JSONEncoder().encode(configSnapshot) {
                 session.config = configData
             }
+
+            // Export and save metrics snapshot from telemetry
+            let metricsSnapshot = await telemetry.exportMetrics()
+            if let metricsData = try? JSONEncoder().encode(metricsSnapshot) {
+                session.metricsSnapshot = metricsData
+                logger.info("Saved metrics snapshot: e2eMedian=\(metricsSnapshot.latencies.e2eMedianMs)ms, totalCost=$\(metricsSnapshot.costs.totalSession)")
+            }
+
+            // Calculate and save total cost
+            session.totalCost = NSDecimalNumber(decimal: metricsSnapshot.costs.totalSession)
 
             // Create TranscriptEntry entities for each message
             var transcriptEntries: [TranscriptEntry] = []
@@ -573,6 +608,14 @@ public final class SessionManager: ObservableObject {
             var fullResponse = ""
             var isFirstToken = true
 
+            // Reset sentence buffer and TTS queue for new response
+            self.sentenceBuffer = ""
+            self.ttsSentenceQueue = []
+            self.isTTSPlaying = false
+
+            // Start the TTS queue processor
+            self.startTTSQueueProcessor()
+
             llmStreamTask = Task {
                 for await token in stream {
                     if isFirstToken {
@@ -591,17 +634,25 @@ public final class SessionManager: ObservableObject {
                     }
 
                     fullResponse += token.content
+                    self.sentenceBuffer += token.content
 
                     await MainActor.run {
                         self.aiResponse = fullResponse
                     }
 
-                    // Stream text to TTS
-                    // (In production, buffer sentences before TTS)
+                    // Check for complete sentences and queue them for TTS
+                    await self.extractAndQueueSentences()
 
                     if token.isDone {
                         break
                     }
+                }
+
+                // Queue any remaining text in the buffer
+                if !self.sentenceBuffer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    self.ttsSentenceQueue.append(self.sentenceBuffer.trimmingCharacters(in: .whitespacesAndNewlines))
+                    self.sentenceBuffer = ""
+                    logger.info("Queued final sentence fragment for TTS")
                 }
 
                 // Check if we got any response
@@ -616,8 +667,12 @@ public final class SessionManager: ObservableObject {
                 // Add AI response to history
                 self.conversationHistory.append(LLMMessage(role: .assistant, content: fullResponse))
 
-                // Synthesize and play TTS
-                await self.synthesizeAndPlayResponse(fullResponse)
+                // Signal that LLM streaming is complete - TTS queue processor will finish
+                // when all sentences have been played
+                self.isLLMStreamingComplete = true
+                logger.info("LLM streaming complete - TTS queue will finish when all sentences played")
+
+                // The queue processor will handle state transition when done
             }
 
         } catch {
@@ -650,9 +705,162 @@ public final class SessionManager: ObservableObject {
 
         logger.info("Recovered to userSpeaking state after error")
     }
-    
-    // MARK: - TTS Handling
-    
+
+    // MARK: - Sentence-Level TTS Streaming
+
+    /// Extract complete sentences from the buffer and queue them for TTS
+    private func extractAndQueueSentences() async {
+        // Sentence-ending punctuation followed by space or end of string
+        let sentenceEnders = CharacterSet(charactersIn: ".!?")
+
+        while let range = sentenceBuffer.rangeOfCharacter(from: sentenceEnders) {
+            // Check if this is followed by a space, newline, or is at the end
+            let endIndex = range.upperBound
+            let nextIndex = sentenceBuffer.index(after: range.lowerBound)
+
+            // Make sure we're not in the middle of an abbreviation like "Dr." or "Mr."
+            let beforePunctuation = String(sentenceBuffer[..<range.lowerBound])
+            let isAbbreviation = beforePunctuation.hasSuffix("Dr") ||
+                                 beforePunctuation.hasSuffix("Mr") ||
+                                 beforePunctuation.hasSuffix("Mrs") ||
+                                 beforePunctuation.hasSuffix("Ms") ||
+                                 beforePunctuation.hasSuffix("vs") ||
+                                 beforePunctuation.hasSuffix("etc") ||
+                                 beforePunctuation.hasSuffix("e.g") ||
+                                 beforePunctuation.hasSuffix("i.e")
+
+            if isAbbreviation {
+                // Move past this punctuation and continue looking
+                if nextIndex < sentenceBuffer.endIndex {
+                    let remaining = String(sentenceBuffer[nextIndex...])
+                    if let nextRange = remaining.rangeOfCharacter(from: sentenceEnders) {
+                        // Found another sentence ender, continue the loop
+                        continue
+                    }
+                }
+                break
+            }
+
+            // Check if followed by space or end
+            if nextIndex >= sentenceBuffer.endIndex ||
+               sentenceBuffer[nextIndex].isWhitespace ||
+               sentenceBuffer[nextIndex].isNewline {
+                // Extract the sentence (including the punctuation)
+                let sentence = String(sentenceBuffer[..<nextIndex]).trimmingCharacters(in: .whitespacesAndNewlines)
+
+                if !sentence.isEmpty {
+                    ttsSentenceQueue.append(sentence)
+                    logger.info("🔊 Queued sentence for TTS (\(ttsSentenceQueue.count) in queue): \"\(sentence.prefix(50))...\"")
+                }
+
+                // Remove the sentence from the buffer
+                if nextIndex < sentenceBuffer.endIndex {
+                    sentenceBuffer = String(sentenceBuffer[nextIndex...]).trimmingCharacters(in: .whitespaces)
+                } else {
+                    sentenceBuffer = ""
+                }
+            } else {
+                break
+            }
+        }
+    }
+
+    /// Start the TTS queue processor that plays sentences as they're queued
+    private func startTTSQueueProcessor() {
+        ttsQueueTask?.cancel()
+        isLLMStreamingComplete = false
+
+        ttsQueueTask = Task {
+            logger.info("🔊 TTS queue processor started")
+            var isFirstSentence = true
+
+            while !Task.isCancelled {
+                // Wait for items in the queue
+                if ttsSentenceQueue.isEmpty {
+                    // Check if LLM is done AND we've finished all sentences
+                    if isLLMStreamingComplete {
+                        // Double-check the queue is still empty (might have been filled during last play)
+                        if ttsSentenceQueue.isEmpty {
+                            logger.info("🔊 LLM complete and queue empty, finishing TTS processor")
+                            break
+                        }
+                    }
+                    // Wait a bit for more sentences
+                    try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                    continue
+                }
+
+                // Dequeue the next sentence
+                let sentence = ttsSentenceQueue.removeFirst()
+                logger.info("🔊 Processing TTS for: \"\(sentence.prefix(50))...\" (\(ttsSentenceQueue.count) remaining in queue)")
+
+                // Record TTFB on first sentence
+                if isFirstSentence {
+                    isFirstSentence = false
+                    if let turnStart = currentTurnStartTime {
+                        let ttsTTFB = Date().timeIntervalSince(turnStart)
+                        await telemetry.recordLatency(.ttsTTFB, ttsTTFB)
+                        logger.info("🔊 TTS TTFB (first sentence queued): \(String(format: "%.3f", ttsTTFB))s")
+                    }
+                }
+
+                // Synthesize and play this sentence - WAIT for it to complete before getting next
+                isTTSPlaying = true
+                await synthesizeAndPlaySentence(sentence)
+                isTTSPlaying = false
+                logger.info("🔊 Finished playing sentence")
+            }
+
+            logger.info("🔊 TTS queue processor finished - all sentences played")
+
+            // Record end-to-end latency
+            if let turnStart = currentTurnStartTime {
+                let e2e = Date().timeIntervalSince(turnStart)
+                await telemetry.recordLatency(.endToEndTurn, e2e)
+                logger.info("Turn E2E latency: \(String(format: "%.3f", e2e))s")
+            }
+
+            // Ready for next user turn
+            await telemetry.recordEvent(.aiFinishedSpeaking)
+            logger.info("AI finished speaking, transitioning to userSpeaking state")
+
+            // Reset silence tracking for new turn
+            hasDetectedSpeech = false
+            silenceStartTime = nil
+
+            await setState(.userSpeaking)
+
+            // NOTE: We no longer clear userTranscript and aiResponse here
+            // The transcript should persist for the user to see the conversation history
+        }
+    }
+
+    /// Synthesize and play a single sentence
+    private func synthesizeAndPlaySentence(_ text: String) async {
+        guard let ttsService = ttsService else {
+            logger.error("TTS service is nil - cannot synthesize sentence")
+            return
+        }
+
+        do {
+            let stream = try await ttsService.synthesize(text: text)
+
+            for await chunk in stream {
+                if let audioEngine = audioEngine {
+                    try await audioEngine.playAudio(chunk)
+                }
+
+                if chunk.isLast {
+                    break
+                }
+            }
+        } catch {
+            logger.error("Failed to synthesize sentence: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - TTS Handling (Legacy - Full Response)
+
     private func synthesizeAndPlayResponse(_ text: String) async {
         logger.info("synthesizeAndPlayResponse called with text length: \(text.count)")
 

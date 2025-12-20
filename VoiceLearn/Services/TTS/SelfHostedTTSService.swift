@@ -10,7 +10,8 @@ import AVFoundation
 /// Self-hosted TTS service compatible with OpenAI TTS API format
 ///
 /// Works with:
-/// - Piper TTS server
+/// - Piper TTS server (port 11402, 22050 Hz)
+/// - VibeVoice (Microsoft VibeVoice-Realtime-0.5B, port 8880, 24000 Hz)
 /// - OpenedAI Speech
 /// - Coqui TTS server
 /// - VoiceLearn gateway TTS endpoint
@@ -24,6 +25,8 @@ public actor SelfHostedTTSService: TTSService {
     private let authToken: String?
     private var voiceId: String
     private let outputFormat: AudioFormat
+    private let sampleRate: Double  // Sample rate for audio output (22050 for Piper, 24000 for VibeVoice)
+    private let providerName: String  // For logging purposes
 
     /// Performance metrics
     public private(set) var metrics: TTSMetrics = TTSMetrics(
@@ -48,32 +51,40 @@ public actor SelfHostedTTSService: TTSService {
     ///   - baseURL: Base URL of the server (e.g., http://localhost:11402)
     ///   - voiceId: Voice identifier (depends on server)
     ///   - outputFormat: Desired audio format
+    ///   - sampleRate: Audio sample rate (22050 for Piper, 24000 for VibeVoice)
+    ///   - providerName: Name for logging (e.g., "Piper", "VibeVoice")
     ///   - authToken: Optional authentication token
     public init(
         baseURL: URL,
         voiceId: String = "nova",
         outputFormat: AudioFormat = .wav,
+        sampleRate: Double = 22050,
+        providerName: String = "SelfHosted",
         authToken: String? = nil
     ) {
         self.baseURL = baseURL
         self.voiceId = voiceId
         self.outputFormat = outputFormat
+        self.sampleRate = sampleRate
+        self.providerName = providerName
         self.authToken = authToken
         self.voiceConfig = TTSVoiceConfig(voiceId: voiceId)
-        logger.info("SelfHostedTTSService initialized: \(baseURL.absoluteString)")
+        logger.info("\(providerName)TTSService initialized: \(baseURL.absoluteString), sampleRate=\(Int(sampleRate))Hz")
     }
 
     /// Initialize from ServerConfig
-    public init?(server: ServerConfig, voiceId: String = "nova") {
+    public init?(server: ServerConfig, voiceId: String = "nova", sampleRate: Double = 22050, providerName: String = "SelfHosted") {
         guard let baseURL = server.baseURL else {
             return nil
         }
         self.baseURL = baseURL
         self.voiceId = voiceId
         self.outputFormat = .wav
+        self.sampleRate = sampleRate
+        self.providerName = providerName
         self.authToken = nil
         self.voiceConfig = TTSVoiceConfig(voiceId: voiceId)
-        logger.info("SelfHostedTTSService initialized from server config: \(server.name)")
+        logger.info("\(providerName)TTSService initialized from server config: \(server.name)")
     }
 
     /// Initialize with auto-discovery
@@ -89,6 +100,8 @@ public actor SelfHostedTTSService: TTSService {
         self.baseURL = baseURL
         self.voiceId = "nova"
         self.outputFormat = .wav
+        self.sampleRate = 22050  // Default to Piper
+        self.providerName = "SelfHosted"
         self.authToken = nil
         self.voiceConfig = TTSVoiceConfig(voiceId: "nova")
     }
@@ -104,8 +117,8 @@ public actor SelfHostedTTSService: TTSService {
 
     /// Synthesize text to audio stream
     public func synthesize(text: String) async throws -> AsyncStream<TTSAudioChunk> {
-        logger.info("SelfHostedTTS.synthesize called - text length: \(text.count), first 50 chars: '\(text.prefix(50))...'")
-        logger.info("SelfHostedTTS config - baseURL: \(baseURL.absoluteString), voice: \(voiceId), format: \(outputFormat.rawValue)")
+        logger.info("[\(providerName)] synthesize called - text length: \(text.count), first 50 chars: '\(text.prefix(50))...'")
+        logger.info("[\(providerName)] config - baseURL: \(baseURL.absoluteString), voice: \(voiceId), sampleRate: \(Int(sampleRate))Hz")
 
         let startTime = Date()
         let currentVoiceId = voiceId
@@ -158,11 +171,11 @@ public actor SelfHostedTTSService: TTSService {
                     }
 
                     // Create audio chunk from response data
-                    // Piper outputs WAV which is PCM 16-bit at 22050 Hz (mono)
-                    self.logger.info("Creating TTSAudioChunk with \(data.count) bytes of audio data")
+                    // Piper outputs WAV at 22050 Hz, VibeVoice outputs WAV at 24000 Hz (both PCM 16-bit mono)
+                    self.logger.info("[\(self.providerName)] Creating TTSAudioChunk with \(data.count) bytes of audio data, sampleRate=\(Int(self.sampleRate))Hz")
                     let chunk = TTSAudioChunk(
                         audioData: data,
-                        format: .pcmInt16(sampleRate: 22050, channels: 1),
+                        format: .pcmInt16(sampleRate: self.sampleRate, channels: 1),
                         sequenceNumber: 0,
                         isFirst: true,
                         isLast: true
@@ -288,13 +301,43 @@ public actor SelfHostedTTSService: TTSService {
 extension SelfHostedTTSService {
 
     /// Create a service connected to local Piper server
+    /// - Parameters:
+    ///   - host: Server hostname or IP (default: localhost)
+    ///   - port: Piper port (default: 11402)
+    ///   - voice: Voice ID (default: nova)
+    /// - Returns: Configured TTS service for Piper (22050 Hz)
     public static func piper(
         host: String = "localhost",
         port: Int = 11402,
         voice: String = "nova"
     ) -> SelfHostedTTSService {
         let url = URL(string: "http://\(host):\(port)")!
-        return SelfHostedTTSService(baseURL: url, voiceId: voice)
+        return SelfHostedTTSService(
+            baseURL: url,
+            voiceId: voice,
+            sampleRate: 22050,  // Piper outputs 22050 Hz
+            providerName: "Piper"
+        )
+    }
+
+    /// Create a service connected to local VibeVoice server (Microsoft VibeVoice-Realtime-0.5B)
+    /// - Parameters:
+    ///   - host: Server hostname or IP (default: localhost)
+    ///   - port: VibeVoice port (default: 8880)
+    ///   - voice: Voice ID - supports OpenAI aliases: alloy, echo, fable, onyx, nova, shimmer (default: nova)
+    /// - Returns: Configured TTS service for VibeVoice (24000 Hz)
+    public static func vibeVoice(
+        host: String = "localhost",
+        port: Int = 8880,
+        voice: String = "nova"
+    ) -> SelfHostedTTSService {
+        let url = URL(string: "http://\(host):\(port)")!
+        return SelfHostedTTSService(
+            baseURL: url,
+            voiceId: voice,
+            sampleRate: 24000,  // VibeVoice outputs 24000 Hz
+            providerName: "VibeVoice"
+        )
     }
 
     /// Create a service connected to VoiceLearn gateway
@@ -304,12 +347,38 @@ extension SelfHostedTTSService {
         voice: String = "nova"
     ) -> SelfHostedTTSService {
         let url = URL(string: "http://\(host):\(port)")!
-        return SelfHostedTTSService(baseURL: url, voiceId: voice)
+        return SelfHostedTTSService(
+            baseURL: url,
+            voiceId: voice,
+            sampleRate: 22050,
+            providerName: "Gateway"
+        )
     }
 
     /// Create a service from auto-discovered server
     public static func autoDiscover() async -> SelfHostedTTSService? {
         await SelfHostedTTSService()
+    }
+
+    /// Create a TTS service based on provider type
+    /// - Parameters:
+    ///   - provider: The TTS provider to use
+    ///   - host: Server hostname or IP
+    ///   - voice: Voice ID
+    /// - Returns: Configured TTS service for the specified provider
+    public static func forProvider(
+        _ provider: TTSProvider,
+        host: String,
+        voice: String = "nova"
+    ) -> SelfHostedTTSService? {
+        switch provider {
+        case .selfHosted:
+            return piper(host: host, voice: voice)
+        case .vibeVoice:
+            return vibeVoice(host: host, voice: voice)
+        default:
+            return nil  // Not a self-hosted provider
+        }
     }
 }
 

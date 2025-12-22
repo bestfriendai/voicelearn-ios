@@ -1,0 +1,675 @@
+{
+  "umlcf": "1.0.0",
+  "id": {
+    "catalog": "UUID",
+    "value": "c3d4e5f6-a7b8-9012-cdef-345678901234"
+  },
+  "title": "PyTorch Fundamentals",
+  "description": "A comprehensive introduction to deep learning with PyTorch, covering tensors, datasets, neural networks, and the complete training pipeline.",
+  "version": {
+    "number": "1.0.0",
+    "date": "2025-12-17T00:00:00Z",
+    "changelog": "Initial release matching VoiceLearn sample curriculum"
+  },
+  "lifecycle": {
+    "status": "final",
+    "contributors": [
+      {
+        "name": "VoiceLearn Curriculum Team",
+        "role": "author",
+        "organization": "VoiceLearn"
+      }
+    ],
+    "created": "2025-12-17T00:00:00Z"
+  },
+  "metadata": {
+    "language": "en-US",
+    "keywords": ["pytorch", "deep learning", "machine learning", "neural networks", "tensors", "python"],
+    "structure": "hierarchical",
+    "aggregationLevel": 3
+  },
+  "educational": {
+    "interactivityType": "mixed",
+    "interactivityLevel": "high",
+    "learningResourceType": ["tutorial", "conversation", "self assessment"],
+    "intendedEndUserRole": ["learner"],
+    "context": ["higher education", "training"],
+    "typicalAgeRange": "18+",
+    "difficulty": "medium",
+    "typicalLearningTime": "PT8H",
+    "educationalAlignment": [
+      {
+        "alignmentType": "teaches",
+        "educationalFramework": "ACM Computing Curricula",
+        "targetName": "Machine Learning Fundamentals"
+      }
+    ],
+    "audienceProfile": {
+      "educationLevel": "undergraduate",
+      "prerequisites": [
+        {
+          "description": "Basic Python programming",
+          "required": true
+        },
+        {
+          "description": "Familiarity with NumPy arrays",
+          "required": false
+        },
+        {
+          "description": "Basic linear algebra (vectors, matrices)",
+          "required": true
+        },
+        {
+          "description": "Basic calculus (derivatives)",
+          "required": false
+        }
+      ]
+    }
+  },
+  "rights": {
+    "cost": false,
+    "license": {
+      "type": "CC-BY-4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "holder": "VoiceLearn Inc."
+  },
+  "glossary": {
+    "terms": [
+      {
+        "id": "term-tensor",
+        "term": "tensor",
+        "pronunciation": "/ˈtensər/",
+        "definition": "A multi-dimensional array that is the fundamental data structure in PyTorch, similar to NumPy arrays but with GPU support and automatic differentiation.",
+        "spokenDefinition": "A tensor is basically a multi-dimensional array - like a spreadsheet that can have many dimensions. What makes PyTorch tensors special is they can run on GPUs for fast computation and automatically track gradients for training neural networks.",
+        "relatedTerms": ["ndarray", "matrix", "gradient"]
+      },
+      {
+        "id": "term-gradient",
+        "term": "gradient",
+        "pronunciation": "/ˈɡrādēənt/",
+        "definition": "The derivative of a function with respect to its inputs, indicating the direction of steepest increase.",
+        "spokenDefinition": "A gradient tells you how to adjust your model's parameters to reduce errors. Think of it like a compass pointing downhill - follow the gradient in the opposite direction to find the lowest point, which represents the best model.",
+        "relatedTerms": ["derivative", "backpropagation", "autograd"]
+      },
+      {
+        "id": "term-epoch",
+        "term": "epoch",
+        "pronunciation": "/ˈēpäk/",
+        "definition": "One complete pass through the entire training dataset during model training.",
+        "spokenDefinition": "An epoch is one full cycle through all your training data. Training usually requires many epochs - like how a student might read a textbook multiple times to fully understand it.",
+        "relatedTerms": ["batch", "iteration", "training loop"]
+      },
+      {
+        "id": "term-loss",
+        "term": "loss function",
+        "pronunciation": "/lôs ˈfəNGkSH(ə)n/",
+        "definition": "A function that measures how far the model's predictions are from the actual targets.",
+        "spokenDefinition": "A loss function tells you how wrong your model is. Lower loss means better predictions. During training, we try to minimize this loss by adjusting the model's weights.",
+        "synonyms": ["cost function", "objective function"],
+        "relatedTerms": ["cross-entropy", "MSE", "optimization"]
+      },
+      {
+        "id": "term-backprop",
+        "term": "backpropagation",
+        "pronunciation": "/bakˌpräpəˈɡāSH(ə)n/",
+        "definition": "The algorithm for computing gradients of the loss with respect to all model parameters by applying the chain rule recursively.",
+        "spokenDefinition": "Backpropagation is how neural networks learn. It works backwards from the output, calculating how each weight contributed to the error. This tells us exactly how to adjust each weight to improve the model.",
+        "synonyms": ["backprop"],
+        "relatedTerms": ["gradient", "chain rule", "autograd"]
+      }
+    ]
+  },
+  "content": [
+    {
+      "id": { "value": "course-pytorch" },
+      "title": "PyTorch Fundamentals Course",
+      "type": "curriculum",
+      "learningObjectives": [
+        {
+          "id": { "value": "obj-tensors" },
+          "statement": "Create and manipulate PyTorch tensors for numerical computation",
+          "bloomsLevel": "apply"
+        },
+        {
+          "id": { "value": "obj-data" },
+          "statement": "Build custom datasets and dataloaders for efficient data handling",
+          "bloomsLevel": "create"
+        },
+        {
+          "id": { "value": "obj-nn" },
+          "statement": "Design and implement neural network architectures using nn.Module",
+          "bloomsLevel": "create"
+        },
+        {
+          "id": { "value": "obj-training" },
+          "statement": "Implement complete training loops with loss computation and optimization",
+          "bloomsLevel": "apply"
+        }
+      ],
+      "tutoringConfig": {
+        "contentDepth": "intermediate",
+        "adaptiveDepth": true,
+        "interactionMode": "socratic",
+        "allowTangents": true,
+        "checkpointFrequency": "medium"
+      },
+      "children": [
+        {
+          "id": { "value": "topic-tensors" },
+          "title": "Tensors",
+          "type": "topic",
+          "orderIndex": 0,
+          "description": "Learn the fundamental data structure in PyTorch - the tensor. Understand creation, manipulation, and GPU acceleration.",
+          "timeEstimates": {
+            "overview": "PT5M",
+            "introductory": "PT20M",
+            "intermediate": "PT45M",
+            "advanced": "PT1H30M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-tensor-intro",
+                "type": "introduction",
+                "content": "Welcome to PyTorch! Today we're going to learn about tensors, which are the foundation of everything in PyTorch. If you've used NumPy before, tensors will feel familiar - but they have some superpowers that make deep learning possible.",
+                "speakingNotes": {
+                  "emotionalTone": "enthusiastic",
+                  "emphasis": ["foundation", "superpowers"]
+                }
+              },
+              {
+                "id": "seg-what-is-tensor",
+                "type": "explanation",
+                "content": "A tensor is essentially a multi-dimensional array. A zero-dimensional tensor is just a number - a scalar. A one-dimensional tensor is a vector, like a list of numbers. A two-dimensional tensor is a matrix, like a spreadsheet. And tensors can have even more dimensions - three, four, or more - which is common when working with images or batches of data.",
+                "glossaryRefs": ["term-tensor"],
+                "speakingNotes": {
+                  "pace": "slow"
+                },
+                "stoppingPoint": {
+                  "type": "natural",
+                  "promptForContinue": true
+                }
+              },
+              {
+                "id": "seg-creating-tensors",
+                "type": "lecture",
+                "content": "Let me show you several ways to create tensors. You can create a tensor from a Python list using torch.tensor with your list as the argument. You can create tensors filled with zeros using torch.zeros, or ones using torch.ones, passing in the shape you want. For random values, torch.rand gives uniform random numbers between 0 and 1, while torch.randn gives random numbers from a normal distribution.",
+                "checkpoint": {
+                  "type": "comprehension_check",
+                  "prompt": "If I wanted to create a tensor filled with random values, which function would I use?",
+                  "expectedResponsePatterns": ["rand", "randn", "torch.rand", "torch.randn"],
+                  "fallbackBehavior": "continue"
+                }
+              },
+              {
+                "id": "seg-gpu",
+                "type": "explanation",
+                "content": "Here's where tensors get their superpower: GPU acceleration. You can move any tensor to a GPU using the .to('cuda') method, or the .cuda() shorthand. Operations on GPU tensors are massively parallel, which is why deep learning became practical - GPUs can do thousands of calculations simultaneously.",
+                "speakingNotes": {
+                  "emphasis": ["superpower", "massively parallel", "simultaneously"],
+                  "emotionalTone": "excited"
+                }
+              }
+            ],
+            "voiceProfile": {
+              "tone": "conversational",
+              "pace": "moderate"
+            }
+          },
+          "examples": [
+            {
+              "id": "ex-create-tensor",
+              "type": "code",
+              "title": "Creating Tensors",
+              "codeLanguage": "python",
+              "content": "import torch\n\n# From a Python list\nx = torch.tensor([1, 2, 3, 4])\n\n# Zeros and ones\nzeros = torch.zeros(3, 4)  # 3x4 matrix of zeros\nones = torch.ones(2, 3)    # 2x3 matrix of ones\n\n# Random tensors\nrand = torch.rand(5, 5)    # Uniform [0, 1)\nrandn = torch.randn(5, 5)  # Normal distribution\n\n# Move to GPU (if available)\nif torch.cuda.is_available():\n    x_gpu = x.to('cuda')",
+              "spokenContent": "Here's how to create tensors in PyTorch. First, import torch. Then you can create a tensor from a Python list by calling torch.tensor. For zeros and ones, specify the dimensions you want. For random values, use rand or randn with the shape. And to use GPU acceleration, call .to('cuda') on any tensor.",
+              "codeExplanation": [
+                { "lineRange": "1", "explanation": "Import the PyTorch library" },
+                { "lineRange": "4", "explanation": "Create a 1D tensor from a Python list" },
+                { "lineRange": "7-8", "explanation": "Create tensors filled with zeros or ones of specified shape" },
+                { "lineRange": "11-12", "explanation": "Create random tensors - rand is uniform, randn is normal distribution" },
+                { "lineRange": "15-16", "explanation": "Move tensor to GPU for accelerated computation" }
+              ],
+              "complexity": "simple"
+            }
+          ],
+          "misconceptions": [
+            {
+              "id": "misc-numpy",
+              "misconception": "PyTorch tensors and NumPy arrays are exactly the same",
+              "triggerPhrases": ["same as numpy", "just like ndarray", "no difference"],
+              "correction": "While similar, PyTorch tensors have two key advantages: they can run on GPUs and they support automatic differentiation for gradient computation. NumPy arrays cannot do either.",
+              "severity": "moderate",
+              "remediationPath": {
+                "reviewTopics": ["topic-autograd"]
+              }
+            }
+          ],
+          "assessments": [
+            {
+              "id": { "value": "q-tensor-create" },
+              "type": "choice",
+              "prompt": "Which function creates a tensor filled with random values from a normal distribution?",
+              "choices": [
+                { "id": "a", "text": "torch.zeros()", "correct": false },
+                { "id": "b", "text": "torch.rand()", "correct": false, "feedback": "torch.rand() gives uniform random values between 0 and 1" },
+                { "id": "c", "text": "torch.randn()", "correct": true, "feedback": "Correct! randn gives values from a standard normal distribution" },
+                { "id": "d", "text": "torch.random()", "correct": false }
+              ],
+              "difficulty": 0.3,
+              "objectivesAssessed": ["obj-tensors"]
+            }
+          ]
+        },
+        {
+          "id": { "value": "topic-datasets" },
+          "title": "Datasets and DataLoaders",
+          "type": "topic",
+          "orderIndex": 1,
+          "description": "Learn to create custom datasets and use DataLoaders for efficient batching and shuffling of training data.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-tensors",
+              "required": true,
+              "minimumMastery": 0.7
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT5M",
+            "introductory": "PT25M",
+            "intermediate": "PT50M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-data-intro",
+                "type": "introduction",
+                "content": "Now that you understand tensors, let's talk about how to get data into your model efficiently. PyTorch provides two key abstractions: Dataset and DataLoader. Together, they handle all the complexity of loading, batching, and shuffling your data.",
+                "speakingNotes": {
+                  "emphasis": ["Dataset", "DataLoader"]
+                }
+              },
+              {
+                "id": "seg-dataset-class",
+                "type": "explanation",
+                "content": "A Dataset is a class that knows how to load individual samples. To create a custom dataset, you inherit from torch.utils.data.Dataset and implement two methods: __len__ which returns the total number of samples, and __getitem__ which loads and returns a single sample given an index. This lazy loading approach means you don't need to load everything into memory at once.",
+                "stoppingPoint": {
+                  "type": "natural",
+                  "promptForContinue": true
+                }
+              },
+              {
+                "id": "seg-dataloader",
+                "type": "lecture",
+                "content": "The DataLoader wraps a Dataset and adds powerful features. It can batch samples together - so instead of one sample at a time, you get, say, 32 samples in a single tensor. It can shuffle the data each epoch, which helps training. And it can load data in parallel using multiple workers, speeding up the data pipeline significantly.",
+                "speakingNotes": {
+                  "emphasis": ["batch", "shuffle", "parallel"]
+                }
+              }
+            ]
+          },
+          "examples": [
+            {
+              "id": "ex-custom-dataset",
+              "type": "code",
+              "title": "Custom Dataset Class",
+              "codeLanguage": "python",
+              "content": "from torch.utils.data import Dataset, DataLoader\n\nclass MyDataset(Dataset):\n    def __init__(self, data, labels):\n        self.data = data\n        self.labels = labels\n    \n    def __len__(self):\n        return len(self.data)\n    \n    def __getitem__(self, idx):\n        return self.data[idx], self.labels[idx]\n\n# Create dataset and dataloader\ndataset = MyDataset(data, labels)\nloader = DataLoader(dataset, batch_size=32, shuffle=True)",
+              "complexity": "moderate"
+            }
+          ],
+          "assessments": [
+            {
+              "id": { "value": "q-dataset-methods" },
+              "type": "multiple_choice",
+              "prompt": "Which methods must you implement in a custom Dataset class? Select all that apply.",
+              "choices": [
+                { "id": "a", "text": "__init__", "correct": false, "feedback": "__init__ is optional, though usually needed" },
+                { "id": "b", "text": "__len__", "correct": true },
+                { "id": "c", "text": "__getitem__", "correct": true },
+                { "id": "d", "text": "__iter__", "correct": false, "feedback": "DataLoader handles iteration, not Dataset" }
+              ],
+              "difficulty": 0.5,
+              "objectivesAssessed": ["obj-data"]
+            }
+          ]
+        },
+        {
+          "id": { "value": "topic-transforms" },
+          "title": "Transforms",
+          "type": "topic",
+          "orderIndex": 2,
+          "description": "Apply data transformations and augmentations to prepare your data for training.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-datasets",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT5M",
+            "introductory": "PT15M",
+            "intermediate": "PT30M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-transforms-intro",
+                "type": "introduction",
+                "content": "Transforms are operations that modify your data before it goes into the model. They're essential for preprocessing - like converting images to tensors and normalizing values - and for data augmentation, which helps your model generalize better."
+              }
+            ]
+          }
+        },
+        {
+          "id": { "value": "topic-nn" },
+          "title": "Neural Networks",
+          "type": "topic",
+          "orderIndex": 3,
+          "description": "Build neural network architectures using the nn.Module base class.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-tensors",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT10M",
+            "introductory": "PT30M",
+            "intermediate": "PT1H",
+            "advanced": "PT2H"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-nn-intro",
+                "type": "introduction",
+                "content": "Now we get to the exciting part - building neural networks! In PyTorch, all neural networks inherit from a class called nn.Module. This base class provides all the machinery for tracking parameters, moving to GPU, saving and loading models, and more.",
+                "speakingNotes": {
+                  "emotionalTone": "excited",
+                  "emphasis": ["nn.Module"]
+                }
+              },
+              {
+                "id": "seg-module-basics",
+                "type": "explanation",
+                "content": "To create a neural network, you define a class that inherits from nn.Module. In the __init__ method, you define your layers - things like nn.Linear for fully connected layers, nn.Conv2d for convolutional layers, or nn.ReLU for activation functions. Then in the forward method, you define how data flows through those layers.",
+                "stoppingPoint": {
+                  "type": "natural",
+                  "promptForContinue": true
+                }
+              },
+              {
+                "id": "seg-layers",
+                "type": "lecture",
+                "content": "Let me explain some common layers. nn.Linear is a fully connected layer - it takes every input and connects it to every output with learnable weights. nn.Conv2d is a convolutional layer, perfect for images - it learns local patterns and is translation-invariant. Activation functions like nn.ReLU add non-linearity, which is what makes neural networks able to learn complex patterns."
+              }
+            ]
+          },
+          "examples": [
+            {
+              "id": "ex-simple-nn",
+              "type": "code",
+              "title": "Simple Neural Network",
+              "codeLanguage": "python",
+              "content": "import torch.nn as nn\n\nclass SimpleNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.fc1 = nn.Linear(784, 128)  # Input layer\n        self.relu = nn.ReLU()\n        self.fc2 = nn.Linear(128, 10)   # Output layer\n    \n    def forward(self, x):\n        x = self.fc1(x)\n        x = self.relu(x)\n        x = self.fc2(x)\n        return x\n\nmodel = SimpleNet()",
+              "spokenContent": "Here's a simple neural network for classifying handwritten digits. We define three layers in init: a fully connected layer that takes 784 inputs (28 by 28 pixel images flattened) and outputs 128 values, a ReLU activation, and another fully connected layer that outputs 10 values (one for each digit). The forward method chains these layers together.",
+              "complexity": "moderate"
+            }
+          ],
+          "assessments": [
+            {
+              "id": { "value": "q-nn-module" },
+              "type": "choice",
+              "prompt": "Which class should your neural network inherit from?",
+              "choices": [
+                { "id": "a", "text": "torch.nn.Network", "correct": false },
+                { "id": "b", "text": "torch.nn.Module", "correct": true },
+                { "id": "c", "text": "torch.Model", "correct": false },
+                { "id": "d", "text": "torch.nn.Layer", "correct": false }
+              ],
+              "difficulty": 0.3,
+              "objectivesAssessed": ["obj-nn"]
+            }
+          ]
+        },
+        {
+          "id": { "value": "topic-autograd" },
+          "title": "Automatic Differentiation",
+          "type": "topic",
+          "orderIndex": 4,
+          "description": "Understand how PyTorch automatically computes gradients for training neural networks.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-tensors",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT5M",
+            "introductory": "PT20M",
+            "intermediate": "PT45M",
+            "advanced": "PT1H30M",
+            "graduate": "PT3H"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-autograd-intro",
+                "type": "introduction",
+                "content": "Automatic differentiation is the magic that makes training neural networks practical. Without it, you'd have to manually derive and implement the gradients for every operation - which would be incredibly tedious and error-prone. PyTorch handles all of this automatically through its autograd system.",
+                "glossaryRefs": ["term-gradient", "term-backprop"],
+                "speakingNotes": {
+                  "emphasis": ["magic", "automatically"]
+                }
+              },
+              {
+                "id": "seg-requires-grad",
+                "type": "explanation",
+                "content": "When you create a tensor with requires_grad=True, PyTorch starts tracking every operation performed on it. This builds up a computational graph. When you call .backward() on a result tensor, PyTorch walks backward through this graph, computing the gradient of each operation using the chain rule.",
+                "stoppingPoint": {
+                  "type": "mandatory",
+                  "promptForContinue": true,
+                  "suggestedPrompt": "Does the concept of computational graphs make sense?"
+                }
+              }
+            ]
+          },
+          "misconceptions": [
+            {
+              "id": "misc-backward-changes",
+              "misconception": "Calling .backward() automatically updates the model weights",
+              "triggerPhrases": ["backward updates weights", "backward changes parameters"],
+              "correction": ".backward() only computes the gradients and stores them in .grad attributes. You need an optimizer (like SGD or Adam) to actually update the weights using those gradients.",
+              "severity": "critical",
+              "remediationPath": {
+                "reviewTopics": ["topic-optimization"]
+              }
+            }
+          ]
+        },
+        {
+          "id": { "value": "topic-optimization" },
+          "title": "Optimization",
+          "type": "topic",
+          "orderIndex": 5,
+          "description": "Learn about loss functions and optimizers for training neural networks.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-autograd",
+              "required": true
+            },
+            {
+              "nodeId": "topic-nn",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT5M",
+            "introductory": "PT25M",
+            "intermediate": "PT50M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-opt-intro",
+                "type": "introduction",
+                "content": "We're getting close to being able to train models! We have our network, we can compute gradients - now we need two more pieces: a loss function to measure how wrong our predictions are, and an optimizer to update our weights.",
+                "glossaryRefs": ["term-loss"]
+              },
+              {
+                "id": "seg-loss-functions",
+                "type": "lecture",
+                "content": "PyTorch provides many loss functions. For classification, cross-entropy loss is most common - it measures the difference between predicted probabilities and true labels. For regression, mean squared error or MSE measures the average squared difference between predictions and targets. The choice depends on your task.",
+                "speakingNotes": {
+                  "emphasis": ["cross-entropy", "classification", "MSE", "regression"]
+                }
+              },
+              {
+                "id": "seg-optimizers",
+                "type": "lecture",
+                "content": "An optimizer implements the algorithm for updating weights. SGD, or stochastic gradient descent, is the classic - it moves weights in the direction opposite to the gradient. Adam is more sophisticated - it adapts the learning rate for each parameter and includes momentum. Adam is often a good default choice."
+              }
+            ]
+          }
+        },
+        {
+          "id": { "value": "topic-save-load" },
+          "title": "Save and Load Models",
+          "type": "topic",
+          "orderIndex": 6,
+          "description": "Learn to save trained models and load them for inference or continued training.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-nn",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT3M",
+            "introductory": "PT10M",
+            "intermediate": "PT20M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-save-intro",
+                "type": "introduction",
+                "content": "After spending hours training a model, you definitely want to save it! PyTorch makes this straightforward. There are two main approaches: saving just the weights, or saving the entire model."
+              },
+              {
+                "id": "seg-state-dict",
+                "type": "explanation",
+                "content": "The recommended approach is to save the state_dict, which is a dictionary mapping layer names to their learned parameters. You save it using torch.save with the model's state_dict and a file path. To load, you create a new instance of your model class, then call load_state_dict with the loaded weights."
+              }
+            ]
+          },
+          "examples": [
+            {
+              "id": "ex-save-load",
+              "type": "code",
+              "title": "Saving and Loading",
+              "codeLanguage": "python",
+              "content": "# Save model weights\ntorch.save(model.state_dict(), 'model_weights.pth')\n\n# Load weights\nmodel = SimpleNet()  # Create fresh model\nmodel.load_state_dict(torch.load('model_weights.pth'))\nmodel.eval()  # Set to evaluation mode",
+              "complexity": "simple"
+            }
+          ]
+        },
+        {
+          "id": { "value": "topic-pipeline" },
+          "title": "Complete Training Pipeline",
+          "type": "topic",
+          "orderIndex": 7,
+          "description": "Bring everything together: implement a complete training loop from scratch.",
+          "prerequisites": [
+            {
+              "nodeId": "topic-datasets",
+              "required": true
+            },
+            {
+              "nodeId": "topic-nn",
+              "required": true
+            },
+            {
+              "nodeId": "topic-optimization",
+              "required": true
+            }
+          ],
+          "timeEstimates": {
+            "overview": "PT10M",
+            "introductory": "PT40M",
+            "intermediate": "PT1H30M",
+            "advanced": "PT2H30M"
+          },
+          "transcript": {
+            "segments": [
+              {
+                "id": "seg-pipeline-intro",
+                "type": "introduction",
+                "content": "This is where everything comes together! A training pipeline follows a clear pattern: for each epoch, loop through batches from your DataLoader, run the forward pass, compute the loss, run backward to get gradients, and step the optimizer to update weights. Let's build one step by step.",
+                "glossaryRefs": ["term-epoch"],
+                "speakingNotes": {
+                  "emotionalTone": "excited"
+                }
+              },
+              {
+                "id": "seg-training-loop",
+                "type": "lecture",
+                "content": "The training loop has five key steps that repeat for each batch. First, zero the gradients - otherwise they accumulate from previous batches. Second, forward pass - run your data through the model. Third, compute loss - measure how wrong the predictions are. Fourth, backward pass - compute all the gradients. Fifth, optimizer step - update the weights. Then repeat for the next batch.",
+                "speakingNotes": {
+                  "pace": "slow",
+                  "emphasis": ["zero gradients", "forward", "loss", "backward", "step"]
+                }
+              }
+            ]
+          },
+          "examples": [
+            {
+              "id": "ex-training-loop",
+              "type": "code",
+              "title": "Complete Training Loop",
+              "codeLanguage": "python",
+              "content": "model = SimpleNet()\ncriterion = nn.CrossEntropyLoss()\noptimizer = torch.optim.Adam(model.parameters(), lr=0.001)\n\nfor epoch in range(num_epochs):\n    for batch_x, batch_y in train_loader:\n        # 1. Zero gradients\n        optimizer.zero_grad()\n        \n        # 2. Forward pass\n        outputs = model(batch_x)\n        \n        # 3. Compute loss\n        loss = criterion(outputs, batch_y)\n        \n        # 4. Backward pass\n        loss.backward()\n        \n        # 5. Update weights\n        optimizer.step()\n    \n    print(f'Epoch {epoch+1}, Loss: {loss.item():.4f}')",
+              "spokenContent": "Here's the complete training loop. First, set up your model, loss function, and optimizer. Then loop through epochs. For each epoch, loop through batches from your data loader. For each batch: zero the gradients, run the forward pass to get outputs, compute the loss, call backward to compute gradients, then call optimizer.step to update weights. Print the loss each epoch to track progress.",
+              "walkthrough": [
+                { "step": 1, "text": "Set up model, loss function, and optimizer", "pauseAfter": true },
+                { "step": 2, "text": "Outer loop iterates over epochs", "pauseAfter": false },
+                { "step": 3, "text": "Inner loop iterates over batches", "pauseAfter": false },
+                { "step": 4, "text": "Zero gradients to prevent accumulation", "pauseAfter": true },
+                { "step": 5, "text": "Forward pass computes predictions", "pauseAfter": false },
+                { "step": 6, "text": "Loss measures prediction error", "pauseAfter": false },
+                { "step": 7, "text": "Backward computes all gradients", "pauseAfter": false },
+                { "step": 8, "text": "Optimizer step updates weights", "pauseAfter": true }
+              ],
+              "complexity": "moderate"
+            }
+          ],
+          "assessments": [
+            {
+              "id": { "value": "q-training-order" },
+              "type": "choice",
+              "prompt": "What is the correct order of operations in a training step?",
+              "choices": [
+                { "id": "a", "text": "forward → backward → zero_grad → step", "correct": false },
+                { "id": "b", "text": "zero_grad → forward → loss → backward → step", "correct": true },
+                { "id": "c", "text": "forward → loss → step → backward", "correct": false },
+                { "id": "d", "text": "backward → forward → loss → step", "correct": false }
+              ],
+              "difficulty": 0.5,
+              "objectivesAssessed": ["obj-training"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extensions": {
+    "https://voicelearn.io/extensions/technical": {
+      "codeExecutionEnabled": true,
+      "pythonVersion": "3.10+",
+      "requiredPackages": ["torch>=2.0", "torchvision"]
+    }
+  }
+}

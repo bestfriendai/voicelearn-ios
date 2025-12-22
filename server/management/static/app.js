@@ -1,6 +1,6 @@
 /**
- * VoiceLearn Management Console - Frontend Application
- * A real-time dashboard for monitoring VoiceLearn services
+ * UnaMentis Management Console - Frontend Application
+ * A real-time dashboard for monitoring UnaMentis services
  */
 
 // =============================================================================
@@ -25,6 +25,7 @@ const state = {
     clients: [],
     servers: [],
     models: [],
+    services: [],
 
     stats: {
         uptime: 0,
@@ -143,6 +144,10 @@ function handleWebSocketMessage(message) {
             refreshServers();
             break;
 
+        case 'service_update':
+            handleServiceUpdate(message.data);
+            break;
+
         case 'logs_cleared':
             state.logs = [];
             renderLogs();
@@ -242,6 +247,73 @@ async function refreshModels() {
         renderModels(data);
     } catch (e) {
         console.error('Failed to refresh models:', e);
+    }
+}
+
+async function refreshServices() {
+    try {
+        const data = await fetchAPI('/services');
+        state.services = data.services;
+        updateServicesUI(data);
+        renderServices(data.services);
+    } catch (e) {
+        console.error('Failed to refresh services:', e);
+    }
+}
+
+async function startService(serviceId) {
+    try {
+        const response = await fetchAPI(`/services/${serviceId}/start`, { method: 'POST' });
+        console.log('Service start response:', response);
+        await refreshServices();
+    } catch (e) {
+        console.error('Failed to start service:', e);
+        alert('Failed to start service: ' + e.message);
+    }
+}
+
+async function stopService(serviceId) {
+    try {
+        const response = await fetchAPI(`/services/${serviceId}/stop`, { method: 'POST' });
+        console.log('Service stop response:', response);
+        await refreshServices();
+    } catch (e) {
+        console.error('Failed to stop service:', e);
+        alert('Failed to stop service: ' + e.message);
+    }
+}
+
+async function restartService(serviceId) {
+    try {
+        const response = await fetchAPI(`/services/${serviceId}/restart`, { method: 'POST' });
+        console.log('Service restart response:', response);
+        await refreshServices();
+    } catch (e) {
+        console.error('Failed to restart service:', e);
+        alert('Failed to restart service: ' + e.message);
+    }
+}
+
+async function startAllServices() {
+    try {
+        const response = await fetchAPI('/services/start-all', { method: 'POST' });
+        console.log('Start all response:', response);
+        await refreshServices();
+    } catch (e) {
+        console.error('Failed to start all services:', e);
+        alert('Failed to start all services: ' + e.message);
+    }
+}
+
+async function stopAllServices() {
+    if (!confirm('Are you sure you want to stop all services?')) return;
+    try {
+        const response = await fetchAPI('/services/stop-all', { method: 'POST' });
+        console.log('Stop all response:', response);
+        await refreshServices();
+    } catch (e) {
+        console.error('Failed to stop all services:', e);
+        alert('Failed to stop all services: ' + e.message);
     }
 }
 
@@ -398,6 +470,188 @@ function handleClientUpdate(client) {
     updateClientsUI({ clients: state.clients, online: 0, idle: 0, offline: 0 });
 }
 
+function handleServiceUpdate(service) {
+    const index = state.services.findIndex(s => s.id === service.id);
+    if (index >= 0) {
+        state.services[index] = service;
+    } else {
+        state.services.push(service);
+    }
+    renderServices(state.services);
+    updateServicesStatsUI();
+}
+
+function updateServicesUI(data) {
+    document.getElementById('services-running').textContent = data.running;
+    document.getElementById('services-stopped').textContent = data.stopped;
+    document.getElementById('services-error').textContent = data.error;
+
+    // Update memory stats if elements exist
+    const memUsedEl = document.getElementById('services-memory-used');
+    const memTotalEl = document.getElementById('services-memory-total');
+    const memPercentEl = document.getElementById('services-memory-percent');
+
+    if (memUsedEl && data.total_memory_mb !== undefined) {
+        memUsedEl.textContent = formatBytes(data.total_memory_mb * 1024 * 1024);
+    }
+    if (data.system_memory) {
+        if (memTotalEl) {
+            memTotalEl.textContent = `${data.system_memory.total_gb} GB`;
+        }
+        if (memPercentEl) {
+            memPercentEl.textContent = `${data.system_memory.percent_used}%`;
+        }
+        // Update progress bar if it exists
+        const memBar = document.getElementById('services-memory-bar');
+        if (memBar) {
+            memBar.style.width = `${data.system_memory.percent_used}%`;
+        }
+    }
+}
+
+function updateServicesStatsUI() {
+    const running = state.services.filter(s => s.status === 'running').length;
+    const stopped = state.services.filter(s => s.status === 'stopped').length;
+    const error = state.services.filter(s => s.status === 'error').length;
+    document.getElementById('services-running').textContent = running;
+    document.getElementById('services-stopped').textContent = stopped;
+    document.getElementById('services-error').textContent = error;
+}
+
+function getServiceTypeStyles(type) {
+    const styles = {
+        'vibevoice': { bg: 'bg-accent-info/20', text: 'text-accent-info' },
+        'nextjs': { bg: 'bg-accent-secondary/20', text: 'text-accent-secondary' },
+        'default': { bg: 'bg-dark-600/20', text: 'text-dark-400' }
+    };
+    return styles[type] || styles.default;
+}
+
+function getServiceTypeIcon(type, size = 'w-5 h-5') {
+    const styles = getServiceTypeStyles(type);
+    const icons = {
+        'vibevoice': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 0112.728 0"></path></svg>`,
+        'nextjs': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`,
+        'default': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"></path></svg>`
+    };
+    return icons[type] || icons.default;
+}
+
+function renderServices(services) {
+    const container = document.getElementById('services-grid');
+    if (!container) return;
+
+    if (services.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center text-dark-500 py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <p class="text-lg font-medium">No managed services configured</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = services.map(service => {
+        const styles = getServiceTypeStyles(service.service_type);
+        const statusColors = {
+            'running': 'bg-accent-success/20 text-accent-success',
+            'stopped': 'bg-dark-600/50 text-dark-400',
+            'starting': 'bg-accent-warning/20 text-accent-warning',
+            'error': 'bg-accent-danger/20 text-accent-danger'
+        };
+        const statusColor = statusColors[service.status] || statusColors.stopped;
+        const isRunning = service.status === 'running';
+        const isStarting = service.status === 'starting';
+
+        return `
+            <div class="card">
+                <div class="p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg ${styles.bg} flex items-center justify-center">
+                                ${getServiceTypeIcon(service.service_type, 'w-6 h-6')}
+                            </div>
+                            <div>
+                                <div class="font-semibold text-dark-100">${escapeHtml(service.name)}</div>
+                                <div class="text-xs text-dark-400">Port ${service.port}</div>
+                            </div>
+                        </div>
+                        <div class="status-badge ${statusColor}">${service.status}</div>
+                    </div>
+
+                    <div class="space-y-2 text-sm mb-4">
+                        ${service.pid ? `
+                        <div class="flex justify-between">
+                            <span class="text-dark-400">PID</span>
+                            <span class="text-dark-200 font-mono">${service.pid}</span>
+                        </div>
+                        ` : ''}
+                        ${service.memory && service.memory.rss_mb > 0 ? `
+                        <div class="flex justify-between">
+                            <span class="text-dark-400">Memory</span>
+                            <span class="text-accent-warning font-semibold">${formatBytes(service.memory.rss_mb * 1024 * 1024)}</span>
+                        </div>
+                        ` : ''}
+                        ${service.started_at ? `
+                        <div class="flex justify-between">
+                            <span class="text-dark-400">Uptime</span>
+                            <span class="text-dark-200">${formatUptime(Date.now()/1000 - service.started_at)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="flex justify-between">
+                            <span class="text-dark-400">Health URL</span>
+                            <a href="${service.health_url}" target="_blank" class="text-accent-primary hover:underline text-xs font-mono truncate max-w-[200px]">${service.health_url}</a>
+                        </div>
+                        ${service.error_message ? `
+                        <div class="mt-2 p-2 rounded bg-accent-danger/10 border border-accent-danger/30">
+                            <div class="text-xs text-accent-danger">${escapeHtml(service.error_message)}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex gap-2">
+                        ${isRunning ? `
+                            <button onclick="stopService('${service.id}')" class="flex-1 btn-danger-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                                </svg>
+                                Stop
+                            </button>
+                            <button onclick="restartService('${service.id}')" class="flex-1 btn-secondary-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Restart
+                            </button>
+                        ` : isStarting ? `
+                            <button disabled class="flex-1 btn-secondary-sm opacity-50 cursor-not-allowed">
+                                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Starting...
+                            </button>
+                        ` : `
+                            <button onclick="startService('${service.id}')" class="flex-1 btn-success-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Start
+                            </button>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
 function renderClients(clients) {
     const container = document.getElementById('clients-list');
 
@@ -523,8 +777,34 @@ function renderModels(data) {
                     <div class="text-xs text-dark-400">${model.type.toUpperCase()} • ${model.server_name}</div>
                 </div>
             </div>
-            <div class="flex items-center justify-between mt-3">
-                <span class="status-badge status-${model.status === 'available' ? 'online' : 'offline'}">${model.status}</span>
+            <div class="space-y-2 text-sm mb-3">
+                ${model.size_gb > 0 ? `
+                <div class="flex justify-between">
+                    <span class="text-dark-400">Size</span>
+                    <span class="text-dark-200 font-mono">${model.size_gb.toFixed(1)} GB</span>
+                </div>
+                ` : ''}
+                ${model.parameter_size ? `
+                <div class="flex justify-between">
+                    <span class="text-dark-400">Parameters</span>
+                    <span class="text-dark-200">${model.parameter_size}</span>
+                </div>
+                ` : ''}
+                ${model.quantization ? `
+                <div class="flex justify-between">
+                    <span class="text-dark-400">Quantization</span>
+                    <span class="text-dark-200 font-mono text-xs">${model.quantization}</span>
+                </div>
+                ` : ''}
+                ${model.vram_gb > 0 ? `
+                <div class="flex justify-between">
+                    <span class="text-dark-400">VRAM Used</span>
+                    <span class="text-accent-warning font-semibold">${model.vram_gb.toFixed(1)} GB</span>
+                </div>
+                ` : ''}
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="status-badge ${model.status === 'loaded' ? 'bg-accent-success/20 text-accent-success' : model.status === 'available' ? 'bg-dark-600/50 text-dark-300' : 'bg-dark-600/50 text-dark-400'}">${model.status}</span>
             </div>
         </div>
     `).join('');
@@ -899,6 +1179,12 @@ function initTabs() {
                 case 'models':
                     refreshModels();
                     break;
+                case 'services':
+                    refreshServices();
+                    break;
+                case 'curriculum':
+                    refreshCurricula();
+                    break;
             }
         });
     });
@@ -1051,6 +1337,14 @@ function formatRelativeTime(timestamp) {
     return `${Math.floor(seconds / 86400)}d ago`;
 }
 
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
 function escapeHtml(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -1063,7 +1357,7 @@ function getServerTypeStyles(type) {
         'ollama': { bg: 'bg-accent-secondary/20', text: 'text-accent-secondary' },
         'whisper': { bg: 'bg-accent-success/20', text: 'text-accent-success' },
         'piper': { bg: 'bg-accent-info/20', text: 'text-accent-info' },
-        'voicelearnGateway': { bg: 'bg-accent-primary/20', text: 'text-accent-primary' },
+        'unamentisGateway': { bg: 'bg-accent-primary/20', text: 'text-accent-primary' },
         'default': { bg: 'bg-dark-600/20', text: 'text-dark-400' }
     };
     return styles[type] || styles.default;
@@ -1075,7 +1369,7 @@ function getServerTypeIcon(type, size = 'w-5 h-5') {
         'ollama': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>`,
         'whisper': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>`,
         'piper': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 0112.728 0"></path></svg>`,
-        'voicelearnGateway': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>`,
+        'unamentisGateway': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>`,
         'default': `<svg class="${size} ${styles.text}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"></path></svg>`
     };
     return icons[type] || icons.default;
@@ -1128,6 +1422,472 @@ style.textContent = `
 document.head.appendChild(style);
 
 // =============================================================================
+// Curriculum Management
+// =============================================================================
+
+// Store curriculum data in state
+state.curricula = [];
+state.selectedCurriculum = null;
+
+async function refreshCurricula() {
+    try {
+        const data = await fetchAPI('/curricula');
+        state.curricula = data.curricula;
+        updateCurriculaStats(data);
+        renderCurricula(data.curricula);
+    } catch (e) {
+        console.error('Failed to refresh curricula:', e);
+        const grid = document.getElementById('curricula-grid');
+        grid.innerHTML = `
+            <div class="text-center text-dark-500 py-12 col-span-full">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-lg font-medium">Failed to load curricula</p>
+                <p class="text-sm mt-1">${e.message}</p>
+            </div>
+        `;
+    }
+}
+
+function updateCurriculaStats(data) {
+    document.getElementById('curricula-total').textContent = data.total;
+
+    // Calculate total topics
+    const totalTopics = state.curricula.reduce((sum, c) => sum + c.topic_count, 0);
+    document.getElementById('curricula-topics').textContent = totalTopics;
+
+    // Calculate total duration (approximate from curriculum durations)
+    let totalMinutes = 0;
+    state.curricula.forEach(c => {
+        if (c.total_duration) {
+            // Parse PT format (e.g., PT6H, PT30M, PT1H30M)
+            const match = c.total_duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+            if (match) {
+                const hours = parseInt(match[1] || 0);
+                const minutes = parseInt(match[2] || 0);
+                totalMinutes += hours * 60 + minutes;
+            }
+        }
+    });
+    const hours = Math.floor(totalMinutes / 60);
+    document.getElementById('curricula-duration').textContent = hours > 0 ? `${hours}h` : `${totalMinutes}m`;
+
+    // Calculate unique keywords
+    const allKeywords = new Set();
+    state.curricula.forEach(c => {
+        (c.keywords || []).forEach(k => allKeywords.add(k.toLowerCase()));
+    });
+    document.getElementById('curricula-keywords').textContent = allKeywords.size;
+}
+
+function renderCurricula(curricula) {
+    const container = document.getElementById('curricula-grid');
+
+    if (curricula.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-dark-500 py-12 col-span-full">
+                <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <p class="text-lg font-medium">No curricula found</p>
+                <p class="text-sm mt-1">Add UMLCF files to the curriculum/examples/realistic/ folder</p>
+            </div>
+        `;
+        return;
+    }
+
+    const getDifficultyStyles = (difficulty) => {
+        const styles = {
+            'beginner': 'bg-accent-success/20 text-accent-success',
+            'intermediate': 'bg-accent-warning/20 text-accent-warning',
+            'advanced': 'bg-accent-danger/20 text-accent-danger',
+            'default': 'bg-dark-600/50 text-dark-400'
+        };
+        return styles[difficulty?.toLowerCase()] || styles.default;
+    };
+
+    const html = curricula.map(curriculum => `
+        <div class="card cursor-pointer hover:border-accent-primary/50 transition-all" onclick="selectCurriculum('${curriculum.id}')">
+            <div class="p-4">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-lg bg-accent-primary/20 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-dark-100">${escapeHtml(curriculum.title)}</div>
+                            <div class="text-xs text-dark-400">v${curriculum.version}</div>
+                        </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium ${getDifficultyStyles(curriculum.difficulty)}">${curriculum.difficulty || 'Unknown'}</span>
+                </div>
+
+                <p class="text-sm text-dark-300 mb-3 line-clamp-2">${escapeHtml(curriculum.description)}</p>
+
+                <div class="flex flex-wrap gap-1 mb-3">
+                    ${(curriculum.keywords || []).slice(0, 3).map(k => `
+                        <span class="px-2 py-0.5 text-xs rounded-full bg-dark-700/50 text-dark-300">${escapeHtml(k)}</span>
+                    `).join('')}
+                    ${(curriculum.keywords || []).length > 3 ? `
+                        <span class="px-2 py-0.5 text-xs rounded-full bg-dark-700/50 text-dark-400">+${curriculum.keywords.length - 3}</span>
+                    ` : ''}
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div class="text-center p-2 rounded bg-dark-800/30">
+                        <div class="font-semibold text-dark-200">${curriculum.topic_count}</div>
+                        <div class="text-dark-500">Topics</div>
+                    </div>
+                    <div class="text-center p-2 rounded bg-dark-800/30">
+                        <div class="font-semibold text-dark-200">${formatDurationPT(curriculum.total_duration)}</div>
+                        <div class="text-dark-500">Duration</div>
+                    </div>
+                    <div class="text-center p-2 rounded bg-dark-800/30">
+                        <div class="font-semibold text-dark-200">${curriculum.age_range || 'All'}</div>
+                        <div class="text-dark-500">Ages</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = html;
+}
+
+function formatDurationPT(ptDuration) {
+    if (!ptDuration) return '--';
+    const match = ptDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
+    if (!match) return ptDuration;
+    const hours = parseInt(match[1] || 0);
+    const minutes = parseInt(match[2] || 0);
+    if (hours > 0 && minutes > 0) return `${hours}h${minutes}m`;
+    if (hours > 0) return `${hours}h`;
+    return `${minutes}m`;
+}
+
+function filterCurricula() {
+    const searchTerm = document.getElementById('curriculum-search').value.toLowerCase();
+    const difficultyFilter = document.getElementById('curriculum-difficulty-filter').value;
+
+    const filtered = state.curricula.filter(c => {
+        // Search filter
+        const matchesSearch = !searchTerm ||
+            c.title.toLowerCase().includes(searchTerm) ||
+            c.description.toLowerCase().includes(searchTerm) ||
+            (c.keywords || []).some(k => k.toLowerCase().includes(searchTerm));
+
+        // Difficulty filter
+        const matchesDifficulty = !difficultyFilter ||
+            (c.difficulty && c.difficulty.toLowerCase() === difficultyFilter);
+
+        return matchesSearch && matchesDifficulty;
+    });
+
+    renderCurricula(filtered);
+}
+
+async function selectCurriculum(curriculumId) {
+    try {
+        const data = await fetchAPI(`/curricula/${curriculumId}`);
+        state.selectedCurriculum = data;
+        showCurriculumDetail(data);
+    } catch (e) {
+        console.error('Failed to load curriculum detail:', e);
+        alert('Failed to load curriculum: ' + e.message);
+    }
+}
+
+function showCurriculumDetail(curriculum) {
+    const panel = document.getElementById('curriculum-detail-panel');
+
+    // Update title
+    document.getElementById('curriculum-detail-title').textContent = curriculum.title;
+
+    // Update description
+    document.getElementById('curriculum-detail-description').textContent = curriculum.description;
+
+    // Update metadata
+    const getDifficultyStyles = (difficulty) => {
+        const styles = {
+            'beginner': 'bg-accent-success/20 text-accent-success',
+            'intermediate': 'bg-accent-warning/20 text-accent-warning',
+            'advanced': 'bg-accent-danger/20 text-accent-danger',
+            'default': 'bg-dark-600/50 text-dark-400'
+        };
+        return styles[difficulty?.toLowerCase()] || styles.default;
+    };
+
+    const difficultyEl = document.getElementById('curriculum-detail-difficulty');
+    difficultyEl.textContent = curriculum.difficulty || 'Unknown';
+    difficultyEl.className = `px-2 py-0.5 rounded text-xs font-medium ${getDifficultyStyles(curriculum.difficulty)}`;
+
+    document.getElementById('curriculum-detail-age').textContent = curriculum.age_range || 'All ages';
+    document.getElementById('curriculum-detail-duration').textContent = formatDurationPT(curriculum.duration);
+    document.getElementById('curriculum-detail-version').textContent = curriculum.version;
+
+    // Update keywords
+    const keywordsEl = document.getElementById('curriculum-detail-keywords');
+    keywordsEl.innerHTML = (curriculum.keywords || []).map(k => `
+        <span class="px-2 py-1 text-xs rounded-full bg-accent-primary/10 text-accent-primary border border-accent-primary/30">${escapeHtml(k)}</span>
+    `).join('');
+
+    // Update learning objectives
+    const objectivesEl = document.getElementById('curriculum-detail-objectives');
+    if (curriculum.learning_objectives && curriculum.learning_objectives.length > 0) {
+        objectivesEl.innerHTML = curriculum.learning_objectives.map(obj => `
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-accent-success mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>${escapeHtml(typeof obj === 'string' ? obj : obj.objective || obj.text || JSON.stringify(obj))}</span>
+            </li>
+        `).join('');
+    } else {
+        objectivesEl.innerHTML = '<li class="text-dark-500">No learning objectives defined</li>';
+    }
+
+    // Update glossary
+    const glossaryEl = document.getElementById('curriculum-detail-glossary');
+    if (curriculum.glossary_terms && curriculum.glossary_terms.length > 0) {
+        glossaryEl.innerHTML = curriculum.glossary_terms.map(term => `
+            <div class="p-3 rounded-lg bg-dark-800/30 border border-dark-700/50">
+                <div class="font-medium text-dark-200 mb-1">${escapeHtml(term.term)}</div>
+                <div class="text-xs text-dark-400">${escapeHtml(term.definition || term.spokenDefinition || '')}</div>
+                ${term.pronunciation ? `<div class="text-xs text-accent-info mt-1">/${term.pronunciation}/</div>` : ''}
+            </div>
+        `).join('');
+    } else {
+        glossaryEl.innerHTML = '<div class="text-dark-500">No glossary terms defined</div>';
+    }
+
+    // Update topics
+    const topicsEl = document.getElementById('curriculum-detail-topics');
+    if (curriculum.topics && curriculum.topics.length > 0) {
+        topicsEl.innerHTML = curriculum.topics.map((topic, index) => `
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-dark-800/30 border border-dark-700/50 hover:border-dark-600/50 transition-all cursor-pointer" onclick="viewTopicTranscript('${curriculum.id}', '${topic.id}')">
+                <div class="w-8 h-8 rounded-lg bg-accent-secondary/20 flex items-center justify-center text-accent-secondary font-semibold text-sm">
+                    ${index + 1}
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium text-dark-200">${escapeHtml(topic.title)}</div>
+                    <div class="text-xs text-dark-400">${escapeHtml(topic.description || '')}</div>
+                </div>
+                <div class="text-right text-xs">
+                    <div class="text-dark-300">${formatDurationPT(topic.duration)}</div>
+                    ${topic.has_transcript ? `<div class="text-accent-success">${topic.segment_count || 0} segments</div>` : '<div class="text-dark-500">No transcript</div>'}
+                </div>
+                <svg class="w-5 h-5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+        `).join('');
+    } else {
+        topicsEl.innerHTML = '<div class="text-dark-500">No topics defined</div>';
+    }
+
+    // Show panel
+    panel.classList.remove('hidden');
+
+    // Scroll to panel
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeCurriculumDetail() {
+    document.getElementById('curriculum-detail-panel').classList.add('hidden');
+    state.selectedCurriculum = null;
+}
+
+async function viewTopicTranscript(curriculumId, topicId) {
+    try {
+        const data = await fetchAPI(`/curricula/${curriculumId}/topics/${topicId}/transcript`);
+
+        // Extract segments from the transcript object
+        const segments = data.transcript?.segments || [];
+        const examples = data.examples || [];
+        const assessments = data.assessments || [];
+        const misconceptions = data.misconceptions || [];
+
+        // Show transcript in a modal
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4';
+        modal.innerHTML = `
+            <div class="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" onclick="this.parentElement.remove()"></div>
+            <div class="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-xl bg-dark-800 border border-dark-700 shadow-xl">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-dark-700/50 bg-dark-850">
+                    <div>
+                        <h3 class="font-semibold text-dark-100">${escapeHtml(data.topic_title || 'Transcript')}</h3>
+                        <div class="text-xs text-dark-500 mt-0.5">${segments.length} segments${examples.length ? `, ${examples.length} examples` : ''}${assessments.length ? `, ${assessments.length} assessments` : ''}</div>
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" class="text-dark-400 hover:text-dark-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-4 overflow-y-auto max-h-[calc(85vh-60px)] space-y-6">
+                    <!-- Transcript Segments -->
+                    ${segments.length > 0 ? `
+                        <div>
+                            <h4 class="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Transcript
+                            </h4>
+                            <div class="space-y-3">
+                                ${segments.map((seg, i) => `
+                                    <div class="p-3 rounded-lg ${getSegmentTypeStyles(seg.type)}">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2 py-0.5 text-xs rounded ${getSegmentTypeBadge(seg.type)}">${seg.type || 'content'}</span>
+                                            <span class="text-xs text-dark-500">#${i + 1}</span>
+                                        </div>
+                                        <div class="text-dark-200 leading-relaxed">${escapeHtml(seg.content || seg.text || '')}</div>
+                                        ${seg.checkpoint ? `
+                                            <div class="mt-3 p-2 rounded bg-accent-warning/10 border border-accent-warning/20">
+                                                <div class="text-xs font-medium text-accent-warning mb-1">Checkpoint: ${seg.checkpoint.type}</div>
+                                                <div class="text-sm text-dark-300">${escapeHtml(seg.checkpoint.prompt || '')}</div>
+                                            </div>
+                                        ` : ''}
+                                        ${seg.stoppingPoint ? `
+                                            <div class="mt-2 text-xs text-dark-500 italic flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Natural stopping point${seg.stoppingPoint.suggestedPrompt ? `: "${seg.stoppingPoint.suggestedPrompt}"` : ''}
+                                            </div>
+                                        ` : ''}
+                                        ${seg.speakingNotes ? `
+                                            <div class="mt-2 text-xs text-dark-500 border-t border-dark-700/30 pt-2 flex flex-wrap gap-2">
+                                                ${seg.speakingNotes.emotionalTone ? `<span class="px-1.5 py-0.5 rounded bg-dark-700/50">Tone: ${seg.speakingNotes.emotionalTone}</span>` : ''}
+                                                ${seg.speakingNotes.pace ? `<span class="px-1.5 py-0.5 rounded bg-dark-700/50">Pace: ${seg.speakingNotes.pace}</span>` : ''}
+                                                ${seg.speakingNotes.emphasis ? `<span class="px-1.5 py-0.5 rounded bg-dark-700/50">Emphasis: ${seg.speakingNotes.emphasis.join(', ')}</span>` : ''}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : '<div class="text-dark-500 text-center py-8">No transcript segments available</div>'}
+
+                    <!-- Examples -->
+                    ${examples.length > 0 ? `
+                        <div>
+                            <h4 class="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                                Examples
+                            </h4>
+                            <div class="space-y-3">
+                                ${examples.map(ex => `
+                                    <div class="p-3 rounded-lg bg-accent-success/5 border border-accent-success/20">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="font-medium text-dark-200">${escapeHtml(ex.title || 'Example')}</span>
+                                            <span class="px-1.5 py-0.5 text-xs rounded bg-accent-success/20 text-accent-success">${ex.type || 'example'}</span>
+                                        </div>
+                                        <div class="text-dark-300 text-sm leading-relaxed">${escapeHtml(ex.spokenContent || ex.content || '')}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Misconceptions -->
+                    ${misconceptions.length > 0 ? `
+                        <div>
+                            <h4 class="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                Common Misconceptions
+                            </h4>
+                            <div class="space-y-3">
+                                ${misconceptions.map(mis => `
+                                    <div class="p-3 rounded-lg bg-accent-danger/5 border border-accent-danger/20">
+                                        <div class="font-medium text-accent-danger mb-1">${escapeHtml(mis.misconception || '')}</div>
+                                        <div class="text-dark-300 text-sm">${escapeHtml(mis.spokenCorrection || mis.correction || '')}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Assessments -->
+                    ${assessments.length > 0 ? `
+                        <div>
+                            <h4 class="text-sm font-medium text-dark-300 mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                Assessments
+                            </h4>
+                            <div class="space-y-3">
+                                ${assessments.map(assess => `
+                                    <div class="p-3 rounded-lg bg-accent-info/5 border border-accent-info/20">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-1.5 py-0.5 text-xs rounded bg-accent-info/20 text-accent-info">${assess.type || 'question'}</span>
+                                            <span class="text-xs text-dark-500">Difficulty: ${Math.round((assess.difficulty || 0.5) * 100)}%</span>
+                                        </div>
+                                        <div class="font-medium text-dark-200 mb-2">${escapeHtml(assess.prompt || assess.spokenPrompt || '')}</div>
+                                        ${assess.choices ? `
+                                            <div class="space-y-1 ml-2">
+                                                ${assess.choices.map(choice => `
+                                                    <div class="flex items-center gap-2 text-sm ${choice.correct ? 'text-accent-success' : 'text-dark-400'}">
+                                                        ${choice.correct ?
+                                                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' :
+                                                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle></svg>'
+                                                        }
+                                                        <span>${escapeHtml(choice.text || '')}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } catch (e) {
+        console.error('Failed to load topic transcript:', e);
+        alert('Failed to load transcript: ' + e.message);
+    }
+}
+
+function getSegmentTypeBadge(type) {
+    const badges = {
+        'introduction': 'bg-accent-primary/20 text-accent-primary',
+        'explanation': 'bg-dark-600 text-dark-300',
+        'lecture': 'bg-accent-info/20 text-accent-info',
+        'example': 'bg-accent-success/20 text-accent-success',
+        'checkpoint': 'bg-accent-warning/20 text-accent-warning',
+        'summary': 'bg-accent-info/20 text-accent-info',
+        'transition': 'bg-dark-600 text-dark-400',
+        'default': 'bg-dark-600 text-dark-300'
+    };
+    return badges[type] || badges.default;
+}
+
+function getSegmentTypeStyles(type) {
+    const styles = {
+        'introduction': 'bg-accent-primary/5 border-l-2 border-accent-primary',
+        'explanation': 'bg-dark-800/30',
+        'example': 'bg-accent-success/5 border-l-2 border-accent-success',
+        'checkpoint': 'bg-accent-warning/5 border-l-2 border-accent-warning',
+        'summary': 'bg-accent-info/5 border-l-2 border-accent-info',
+        'transition': 'bg-dark-700/30',
+        'default': 'bg-dark-800/30'
+    };
+    return styles[type] || styles.default;
+}
+
+// =============================================================================
 // Clock Update
 // =============================================================================
 
@@ -1141,7 +1901,7 @@ function updateClock() {
 // =============================================================================
 
 async function init() {
-    console.log('VoiceLearn Management Console initializing...');
+    console.log('UnaMentis Management Console initializing...');
 
     // Initialize UI
     initTabs();
@@ -1172,7 +1932,500 @@ async function init() {
         refreshStats();
     }, 5000);
 
-    console.log('VoiceLearn Management Console ready');
+    console.log('UnaMentis Management Console ready');
+}
+
+// =============================================================================
+// Import & Source Browser Functions
+// =============================================================================
+
+// Store file for upload
+state.selectedFile = null;
+
+function showImportModal() {
+    document.getElementById('import-curriculum-modal').classList.remove('hidden');
+}
+
+function hideImportModal() {
+    document.getElementById('import-curriculum-modal').classList.add('hidden');
+    // Reset forms
+    document.getElementById('import-url-form')?.reset();
+    document.getElementById('import-paste-form')?.reset();
+    document.getElementById('curriculum-file-input').value = '';
+    document.getElementById('file-upload-text').textContent = 'Click or drag to upload .umlcf file';
+    document.getElementById('file-upload-btn').disabled = true;
+    state.selectedFile = null;
+}
+
+function switchImportTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.import-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.importTab === tab);
+    });
+    // Show/hide tab content
+    document.querySelectorAll('.import-tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById(`import-tab-${tab}`).classList.remove('hidden');
+}
+
+async function importFromUrl(event) {
+    event.preventDefault();
+    const form = event.target;
+    const url = form.url.value;
+
+    try {
+        showImportLoading('Importing from URL...');
+        const response = await fetchAPI('/curricula/import', {
+            method: 'POST',
+            body: JSON.stringify({ url: url })
+        });
+        hideImportModal();
+        showToast(`Curriculum "${response.title}" imported successfully!`, 'success');
+        await refreshCurricula();
+    } catch (e) {
+        showToast('Failed to import curriculum: ' + e.message, 'error');
+    }
+}
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        state.selectedFile = file;
+        document.getElementById('file-upload-text').textContent = file.name;
+        document.getElementById('file-upload-btn').disabled = false;
+    }
+}
+
+async function importFromFile(event) {
+    event.preventDefault();
+    if (!state.selectedFile) return;
+
+    try {
+        const content = await state.selectedFile.text();
+        const json = JSON.parse(content);
+
+        showImportLoading('Importing file...');
+        const response = await fetchAPI('/curricula/import', {
+            method: 'POST',
+            body: JSON.stringify({ content: json })
+        });
+        hideImportModal();
+        showToast(`Curriculum "${response.title}" imported successfully!`, 'success');
+        await refreshCurricula();
+    } catch (e) {
+        showToast('Failed to import curriculum: ' + e.message, 'error');
+    }
+}
+
+async function importFromPaste(event) {
+    event.preventDefault();
+    const form = event.target;
+    const jsonText = form.json.value;
+
+    try {
+        const json = JSON.parse(jsonText);
+
+        showImportLoading('Importing...');
+        const response = await fetchAPI('/curricula/import', {
+            method: 'POST',
+            body: JSON.stringify({ content: json })
+        });
+        hideImportModal();
+        showToast(`Curriculum "${response.title}" imported successfully!`, 'success');
+        await refreshCurricula();
+    } catch (e) {
+        if (e instanceof SyntaxError) {
+            showToast('Invalid JSON format', 'error');
+        } else {
+            showToast('Failed to import curriculum: ' + e.message, 'error');
+        }
+    }
+}
+
+function showImportLoading(message) {
+    // Could add a loading overlay to the modal
+    console.log(message);
+}
+
+// Source Browser Functions
+function showSourceBrowser() {
+    document.getElementById('source-browser-modal').classList.remove('hidden');
+}
+
+function hideSourceBrowser() {
+    document.getElementById('source-browser-modal').classList.add('hidden');
+    document.getElementById('source-results').innerHTML = `
+        <div class="text-center text-dark-500 py-12">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <p class="text-lg font-medium">Search for curricula</p>
+            <p class="text-sm mt-1">Use the search above to find curricula from external sources</p>
+        </div>
+    `;
+}
+
+function switchSource(source) {
+    // Update source buttons
+    document.querySelectorAll('.source-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.source === source);
+    });
+    // Show/hide source content
+    document.querySelectorAll('.source-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById(`source-${source}`).classList.remove('hidden');
+}
+
+async function searchGitHub() {
+    const query = document.getElementById('github-search').value.trim();
+    if (!query) return;
+
+    const resultsContainer = document.getElementById('source-results');
+    resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+            <svg class="w-12 h-12 mx-auto mb-4 text-accent-primary animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <p class="text-dark-400">Searching GitHub...</p>
+        </div>
+    `;
+
+    try {
+        // Search GitHub for repositories containing UMLCF files
+        const searchQuery = encodeURIComponent(`${query} extension:umlcf OR extension:json umlcf`);
+        const response = await fetch(`https://api.github.com/search/code?q=${searchQuery}&per_page=20`, {
+            headers: { 'Accept': 'application/vnd.github.v3+json' }
+        });
+
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('GitHub API rate limit exceeded. Please try again later.');
+            }
+            throw new Error('GitHub API error');
+        }
+
+        const data = await response.json();
+
+        if (data.items && data.items.length > 0) {
+            resultsContainer.innerHTML = `
+                <div class="mb-4 text-sm text-dark-400">Found ${data.total_count} results</div>
+                <div class="space-y-3">
+                    ${data.items.map(item => `
+                        <div class="flex items-center justify-between p-4 rounded-lg bg-dark-800/30 border border-dark-700/50 hover:border-accent-primary/50 transition-all">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-10 h-10 rounded-lg bg-dark-700/50 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-dark-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-dark-200 truncate">${escapeHtml(item.name)}</div>
+                                    <div class="text-xs text-dark-400 truncate">${escapeHtml(item.repository.full_name)}</div>
+                                    <div class="text-xs text-dark-500 truncate">${escapeHtml(item.path)}</div>
+                                </div>
+                            </div>
+                            <button class="btn-primary text-sm flex-shrink-0" onclick="importFromGitHub('${escapeHtml(item.repository.full_name)}', '${escapeHtml(item.path)}')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                </svg>
+                                Import
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            resultsContainer.innerHTML = `
+                <div class="text-center text-dark-500 py-12">
+                    <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-lg font-medium">No curricula found</p>
+                    <p class="text-sm mt-1">Try different search terms</p>
+                </div>
+            `;
+        }
+    } catch (e) {
+        resultsContainer.innerHTML = `
+            <div class="text-center text-dark-500 py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-accent-danger opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-lg font-medium text-accent-danger">Search failed</p>
+                <p class="text-sm mt-1">${escapeHtml(e.message)}</p>
+            </div>
+        `;
+    }
+}
+
+async function importFromGitHub(repo, path) {
+    try {
+        const rawUrl = `https://raw.githubusercontent.com/${repo}/main/${path}`;
+        showToast('Importing from GitHub...', 'info');
+
+        const response = await fetchAPI('/curricula/import', {
+            method: 'POST',
+            body: JSON.stringify({ url: rawUrl })
+        });
+
+        hideSourceBrowser();
+        showToast(`Curriculum "${response.title}" imported successfully!`, 'success');
+        await refreshCurricula();
+    } catch (e) {
+        showToast('Failed to import: ' + e.message, 'error');
+    }
+}
+
+async function searchHuggingFace() {
+    const query = document.getElementById('hf-search').value.trim();
+    if (!query) return;
+
+    const resultsContainer = document.getElementById('source-results');
+    resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+            <svg class="w-12 h-12 mx-auto mb-4 text-accent-primary animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <p class="text-dark-400">Searching Hugging Face...</p>
+        </div>
+    `;
+
+    try {
+        const searchQuery = encodeURIComponent(query);
+        const response = await fetch(`https://huggingface.co/api/datasets?search=${searchQuery}&limit=20`);
+
+        if (!response.ok) {
+            throw new Error('Hugging Face API error');
+        }
+
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            resultsContainer.innerHTML = `
+                <div class="mb-4 text-sm text-dark-400">Found ${data.length} datasets</div>
+                <div class="space-y-3">
+                    ${data.map(item => `
+                        <div class="flex items-center justify-between p-4 rounded-lg bg-dark-800/30 border border-dark-700/50 hover:border-accent-primary/50 transition-all">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="w-10 h-10 rounded-lg bg-accent-warning/20 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-accent-warning" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                                        <circle cx="8.5" cy="10.5" r="1.5"/>
+                                        <circle cx="15.5" cy="10.5" r="1.5"/>
+                                        <path d="M12 16c-2.206 0-4-1.346-4-3h8c0 1.654-1.794 3-4 3z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-dark-200 truncate">${escapeHtml(item.id)}</div>
+                                    <div class="text-xs text-dark-400">${item.downloads ? item.downloads.toLocaleString() + ' downloads' : 'No download info'}</div>
+                                    ${item.tags ? `<div class="flex flex-wrap gap-1 mt-1">${item.tags.slice(0, 3).map(tag => `<span class="px-1.5 py-0.5 text-xs rounded bg-dark-700/50 text-dark-400">${escapeHtml(tag)}</span>`).join('')}</div>` : ''}
+                                </div>
+                            </div>
+                            <a href="https://huggingface.co/datasets/${item.id}" target="_blank" class="btn-secondary text-sm flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                View
+                            </a>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-4 p-4 rounded-lg bg-dark-800/30 border border-dark-700/50">
+                    <p class="text-sm text-dark-400">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        To import a Hugging Face dataset, download the UMLCF file from the dataset page and use the "Upload File" option in the Import dialog.
+                    </p>
+                </div>
+            `;
+        } else {
+            resultsContainer.innerHTML = `
+                <div class="text-center text-dark-500 py-12">
+                    <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-lg font-medium">No datasets found</p>
+                    <p class="text-sm mt-1">Try different search terms</p>
+                </div>
+            `;
+        }
+    } catch (e) {
+        resultsContainer.innerHTML = `
+            <div class="text-center text-dark-500 py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-accent-danger opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-lg font-medium text-accent-danger">Search failed</p>
+                <p class="text-sm mt-1">${escapeHtml(e.message)}</p>
+            </div>
+        `;
+    }
+}
+
+async function browseCustomUrl() {
+    const url = document.getElementById('custom-source-url').value.trim();
+    if (!url) return;
+
+    const resultsContainer = document.getElementById('source-results');
+    resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+            <svg class="w-12 h-12 mx-auto mb-4 text-accent-primary animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <p class="text-dark-400">Fetching from URL...</p>
+        </div>
+    `;
+
+    try {
+        // Try to fetch the URL - if it's a UMLCF file, offer to import directly
+        // If it's a directory listing or JSON array, show the list
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        const text = await response.text();
+
+        if (contentType.includes('application/json') || url.endsWith('.umlcf') || url.endsWith('.json')) {
+            try {
+                const json = JSON.parse(text);
+
+                // Check if it's a single UMLCF curriculum
+                if (json.formatIdentifier === 'umlcf') {
+                    resultsContainer.innerHTML = `
+                        <div class="p-4 rounded-lg bg-dark-800/30 border border-dark-700/50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-medium text-dark-200">${escapeHtml(json.metadata?.title || 'Untitled Curriculum')}</div>
+                                    <div class="text-sm text-dark-400">${escapeHtml(json.metadata?.description || 'No description')}</div>
+                                </div>
+                                <button class="btn-primary" onclick="importFromCustomUrl('${escapeHtml(url)}')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    Import
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (Array.isArray(json)) {
+                    // Array of curricula or URLs
+                    resultsContainer.innerHTML = `
+                        <div class="mb-4 text-sm text-dark-400">Found ${json.length} items</div>
+                        <div class="space-y-3">
+                            ${json.map((item, i) => {
+                                const itemUrl = typeof item === 'string' ? item : item.url || item.href;
+                                const itemTitle = typeof item === 'string' ? item.split('/').pop() : (item.title || item.name || `Item ${i + 1}`);
+                                return `
+                                    <div class="flex items-center justify-between p-4 rounded-lg bg-dark-800/30 border border-dark-700/50">
+                                        <div class="font-medium text-dark-200">${escapeHtml(itemTitle)}</div>
+                                        <button class="btn-primary text-sm" onclick="importFromCustomUrl('${escapeHtml(itemUrl)}')">Import</button>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                } else {
+                    resultsContainer.innerHTML = `
+                        <div class="text-center text-dark-500 py-12">
+                            <p class="text-lg font-medium">Unknown JSON format</p>
+                            <p class="text-sm mt-1">The URL returned JSON but it's not a recognized UMLCF format</p>
+                        </div>
+                    `;
+                }
+            } catch (parseError) {
+                throw new Error('Invalid JSON at URL');
+            }
+        } else {
+            // Try to parse as HTML and look for links to .umlcf files
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const links = Array.from(doc.querySelectorAll('a[href]'))
+                .filter(a => a.href.endsWith('.umlcf') || a.href.endsWith('.json'))
+                .map(a => ({
+                    href: new URL(a.getAttribute('href'), url).href,
+                    text: a.textContent.trim() || a.getAttribute('href')
+                }));
+
+            if (links.length > 0) {
+                resultsContainer.innerHTML = `
+                    <div class="mb-4 text-sm text-dark-400">Found ${links.length} curriculum files</div>
+                    <div class="space-y-3">
+                        ${links.map(link => `
+                            <div class="flex items-center justify-between p-4 rounded-lg bg-dark-800/30 border border-dark-700/50">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-dark-200 truncate">${escapeHtml(link.text)}</div>
+                                    <div class="text-xs text-dark-500 truncate">${escapeHtml(link.href)}</div>
+                                </div>
+                                <button class="btn-primary text-sm flex-shrink-0" onclick="importFromCustomUrl('${escapeHtml(link.href)}')">Import</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="text-center text-dark-500 py-12">
+                        <p class="text-lg font-medium">No curriculum files found</p>
+                        <p class="text-sm mt-1">The URL doesn't appear to contain UMLCF files</p>
+                    </div>
+                `;
+            }
+        }
+    } catch (e) {
+        resultsContainer.innerHTML = `
+            <div class="text-center text-dark-500 py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-accent-danger opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-lg font-medium text-accent-danger">Failed to fetch URL</p>
+                <p class="text-sm mt-1">${escapeHtml(e.message)}</p>
+            </div>
+        `;
+    }
+}
+
+async function importFromCustomUrl(url) {
+    try {
+        showToast('Importing...', 'info');
+        const response = await fetchAPI('/curricula/import', {
+            method: 'POST',
+            body: JSON.stringify({ url: url })
+        });
+        hideSourceBrowser();
+        showToast(`Curriculum "${response.title}" imported successfully!`, 'success');
+        await refreshCurricula();
+    } catch (e) {
+        showToast('Failed to import: ' + e.message, 'error');
+    }
+}
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+
+    const colors = {
+        'success': 'bg-accent-success',
+        'error': 'bg-accent-danger',
+        'warning': 'bg-accent-warning',
+        'info': 'bg-accent-info'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification fixed bottom-4 right-4 z-[100] px-4 py-3 rounded-lg ${colors[type]} text-white shadow-lg animate-slide-up`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 // Start the application

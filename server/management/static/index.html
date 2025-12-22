@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoiceLearn Management Console</title>
+    <title>UnaMentis Management Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
@@ -146,7 +146,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <h1 class="text-xl font-bold gradient-text">VoiceLearn</h1>
+                                <h1 class="text-xl font-bold gradient-text">UnaMentis</h1>
                                 <p class="text-xs text-dark-400">Management Console</p>
                             </div>
                         </div>
@@ -221,6 +221,19 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                         </svg>
                         Models
+                    </button>
+                    <button class="nav-tab" data-tab="services">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Services
+                    </button>
+                    <button class="nav-tab" data-tab="curriculum">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        Curriculum
                     </button>
                 </div>
             </div>
@@ -764,6 +777,299 @@
                     <!-- Model cards will be inserted here -->
                 </div>
             </div>
+
+            <!-- Services Tab -->
+            <div id="tab-services" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">Managed Services</h2>
+                    <div class="flex gap-2">
+                        <button class="btn-secondary" onclick="refreshServices()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Refresh
+                        </button>
+                        <button class="btn-success" onclick="startAllServices()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Start All
+                        </button>
+                        <button class="btn-danger" onclick="stopAllServices()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                            </svg>
+                            Stop All
+                        </button>
+                    </div>
+                </div>
+
+                <style>
+                    .btn-success {
+                        @apply flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent-success hover:bg-accent-success/80 text-white transition-all;
+                    }
+                    .btn-danger {
+                        @apply flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent-danger hover:bg-accent-danger/80 text-white transition-all;
+                    }
+                    .btn-success-sm {
+                        @apply flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-accent-success hover:bg-accent-success/80 text-white transition-all;
+                    }
+                    .btn-danger-sm {
+                        @apply flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-accent-danger hover:bg-accent-danger/80 text-white transition-all;
+                    }
+                    .btn-secondary-sm {
+                        @apply flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-dark-700 text-dark-300 hover:text-dark-100 hover:bg-dark-700/50 transition-all;
+                    }
+                </style>
+
+                <!-- Service Stats -->
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-success/20 text-accent-success">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="services-running">0</div>
+                            <div class="stat-label">Running</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-dark-500/20 text-dark-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="services-stopped">0</div>
+                            <div class="stat-label">Stopped</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-danger/20 text-accent-danger">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="services-error">0</div>
+                            <div class="stat-label">Error</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-warning/20 text-accent-warning">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="services-memory-used">0 MB</div>
+                            <div class="stat-label">Service Memory</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Memory Bar -->
+                <div class="mb-6 p-4 rounded-xl bg-dark-800/50 border border-dark-700/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-dark-200">Unified Memory</span>
+                        <span class="text-sm text-dark-400">
+                            <span id="services-memory-percent">0%</span> used of <span id="services-memory-total">0 GB</span>
+                        </span>
+                    </div>
+                    <div class="w-full h-3 bg-dark-700 rounded-full overflow-hidden">
+                        <div id="services-memory-bar" class="h-full bg-gradient-to-r from-accent-warning to-accent-danger transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Services Grid -->
+                <div class="grid md:grid-cols-2 gap-4" id="services-grid">
+                    <!-- Service cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Curriculum Tab -->
+            <div id="tab-curriculum" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold">Curriculum Management</h2>
+                    <div class="flex gap-2">
+                        <button class="btn-secondary" onclick="showImportModal()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg>
+                            Import
+                        </button>
+                        <button class="btn-secondary" onclick="showSourceBrowser()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                            </svg>
+                            Browse Sources
+                        </button>
+                        <button class="btn-secondary" onclick="refreshCurricula()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Reload
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Curriculum Stats -->
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-primary/20 text-accent-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="curricula-total">0</div>
+                            <div class="stat-label">Total Curricula</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-success/20 text-accent-success">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="curricula-topics">0</div>
+                            <div class="stat-label">Total Topics</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-info/20 text-accent-info">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="curricula-duration">0h</div>
+                            <div class="stat-label">Total Duration</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-accent-secondary/20 text-accent-secondary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="stat-value" id="curricula-keywords">0</div>
+                            <div class="stat-label">Keywords</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <div class="flex-1 min-w-[200px]">
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" id="curriculum-search" placeholder="Search curricula by title, keyword, or description..." class="input-field pl-10" onkeyup="filterCurricula()">
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="curriculum-difficulty-filter" class="input-field w-auto" onchange="filterCurricula()">
+                            <option value="">All Difficulties</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Curriculum Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="curricula-grid">
+                    <div class="text-center text-dark-500 py-12 col-span-full">
+                        <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <p class="text-lg font-medium">Loading curricula...</p>
+                        <p class="text-sm mt-1">Curricula will appear here when loaded</p>
+                    </div>
+                </div>
+
+                <!-- Curriculum Detail Panel (shown when a curriculum is selected) -->
+                <div id="curriculum-detail-panel" class="hidden mt-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title" id="curriculum-detail-title">Curriculum Details</h3>
+                            <button onclick="closeCurriculumDetail()" class="text-dark-400 hover:text-dark-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <!-- Curriculum Info -->
+                            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <h4 class="text-sm font-medium text-dark-400 mb-2">Description</h4>
+                                    <p id="curriculum-detail-description" class="text-dark-200"></p>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-dark-400 text-sm w-24">Difficulty:</span>
+                                        <span id="curriculum-detail-difficulty" class="px-2 py-0.5 rounded text-xs font-medium"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-dark-400 text-sm w-24">Age Range:</span>
+                                        <span id="curriculum-detail-age" class="text-dark-200"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-dark-400 text-sm w-24">Duration:</span>
+                                        <span id="curriculum-detail-duration" class="text-dark-200"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-dark-400 text-sm w-24">Version:</span>
+                                        <span id="curriculum-detail-version" class="text-dark-200 font-mono text-sm"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Keywords -->
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-dark-400 mb-2">Keywords</h4>
+                                <div id="curriculum-detail-keywords" class="flex flex-wrap gap-2">
+                                    <!-- Keywords will be inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- Learning Objectives -->
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-dark-400 mb-2">Learning Objectives</h4>
+                                <ul id="curriculum-detail-objectives" class="space-y-2 text-dark-200">
+                                    <!-- Objectives will be inserted here -->
+                                </ul>
+                            </div>
+
+                            <!-- Glossary -->
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-dark-400 mb-2">Glossary Terms</h4>
+                                <div id="curriculum-detail-glossary" class="grid md:grid-cols-2 gap-3">
+                                    <!-- Glossary terms will be inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- Topics -->
+                            <div>
+                                <h4 class="text-sm font-medium text-dark-400 mb-2">Topics</h4>
+                                <div id="curriculum-detail-topics" class="space-y-2">
+                                    <!-- Topics will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <style>
@@ -778,6 +1084,216 @@
             }
         </style>
     </div>
+
+    <!-- Import Curriculum Modal -->
+    <div id="import-curriculum-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" onclick="hideImportModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+            <div class="card animate-slide-up">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Import Curriculum
+                    </h3>
+                    <button onclick="hideImportModal()" class="text-dark-400 hover:text-dark-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <!-- Import Tabs -->
+                    <div class="flex gap-2 mb-4">
+                        <button class="import-tab active" data-import-tab="url" onclick="switchImportTab('url')">From URL</button>
+                        <button class="import-tab" data-import-tab="file" onclick="switchImportTab('file')">Upload File</button>
+                        <button class="import-tab" data-import-tab="paste" onclick="switchImportTab('paste')">Paste JSON</button>
+                    </div>
+
+                    <!-- URL Import -->
+                    <div id="import-tab-url" class="import-tab-content">
+                        <form id="import-url-form" onsubmit="importFromUrl(event)">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-dark-300 mb-2">UMLCF URL</label>
+                                <input type="url" name="url" required class="input-field" placeholder="https://example.com/curriculum.umlcf">
+                                <p class="text-xs text-dark-500 mt-1">Enter a direct link to a UMLCF curriculum file</p>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btn-secondary" onclick="hideImportModal()">Cancel</button>
+                                <button type="submit" class="btn-primary">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    Import
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div id="import-tab-file" class="import-tab-content hidden">
+                        <form id="import-file-form" onsubmit="importFromFile(event)">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-dark-300 mb-2">Upload UMLCF File</label>
+                                <div class="border-2 border-dashed border-dark-600 rounded-lg p-6 text-center hover:border-accent-primary/50 transition-colors cursor-pointer" onclick="document.getElementById('curriculum-file-input').click()">
+                                    <input type="file" id="curriculum-file-input" name="file" accept=".umlcf,.json" class="hidden" onchange="handleFileSelect(event)">
+                                    <svg class="w-10 h-10 mx-auto mb-2 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="text-dark-300" id="file-upload-text">Click or drag to upload .umlcf file</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btn-secondary" onclick="hideImportModal()">Cancel</button>
+                                <button type="submit" class="btn-primary" id="file-upload-btn" disabled>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    Import
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Paste JSON -->
+                    <div id="import-tab-paste" class="import-tab-content hidden">
+                        <form id="import-paste-form" onsubmit="importFromPaste(event)">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-dark-300 mb-2">Paste UMLCF JSON</label>
+                                <textarea name="json" required class="input-field h-48 font-mono text-sm" placeholder='{"formatIdentifier": "umlcf", ...}'></textarea>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="btn-secondary" onclick="hideImportModal()">Cancel</button>
+                                <button type="submit" class="btn-primary">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                    </svg>
+                                    Import
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .import-tab {
+            @apply flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-dark-700 text-dark-400 hover:text-dark-200 hover:bg-dark-700/50 transition-all text-center;
+        }
+        .import-tab.active {
+            @apply bg-accent-primary/20 border-accent-primary/50 text-accent-primary;
+        }
+    </style>
+
+    <!-- Source Browser Modal -->
+    <div id="source-browser-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-dark-950/80 backdrop-blur-sm" onclick="hideSourceBrowser()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[80vh] overflow-hidden">
+            <div class="card animate-slide-up h-full flex flex-col">
+                <div class="card-header flex-shrink-0">
+                    <h3 class="card-title">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                        </svg>
+                        Browse Curriculum Sources
+                    </h3>
+                    <button onclick="hideSourceBrowser()" class="text-dark-400 hover:text-dark-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-4 flex-shrink-0 border-b border-dark-700/50">
+                    <!-- Source Selection -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button class="source-btn active" data-source="github" onclick="switchSource('github')">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                            GitHub
+                        </button>
+                        <button class="source-btn" data-source="huggingface" onclick="switchSource('huggingface')">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                                <circle cx="8.5" cy="10.5" r="1.5"/>
+                                <circle cx="15.5" cy="10.5" r="1.5"/>
+                                <path d="M12 16c-2.206 0-4-1.346-4-3h8c0 1.654-1.794 3-4 3z"/>
+                            </svg>
+                            Hugging Face
+                        </button>
+                        <button class="source-btn" data-source="custom" onclick="switchSource('custom')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                            Custom URL
+                        </button>
+                    </div>
+
+                    <!-- GitHub Search -->
+                    <div id="source-github" class="source-content">
+                        <div class="flex gap-2">
+                            <input type="text" id="github-search" class="input-field flex-1" placeholder="Search repositories (e.g., 'umlcf curriculum')">
+                            <button class="btn-primary" onclick="searchGitHub()">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hugging Face Search -->
+                    <div id="source-huggingface" class="source-content hidden">
+                        <div class="flex gap-2">
+                            <input type="text" id="hf-search" class="input-field flex-1" placeholder="Search datasets (e.g., 'curriculum learning')">
+                            <button class="btn-primary" onclick="searchHuggingFace()">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom URL -->
+                    <div id="source-custom" class="source-content hidden">
+                        <div class="flex gap-2">
+                            <input type="url" id="custom-source-url" class="input-field flex-1" placeholder="https://example.com/curricula/">
+                            <button class="btn-primary" onclick="browseCustomUrl()">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                </svg>
+                                Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="flex-1 overflow-y-auto p-4" id="source-results">
+                    <div class="text-center text-dark-500 py-12">
+                        <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <p class="text-lg font-medium">Search for curricula</p>
+                        <p class="text-sm mt-1">Use the search above to find curricula from external sources</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .source-btn {
+            @apply flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-dark-700 text-dark-400 hover:text-dark-200 hover:bg-dark-700/50 transition-all;
+        }
+        .source-btn.active {
+            @apply bg-accent-primary/20 border-accent-primary/50 text-accent-primary;
+        }
+    </style>
 
     <!-- Add Server Modal -->
     <div id="add-server-modal" class="fixed inset-0 z-50 hidden">
@@ -803,7 +1319,7 @@
                             <option value="ollama">Ollama (LLM)</option>
                             <option value="whisper">Whisper (STT)</option>
                             <option value="piper">Piper (TTS)</option>
-                            <option value="voicelearnGateway">VoiceLearn Gateway</option>
+                            <option value="unamentisGateway">UnaMentis Gateway</option>
                             <option value="custom">Custom</option>
                         </select>
                     </div>

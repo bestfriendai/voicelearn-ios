@@ -1,0 +1,75 @@
+{
+  "umlcf": "1.0.0",
+  "id": {
+    "catalog": "UUID",
+    "value": "00000000-0000-0000-0000-000000000002"
+  },
+  "title": "Minimal Assessment Example",
+  "description": "Demonstrates basic assessment structure with all four supported question types.",
+  "version": {
+    "number": "1.0.0"
+  },
+  "content": [
+    {
+      "id": { "value": "topic-assessments" },
+      "title": "Assessment Examples",
+      "type": "topic",
+      "assessments": [
+        {
+          "id": { "value": "q-choice" },
+          "type": "choice",
+          "title": "Single Choice Question",
+          "prompt": "What is 2 + 2?",
+          "spokenPrompt": "What is two plus two?",
+          "choices": [
+            { "id": "a", "text": "3", "correct": false },
+            { "id": "b", "text": "4", "correct": true },
+            { "id": "c", "text": "5", "correct": false }
+          ],
+          "feedback": {
+            "correct": {
+              "text": "Correct!",
+              "spokenText": "That's right! Two plus two equals four."
+            },
+            "incorrect": {
+              "text": "Try again.",
+              "hint": "Count on your fingers if it helps."
+            }
+          }
+        },
+        {
+          "id": { "value": "q-multiple" },
+          "type": "multiple_choice",
+          "title": "Multiple Choice Question",
+          "prompt": "Which of these are primary colors? Select all that apply.",
+          "choices": [
+            { "id": "a", "text": "Red", "correct": true },
+            { "id": "b", "text": "Green", "correct": false },
+            { "id": "c", "text": "Blue", "correct": true },
+            { "id": "d", "text": "Yellow", "correct": true }
+          ]
+        },
+        {
+          "id": { "value": "q-truefalse" },
+          "type": "true_false",
+          "prompt": "The Earth is flat.",
+          "correctResponse": ["false"],
+          "feedback": {
+            "correct": { "text": "Correct! The Earth is roughly spherical." },
+            "incorrect": { "text": "The Earth is actually a sphere (technically an oblate spheroid)." }
+          }
+        },
+        {
+          "id": { "value": "q-text" },
+          "type": "text_entry",
+          "prompt": "What planet do we live on?",
+          "correctResponse": ["Earth", "earth", "EARTH"],
+          "scoring": {
+            "maxScore": 1,
+            "passingScore": 1
+          }
+        }
+      ]
+    }
+  ]
+}

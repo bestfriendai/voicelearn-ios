@@ -166,6 +166,52 @@ class ManagedService:
     auto_restart: bool = True
 
 
+@dataclass
+class CurriculumSummary:
+    """Summary of a curriculum for listing/browsing."""
+    id: str
+    title: str
+    description: str
+    version: str
+    topic_count: int
+    total_duration: str
+    difficulty: str
+    age_range: str
+    keywords: List[str] = field(default_factory=list)
+    file_path: str = ""
+    loaded_at: float = field(default_factory=time.time)
+
+
+@dataclass
+class TopicSummary:
+    """Summary of a topic within a curriculum."""
+    id: str
+    title: str
+    description: str
+    order_index: int
+    duration: str
+    has_transcript: bool = False
+    segment_count: int = 0
+    assessment_count: int = 0
+
+
+@dataclass
+class CurriculumDetail:
+    """Full curriculum detail including topics."""
+    id: str
+    title: str
+    description: str
+    version: str
+    difficulty: str
+    age_range: str
+    duration: str
+    keywords: List[str]
+    topics: List[TopicSummary]
+    glossary_terms: List[Dict[str, Any]]
+    learning_objectives: List[Dict[str, Any]]
+    raw_umlcf: Dict[str, Any] = field(default_factory=dict)
+
+
 class ManagementState:
     """Global state for the management server."""
 
@@ -177,6 +223,10 @@ class ManagementState:
         self.models: Dict[str, ModelInfo] = {}
         self.managed_services: Dict[str, ManagedService] = {}
         self.websockets: Set[web.WebSocketResponse] = set()
+        # Curriculum storage
+        self.curriculums: Dict[str, CurriculumSummary] = {}
+        self.curriculum_details: Dict[str, CurriculumDetail] = {}
+        self.curriculum_raw: Dict[str, Dict[str, Any]] = {}  # Full UMLCF data by ID
         self.stats = {
             "total_logs_received": 0,
             "total_metrics_received": 0,
@@ -188,6 +238,8 @@ class ManagementState:
         self._init_default_servers()
         # Initialize managed services
         self._init_managed_services()
+        # Load curricula from disk
+        self._load_curricula()
 
     def _init_default_servers(self):
         """Initialize default server configurations."""
@@ -241,6 +293,110 @@ class ManagementState:
                 port=3000,
                 health_url="http://localhost:3000"
             )
+
+    def _load_curricula(self):
+        """Load all UMLCF curriculum files from the curriculum directory."""
+        curriculum_dir = PROJECT_ROOT / "curriculum" / "examples" / "realistic"
+        if not curriculum_dir.exists():
+            logger.warning(f"Curriculum directory not found: {curriculum_dir}")
+            return
+
+        for umlcf_file in curriculum_dir.glob("*.umlcf"):
+            try:
+                self._load_curriculum_file(umlcf_file)
+            except Exception as e:
+                logger.error(f"Failed to load curriculum {umlcf_file}: {e}")
+
+        logger.info(f"Loaded {len(self.curriculums)} curricula")
+
+    def _load_curriculum_file(self, file_path: Path):
+        """Load a single UMLCF file and extract summary/details."""
+        with open(file_path, 'r', encoding='utf-8') as f:
+            umlcf = json.load(f)
+
+        # Extract ID from the UMLCF or generate from filename
+        umlcf_id = umlcf.get("id", {}).get("value", file_path.stem)
+
+        # Extract educational metadata
+        educational = umlcf.get("educational", {})
+        version_info = umlcf.get("version", {})
+
+        # Count topics and calculate duration
+        content = umlcf.get("content", [])
+        topic_count = 0
+        topics = []
+        if content and isinstance(content, list):
+            root = content[0]
+            children = root.get("children", [])
+            topic_count = len(children)
+
+            for idx, child in enumerate(children):
+                time_estimates = child.get("timeEstimates", {})
+                duration = time_estimates.get("intermediate", time_estimates.get("introductory", "PT30M"))
+                transcript = child.get("transcript", {})
+                segments = transcript.get("segments", [])
+                assessments = child.get("assessments", [])
+
+                topics.append(TopicSummary(
+                    id=child.get("id", {}).get("value", f"topic-{idx}"),
+                    title=child.get("title", "Untitled"),
+                    description=child.get("description", ""),
+                    order_index=child.get("orderIndex", idx),
+                    duration=duration,
+                    has_transcript=len(segments) > 0,
+                    segment_count=len(segments),
+                    assessment_count=len(assessments)
+                ))
+
+        # Extract glossary
+        glossary = umlcf.get("glossary", {}).get("terms", [])
+
+        # Extract learning objectives from root content
+        learning_objectives = []
+        if content and isinstance(content, list):
+            root = content[0]
+            learning_objectives = root.get("learningObjectives", [])
+
+        # Create summary for listing
+        summary = CurriculumSummary(
+            id=umlcf_id,
+            title=umlcf.get("title", "Untitled"),
+            description=umlcf.get("description", ""),
+            version=version_info.get("number", "1.0.0"),
+            topic_count=topic_count,
+            total_duration=educational.get("typicalLearningTime", "PT4H"),
+            difficulty=educational.get("difficulty", "medium"),
+            age_range=educational.get("typicalAgeRange", "18+"),
+            keywords=umlcf.get("metadata", {}).get("keywords", []),
+            file_path=str(file_path)
+        )
+
+        # Create detailed view
+        detail = CurriculumDetail(
+            id=umlcf_id,
+            title=umlcf.get("title", "Untitled"),
+            description=umlcf.get("description", ""),
+            version=version_info.get("number", "1.0.0"),
+            difficulty=educational.get("difficulty", "medium"),
+            age_range=educational.get("typicalAgeRange", "18+"),
+            duration=educational.get("typicalLearningTime", "PT4H"),
+            keywords=umlcf.get("metadata", {}).get("keywords", []),
+            topics=[asdict(t) for t in topics],
+            glossary_terms=glossary,
+            learning_objectives=learning_objectives,
+            raw_umlcf=umlcf
+        )
+
+        self.curriculums[umlcf_id] = summary
+        self.curriculum_details[umlcf_id] = detail
+        self.curriculum_raw[umlcf_id] = umlcf
+
+    def reload_curricula(self):
+        """Reload all curricula from disk."""
+        self.curriculums.clear()
+        self.curriculum_details.clear()
+        self.curriculum_raw.clear()
+        self._load_curricula()
 
 
 # Global state
@@ -1277,6 +1433,276 @@ async def handle_stop_all_services(request: web.Request) -> web.Response:
 
 
 # =============================================================================
+# API Handlers - Curriculum
+# =============================================================================
+
+async def handle_get_curricula(request: web.Request) -> web.Response:
+    """Get list of available curricula."""
+    try:
+        search = request.query.get("search", "").lower()
+        difficulty = request.query.get("difficulty", "")
+
+        curricula = list(state.curriculums.values())
+
+        # Apply filters
+        if search:
+            curricula = [
+                c for c in curricula
+                if search in c.title.lower() or search in c.description.lower()
+                or any(search in kw.lower() for kw in c.keywords)
+            ]
+
+        if difficulty:
+            curricula = [c for c in curricula if c.difficulty == difficulty]
+
+        return web.json_response({
+            "curricula": [asdict(c) for c in curricula],
+            "total": len(curricula)
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting curricula: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_curriculum_detail(request: web.Request) -> web.Response:
+    """Get detailed curriculum info including topics."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+
+        if curriculum_id not in state.curriculum_details:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        detail = state.curriculum_details[curriculum_id]
+        # Don't include raw_umlcf in detail response (it's huge)
+        result = asdict(detail)
+        del result["raw_umlcf"]
+
+        return web.json_response(result)
+
+    except Exception as e:
+        logger.error(f"Error getting curriculum detail: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_curriculum_full(request: web.Request) -> web.Response:
+    """Get full UMLCF data for a curriculum (for iOS download)."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+
+        if curriculum_id not in state.curriculum_raw:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        return web.json_response(state.curriculum_raw[curriculum_id])
+
+    except Exception as e:
+        logger.error(f"Error getting curriculum full: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_topic_transcript(request: web.Request) -> web.Response:
+    """Get transcript segments for a specific topic."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+        topic_id = request.match_info.get("topic_id")
+
+        if curriculum_id not in state.curriculum_raw:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        umlcf = state.curriculum_raw[curriculum_id]
+        content = umlcf.get("content", [])
+
+        if not content:
+            return web.json_response({"error": "No content in curriculum"}, status=404)
+
+        # Find the topic
+        root = content[0]
+        children = root.get("children", [])
+
+        for child in children:
+            child_id = child.get("id", {}).get("value", "")
+            if child_id == topic_id:
+                transcript = child.get("transcript", {})
+                return web.json_response({
+                    "topic_id": topic_id,
+                    "topic_title": child.get("title", ""),
+                    "transcript": transcript,
+                    "misconceptions": child.get("misconceptions", []),
+                    "examples": child.get("examples", []),
+                    "assessments": child.get("assessments", [])
+                })
+
+        return web.json_response({"error": "Topic not found"}, status=404)
+
+    except Exception as e:
+        logger.error(f"Error getting topic transcript: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_reload_curricula(request: web.Request) -> web.Response:
+    """Reload all curricula from disk."""
+    try:
+        state.reload_curricula()
+        await broadcast_message("curricula_reloaded", {
+            "count": len(state.curriculums)
+        })
+        return web.json_response({
+            "status": "ok",
+            "count": len(state.curriculums)
+        })
+
+    except Exception as e:
+        logger.error(f"Error reloading curricula: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_save_curriculum(request: web.Request) -> web.Response:
+    """Save/update a curriculum VLCF file."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+        data = await request.json()
+
+        # Validate it's valid UMLCF (basic check)
+        if "umlcf" not in data or "title" not in data:
+            return web.json_response({"error": "Invalid UMLCF data"}, status=400)
+
+        # Determine file path
+        if curriculum_id in state.curriculums:
+            file_path = Path(state.curriculums[curriculum_id].file_path)
+        else:
+            # New curriculum - create filename from title
+            safe_name = "".join(c if c.isalnum() or c in "-_" else "-" for c in data["title"].lower())
+            file_path = PROJECT_ROOT / "curriculum" / "examples" / "realistic" / f"{safe_name}.umlcf"
+
+        # Write the file
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+
+        # Reload the curriculum
+        state._load_curriculum_file(file_path)
+
+        await broadcast_message("curriculum_updated", {
+            "id": curriculum_id,
+            "title": data.get("title")
+        })
+
+        return web.json_response({
+            "status": "ok",
+            "id": data.get("id", {}).get("value", file_path.stem),
+            "file_path": str(file_path)
+        })
+
+    except Exception as e:
+        logger.error(f"Error saving curriculum: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_import_curriculum(request: web.Request) -> web.Response:
+    """Import a curriculum from URL or direct content."""
+    try:
+        data = await request.json()
+        umlcf_data = None
+        source_url = None
+
+        # Import from URL
+        if "url" in data:
+            source_url = data["url"]
+            logger.info(f"Importing curriculum from URL: {source_url}")
+
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.get(source_url, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                    if response.status != 200:
+                        return web.json_response(
+                            {"error": f"Failed to fetch URL: HTTP {response.status}"},
+                            status=400
+                        )
+                    content = await response.text()
+                    try:
+                        umlcf_data = json.loads(content)
+                    except json.JSONDecodeError as e:
+                        return web.json_response(
+                            {"error": f"Invalid JSON at URL: {str(e)}"},
+                            status=400
+                        )
+
+        # Import from direct content
+        elif "content" in data:
+            umlcf_data = data["content"]
+            logger.info("Importing curriculum from direct content")
+
+        else:
+            return web.json_response(
+                {"error": "Must provide 'url' or 'content'"},
+                status=400
+            )
+
+        # Validate UMLCF format
+        if not isinstance(umlcf_data, dict):
+            return web.json_response({"error": "Content must be a JSON object"}, status=400)
+
+        if umlcf_data.get("formatIdentifier") != "umlcf":
+            return web.json_response(
+                {"error": "Invalid format: formatIdentifier must be 'umlcf'"},
+                status=400
+            )
+
+        # Extract title for filename
+        metadata = umlcf_data.get("metadata", {})
+        title = metadata.get("title", "Imported Curriculum")
+        curriculum_id = umlcf_data.get("id", {}).get("value", "")
+
+        # Create safe filename
+        safe_name = "".join(c if c.isalnum() or c in "-_" else "-" for c in title.lower())
+        if not safe_name:
+            safe_name = f"imported-{int(time.time())}"
+
+        # Determine destination path
+        curriculum_dir = PROJECT_ROOT / "curriculum" / "examples" / "realistic"
+        curriculum_dir.mkdir(parents=True, exist_ok=True)
+
+        file_path = curriculum_dir / f"{safe_name}.umlcf"
+
+        # Handle duplicate filenames
+        counter = 1
+        while file_path.exists():
+            file_path = curriculum_dir / f"{safe_name}-{counter}.umlcf"
+            counter += 1
+
+        # Write the file
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(umlcf_data, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"Saved imported curriculum to: {file_path}")
+
+        # Load into state
+        state._load_curriculum_file(file_path)
+
+        # Broadcast update
+        await broadcast_message("curriculum_imported", {
+            "id": curriculum_id or file_path.stem,
+            "title": title,
+            "file_path": str(file_path)
+        })
+
+        return web.json_response({
+            "status": "ok",
+            "id": curriculum_id or file_path.stem,
+            "title": title,
+            "file_path": str(file_path),
+            "source_url": source_url
+        })
+
+    except asyncio.TimeoutError:
+        return web.json_response({"error": "Timeout fetching URL"}, status=408)
+    except Exception as e:
+        logger.error(f"Error importing curriculum: {e}")
+        import traceback
+        traceback.print_exc()
+        return web.json_response({"error": str(e)}, status=500)
+
+
+# =============================================================================
 # WebSocket Handler
 # =============================================================================
 
@@ -1405,6 +1831,15 @@ def create_app() -> web.Application:
     app.router.add_post("/api/services/start-all", handle_start_all_services)
     app.router.add_post("/api/services/stop-all", handle_stop_all_services)
 
+    # Curriculum
+    app.router.add_get("/api/curricula", handle_get_curricula)
+    app.router.add_get("/api/curricula/{curriculum_id}", handle_get_curriculum_detail)
+    app.router.add_get("/api/curricula/{curriculum_id}/full", handle_get_curriculum_full)
+    app.router.add_get("/api/curricula/{curriculum_id}/topics/{topic_id}/transcript", handle_get_topic_transcript)
+    app.router.add_post("/api/curricula/reload", handle_reload_curricula)
+    app.router.add_post("/api/curricula/import", handle_import_curriculum)
+    app.router.add_put("/api/curricula/{curriculum_id}", handle_save_curriculum)
+
     # WebSocket
     app.router.add_get("/ws", handle_websocket)
 
@@ -1414,9 +1849,10 @@ def create_app() -> web.Application:
         app.router.add_static("/static", static_dir)
     app.router.add_get("/", handle_dashboard)
 
-    # Startup hook to detect existing services
+    # Startup hook to detect existing services and load curricula
     async def on_startup(app):
         await detect_existing_processes()
+        state._load_curricula()  # Load all UMLCF curricula on startup
 
     app.on_startup.append(on_startup)
 

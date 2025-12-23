@@ -262,10 +262,142 @@ curriculum/
 | `glossaryTerms` | GlossaryTerm[] | Node-specific terms |
 | `misconceptions` | Misconception[] | Common errors |
 | `resources` | Resource[] | External references |
+| `media` | MediaCollection | Visual assets (images, diagrams, equations) |
 | `children` | ContentNode[] | Nested child nodes |
 | `tutoringConfig` | TutoringConfig | AI behavior settings |
 | `compliance` | NodeCompliance | Pass/fail requirements |
 | `extensions` | Extensions | Custom data |
+
+---
+
+## Media and Visual Assets
+
+VLCF supports rich media content that can be displayed alongside or synchronized with audio content.
+
+### Media Collection
+
+Each content node can include a `media` object with two categories:
+
+```json
+{
+  "media": {
+    "embedded": [
+      {
+        "id": "img-1",
+        "type": "diagram",
+        "url": "https://cdn.example.com/images/architecture.png",
+        "localPath": "media/architecture.png",
+        "title": "System Architecture",
+        "alt": "Diagram showing the three-tier architecture with client, server, and database layers",
+        "caption": "Figure 1: High-level system architecture",
+        "mimeType": "image/png",
+        "dimensions": { "width": 1200, "height": 800 },
+        "segmentTiming": {
+          "startSegment": 2,
+          "endSegment": 5,
+          "displayMode": "persistent"
+        }
+      }
+    ],
+    "reference": [
+      {
+        "id": "ref-1",
+        "type": "slideDeck",
+        "url": "https://cdn.example.com/slides/overview.pdf",
+        "title": "Complete Overview Slides",
+        "description": "30-slide presentation with detailed diagrams",
+        "keywords": ["architecture", "deployment", "scaling"]
+      }
+    ]
+  }
+}
+```
+
+### Media Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `image` | Static images (PNG, JPEG, WebP) | Photos, screenshots, illustrations |
+| `diagram` | Architectural/flow diagrams | System design, process flows |
+| `equation` | Mathematical formulas (LaTeX) | Formulas, derivations |
+| `chart` | Data visualizations | Graphs, statistics |
+| `slideImage` | Single slide from a deck | Key presentation slides |
+| `slideDeck` | Full presentation reference | Complete slide sets |
+
+### Embedded Media Fields
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `id` | Yes | string | Unique identifier within the curriculum |
+| `type` | Yes | string | Media type (see table above) |
+| `url` | Yes | string | Remote URL for the asset |
+| `localPath` | No | string | Relative path for bundled assets |
+| `title` | No | string | Display title |
+| `alt` | Yes | string | Accessibility description |
+| `caption` | No | string | Caption text to display |
+| `mimeType` | No | string | MIME type (e.g., "image/png") |
+| `dimensions` | No | object | Width and height in pixels |
+| `segmentTiming` | No | object | When to display during playback |
+| `audioDescription` | No | string | Detailed verbal description for accessibility |
+
+### Segment Timing
+
+Controls when visuals appear during transcript playback:
+
+```json
+{
+  "segmentTiming": {
+    "startSegment": 2,
+    "endSegment": 5,
+    "displayMode": "persistent"
+  }
+}
+```
+
+**Display Modes:**
+- `persistent` - Visual remains on screen for the entire segment range
+- `highlight` - Visual appears prominently, then fades to thumbnail
+- `popup` - Visual appears as dismissible overlay
+- `inline` - Visual embedded directly in transcript text flow
+
+### Reference Media Fields
+
+Reference media are optional supplementary materials users can request:
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `id` | Yes | string | Unique identifier |
+| `type` | Yes | string | Media type |
+| `url` | Yes | string | Remote URL |
+| `title` | Yes | string | Display title |
+| `description` | No | string | Description of content |
+| `keywords` | No | string[] | Search keywords for matching user requests |
+
+### Equation Format
+
+For mathematical content, use LaTeX notation:
+
+```json
+{
+  "id": "eq-1",
+  "type": "equation",
+  "latex": "\\sigma(x) = \\frac{1}{1 + e^{-x}}",
+  "alt": "Sigmoid function: sigma of x equals one over one plus e to the negative x",
+  "title": "Sigmoid Activation Function",
+  "segmentTiming": {
+    "startSegment": 3,
+    "endSegment": 3,
+    "displayMode": "highlight"
+  }
+}
+```
+
+### Accessibility Requirements
+
+All visual content MUST include:
+1. `alt` text describing the visual for screen readers
+2. Consider providing `audioDescription` for complex diagrams
+3. Equations should have verbal descriptions in `alt`
 
 ---
 
@@ -679,12 +811,13 @@ Future versions may support:
 - Graphical/hotspot
 - Drag-and-drop
 
-### Embedded Media
+### Enhanced Media Features
 
-Currently URL-only; future versions may support:
-- Base64 embedded assets
-- MIME type declarations
-- Accessibility alternatives
+Future versions may support:
+- Base64 embedded assets for fully offline content
+- Video clips and animated diagrams
+- Interactive 3D models
+- Collaborative annotations on visuals
 
 ### Import/Export Adapters
 

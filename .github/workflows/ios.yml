@@ -76,7 +76,7 @@ jobs:
         set -o pipefail
         xcodebuild build \
           -scheme UnaMentis \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           -skipPackagePluginValidation \
           CODE_SIGNING_ALLOWED=NO \
           | xcbeautify --renderer github-actions
@@ -86,7 +86,7 @@ jobs:
         set -o pipefail
         xcodebuild test \
           -scheme UnaMentis \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           -only-testing:UnaMentisTests/Unit \
           -enableCodeCoverage YES \
           -resultBundlePath UnitTestResults.xcresult \
@@ -157,7 +157,7 @@ jobs:
         set -o pipefail
         xcodebuild build \
           -scheme UnaMentis \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           -skipPackagePluginValidation \
           CODE_SIGNING_ALLOWED=NO \
           | xcbeautify --renderer github-actions
@@ -167,7 +167,7 @@ jobs:
         set -o pipefail
         xcodebuild test \
           -scheme UnaMentis \
-          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
           -only-testing:UnaMentisTests/Integration \
           -resultBundlePath IntegrationTestResults.xcresult \
           CODE_SIGNING_ALLOWED=NO \

@@ -83,11 +83,18 @@ See [docs/TASK_STATUS.md](docs/TASK_STATUS.md) for detailed task tracking.
 - [Testing Guide](docs/TESTING.md)
 - [Debug & Testing UI](docs/DEBUG_TESTING_UI.md) - Built-in troubleshooting tools
 
-### Curriculum Format (VLCF)
-- [Curriculum Overview](curriculum/README.md) - **Comprehensive guide to VLCF**
-- [VLCF Specification](curriculum/spec/VLCF_SPECIFICATION.md) - Format specification
+### Curriculum Format (UMLCF)
+- [Curriculum Overview](curriculum/README.md) - **Comprehensive guide to UMLCF**
+- [UMLCF Specification](curriculum/spec/VLCF_SPECIFICATION.md) - Format specification
 - [Standards Traceability](curriculum/spec/STANDARDS_TRACEABILITY.md) - Standards mapping
 - [Import Architecture](curriculum/importers/IMPORTER_ARCHITECTURE.md) - Import system design
+- [Pronunciation Guide](docs/PRONUNCIATION_GUIDE.md) - TTS pronunciation enhancement system
+
+### Architecture & Design
+- [Project Overview](docs/PROJECT_OVERVIEW.md) - High-level architecture
+- [Enterprise Architecture](docs/ENTERPRISE_ARCHITECTURE.md) - Comprehensive system design
+- [Patch Panel Architecture](docs/PATCH_PANEL_ARCHITECTURE.md) - LLM routing system
+- [Technical Design Document](docs/UnaMentis_TDD.md) - Complete TDD
 
 ### Project
 - [Contributing](docs/CONTRIBUTING.md)
@@ -140,9 +147,9 @@ UnaMentis/
 - **Persistence**: Core Data
 - **Testing**: XCTest (no mocks, real implementations)
 
-## Curriculum System (VLCF)
+## Curriculum System (UMLCF)
 
-UnaMentis includes a comprehensive curriculum format specification: the **UnaMentis Curriculum Format (VLCF)**. This is a JSON-based standard designed specifically for conversational AI tutoring.
+UnaMentis includes a comprehensive curriculum format specification: the **UnaMentis Markup Language Curriculum Format (UMLCF)**. This is a JSON-based standard designed specifically for conversational AI tutoring.
 
 ### Key Features
 
@@ -157,12 +164,12 @@ UnaMentis includes a comprehensive curriculum format specification: the **UnaMen
 |----------|-------------|
 | [curriculum/README.md](curriculum/README.md) | **START HERE** - Complete overview |
 | [curriculum/spec/VLCF_SPECIFICATION.md](curriculum/spec/VLCF_SPECIFICATION.md) | Human-readable specification |
-| [curriculum/spec/vlcf-schema.json](curriculum/spec/vlcf-schema.json) | JSON Schema (Draft 2020-12) |
+| [curriculum/spec/umlcf-schema.json](curriculum/spec/umlcf-schema.json) | JSON Schema (Draft 2020-12) |
 | [curriculum/spec/STANDARDS_TRACEABILITY.md](curriculum/spec/STANDARDS_TRACEABILITY.md) | Field-by-field standards mapping |
 
 ### Import System
 
-VLCF includes a pluggable import architecture for converting external curriculum formats:
+UMLCF includes a pluggable import architecture for converting external curriculum formats:
 
 | Importer | Source | Target Audience |
 |----------|--------|-----------------|
@@ -174,7 +181,7 @@ See [curriculum/importers/](curriculum/importers/) for specifications.
 
 ### Future Direction
 
-VLCF may be spun off as a standalone project to enable adoption by other tutoring systems. The specification is designed for academic review and potential standardization.
+UMLCF may be spun off as a standalone project to enable adoption by other tutoring systems. The specification is designed for academic review and potential standardization.
 
 ---
 

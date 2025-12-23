@@ -309,10 +309,10 @@ dependencies: [
 
 ```bash
 # Query traces
-curl http://localhost:3301/api/v1/traces?service=voicelearn
+curl http://localhost:3301/api/v1/traces?service=unamentis
 
 # Query metrics
-curl http://localhost:3301/api/v1/metrics?name=voicelearn.llm.first_token_latency
+curl http://localhost:3301/api/v1/metrics?name=unamentis.llm.first_token_latency
 
 # Get dashboard data
 curl http://localhost:3301/api/v1/dashboards
@@ -327,14 +327,14 @@ For AI agents running in the cloud (Claude Code, GPT CodeX):
 brew install cloudflare/cloudflare/cloudflared
 
 # Create tunnel (one-time)
-cloudflared tunnel create voicelearn-otel
+cloudflared tunnel create unamentis-otel
 
 # Run tunnel
-cloudflared tunnel run --url http://localhost:3301 voicelearn-otel
+cloudflared tunnel run --url http://localhost:3301 unamentis-otel
 ```
 
 Then configure the AI agent with:
-- **URL**: `https://voicelearn-otel.cfargotunnel.com`
+- **URL**: `https://unamentis-otel.cfargotunnel.com`
 - **API Key**: (configured in SigNoz)
 
 ### Security Considerations
@@ -390,7 +390,7 @@ SELECT
   session_id,
   sum(value) as total_cost
 FROM metrics
-WHERE name = 'voicelearn.cost.total'
+WHERE name = 'unamentis.cost.total'
 GROUP BY session_id
 ```
 

@@ -24,7 +24,7 @@
 
 ## Overview
 
-The Fast.ai importer converts Fast.ai course materials (Jupyter notebooks) into VLCF format for use with VoiceLearn's conversational AI tutoring system. Fast.ai is a leading AI/ML education platform known for its practical, top-down teaching approach and high-quality free courses.
+The Fast.ai importer converts Fast.ai course materials (Jupyter notebooks) into UMLCF format for use with UnaMentis's conversational AI tutoring system. Fast.ai is a leading AI/ML education platform known for its practical, top-down teaching approach and high-quality free courses.
 
 ### Why Fast.ai?
 
@@ -77,7 +77,7 @@ fastbook/
 
 ### Notebook Cell Types
 
-| Cell Type | Content | VLCF Mapping |
+| Cell Type | Content | UMLCFMapping |
 |-----------|---------|--------------|
 | **Markdown** | Explanatory text, headings, lists | `transcript.segments[]` |
 | **Code** | Python code, fastai library calls | `examples[].content` |
@@ -101,7 +101,7 @@ Fast.ai uses a unique "whole game" approach:
 3. **Repeat concepts with variations**
 4. **Encourage experimentation**
 
-This maps well to VLCF's `tutoringConfig.depth` levels:
+This maps well to UMLCF's `tutoringConfig.depth` levels:
 - `surface`: Show working code, explain what it does
 - `standard`: Explain why each part works
 - `deep`: Dig into implementation details
@@ -140,7 +140,7 @@ Some supplementary content in markdown:
 
 ### Metadata Mapping
 
-| Jupyter Element | VLCF Field | Notes |
+| Jupyter Element | UMLCFField | Notes |
 |-----------------|------------|-------|
 | `metadata.title` | `title` | Notebook title |
 | `metadata.authors` | `lifecycle.contributors[]` | Authors |
@@ -150,7 +150,7 @@ Some supplementary content in markdown:
 
 ### Content Hierarchy Mapping
 
-| Notebook Element | VLCF Type | Detection Method |
+| Notebook Element | UMLCFType | Detection Method |
 |------------------|-----------|------------------|
 | Notebook file | Root curriculum or `module` | File boundary |
 | H1 heading (# ) | `module` | Markdown parsing |
@@ -161,7 +161,7 @@ Some supplementary content in markdown:
 
 ### Code Example Mapping
 
-| Code Element | VLCF Field | Notes |
+| Code Element | UMLCFField | Notes |
 |--------------|------------|-------|
 | Code cell source | `examples[].content` | Python code |
 | Cell output | `examples[].output` | Execution result |
@@ -172,7 +172,7 @@ Some supplementary content in markdown:
 
 Fast.ai doesn't have formal quizzes, but we can infer assessments from:
 
-| Pattern | VLCF Assessment | Example |
+| Pattern | UMLCFAssessment | Example |
 |---------|-----------------|---------|
 | "**Questionnaire**" section | Multiple `choice` | "What does a CNN do?" |
 | `#hide` comment questions | `text-entry` | "Complete this function" |
@@ -186,7 +186,7 @@ Fast.ai doesn't have formal quizzes, but we can infer assessments from:
 ### Module Structure
 
 ```python
-vlcf_importer/
+umlcf_importer/
 └── importers/
     └── fastai/
         ├── __init__.py
@@ -201,8 +201,8 @@ vlcf_importer/
 ### FastaiImporter Class
 
 ```python
-from vlcf_importer.core.base import CurriculumImporter, ValidationResult
-from vlcf_importer.core.models import CurriculumData
+from umlcf_importer.core.base import CurriculumImporter, ValidationResult
+from umlcf_importer.core.models import CurriculumData
 from typing import Dict, Any, List, Optional
 import json
 
@@ -210,7 +210,7 @@ class FastaiImporter(CurriculumImporter):
     """
     Importer for Fast.ai course materials (Jupyter notebooks).
 
-    Converts fastbook and course notebooks to VLCF format,
+    Converts fastbook and course notebooks to UMLCFformat,
     preserving code examples, outputs, and questionnaires.
     """
 
@@ -472,7 +472,7 @@ class FastaiImporter(CurriculumImporter):
 
     async def parse(self, content: bytes) -> CurriculumData:
         """
-        Parse Jupyter notebook and transform to VLCF format.
+        Parse Jupyter notebook and transform to UMLCFformat.
 
         Pipeline:
         1. Extract raw structure
@@ -484,9 +484,9 @@ class FastaiImporter(CurriculumImporter):
         """
         raw = await self.extract(content)
 
-        # Build VLCF structure
-        vlcf = {
-            "vlcf": "1.0.0",
+        # Build UMLCFstructure
+        umlcf = {
+            "umlcf": "1.0.0",
             "id": self._generate_id(raw),
             "title": self._extract_title(raw),
             "description": self._extract_description(raw),
@@ -502,9 +502,9 @@ class FastaiImporter(CurriculumImporter):
         }
 
         # Build content hierarchy from headings
-        vlcf["content"] = await self._build_content_tree(raw)
+        umlcf["content"] = await self._build_content_tree(raw)
 
-        return CurriculumData(**vlcf)
+        return CurriculumData(**umlcf)
 
     async def _build_content_tree(self, raw: Dict) -> List[Dict]:
         """Build hierarchical content from notebook cells and headings"""
@@ -648,7 +648,7 @@ class FastaiImporter(CurriculumImporter):
         return text.strip()
 
     async def _code_to_example(self, cell: Dict) -> Dict:
-        """Convert code cell to VLCF example"""
+        """Convert code cell to UMLCFexample"""
         source = cell["source"]
         outputs = cell.get("outputs", [])
 
@@ -796,7 +796,7 @@ class FastaiImporter(CurriculumImporter):
         return "Code Example"
 
     def _question_to_assessment(self, question: Dict) -> Dict:
-        """Convert extracted question to VLCF assessment"""
+        """Convert extracted question to UMLCFassessment"""
         return {
             "id": {"value": question["id"]},
             "type": "self-assessment",
@@ -809,7 +809,7 @@ class FastaiImporter(CurriculumImporter):
         }
 
     def _build_educational(self, raw: Dict) -> Dict:
-        """Build VLCF educational context for Fast.ai content"""
+        """Build UMLCFeducational context for Fast.ai content"""
         return {
             "audience": {
                 "type": "learner",
@@ -848,7 +848,7 @@ class FastaiImporter(CurriculumImporter):
         return round((markdown_cells * 2 + code_cells * 5) / 60, 1)
 
     def _build_rights(self) -> Dict:
-        """Build VLCF rights for Fast.ai content"""
+        """Build UMLCFrights for Fast.ai content"""
         return {
             "license": {
                 "type": "Apache-2.0",
@@ -894,7 +894,7 @@ class FastaiImporter(CurriculumImporter):
         return ""
 
     def _generate_id(self, raw: Dict) -> Dict:
-        """Generate VLCF ID from notebook metadata"""
+        """Generate UMLCFID from notebook metadata"""
         # Try to get from metadata
         nb_meta = raw.get("metadata", {})
 
@@ -926,7 +926,7 @@ class FastaiImporter(CurriculumImporter):
         }
 
     def _build_metadata(self, raw: Dict) -> Dict:
-        """Build VLCF metadata"""
+        """Build UMLCFmetadata"""
         return {
             "language": "en-US",
             "keywords": ["deep learning", "machine learning", "AI", "fastai", "PyTorch"],
@@ -1120,10 +1120,10 @@ async def test_extract_headings(importer, sample_notebook):
     assert len(raw["headings"]) == 1
     assert raw["headings"][0]["text"] == "Introduction"
 
-async def test_parse_creates_vlcf(importer, sample_notebook):
+async def test_parse_creates_umlcf(importer, sample_notebook):
     content = json.dumps(sample_notebook).encode()
     curriculum = await importer.parse(content)
-    assert curriculum.vlcf == "1.0.0"
+    assert curriculum.umlcf == "1.0.0"
     assert len(curriculum.content) >= 1
 ```
 

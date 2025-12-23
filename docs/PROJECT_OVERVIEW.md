@@ -62,9 +62,9 @@ UnaMentis can connect to local/LAN servers for zero-cost inference:
 
 ---
 
-## Curriculum System (VLCF)
+## Curriculum System (UMLCF)
 
-**UnaMentis Curriculum Format** - A JSON-based specification designed for conversational AI tutoring:
+**UnaMentis Markup Language Curriculum Format** - A JSON-based specification designed for conversational AI tutoring:
 
 ### Structure
 ```
@@ -89,9 +89,9 @@ Curriculum
 - **Research** (90-180 min) - Paper-level depth
 
 ### Importers
-- **CK-12 FlexBooks** - EPUB textbooks → VLCF
-- **Fast.ai** - Jupyter notebooks → VLCF
-- **AI Enrichment Pipeline** - Plain text → rich VLCF via 7-stage LLM transformation
+- **CK-12 FlexBooks** - EPUB textbooks → UMLCF
+- **Fast.ai** - Jupyter notebooks → UMLCF
+- **AI Enrichment Pipeline** - Plain text → rich UMLCF via 7-stage LLM transformation
 
 ### Standards Alignment
 Maps to IEEE LOM, LRMI, SCORM, xAPI, QTI, and 5+ other educational standards.
@@ -114,7 +114,7 @@ Maps to IEEE LOM, LRMI, SCORM, xAPI, QTI, and 5+ other educational standards.
 ### Complete
 - All services implemented (STT, TTS, LLM, VAD)
 - Full UI (Session, Curriculum, History, Analytics, Settings, Debug)
-- VLCF 1.0 specification with JSON Schema
+- UMLCF 1.0 specification with JSON Schema
 - 103+ unit tests, 16+ integration tests passing
 - Telemetry, cost tracking, thermal management
 - Self-hosted server discovery and health monitoring
@@ -139,7 +139,7 @@ Maps to IEEE LOM, LRMI, SCORM, xAPI, QTI, and 5+ other educational standards.
 | `UnaMentis/Core/Curriculum/CurriculumEngine.swift` | Curriculum context generation |
 | `UnaMentis/Core/Routing/PatchPanelService.swift` | LLM endpoint routing |
 | `UnaMentis/Services/LLM/SelfHostedLLMService.swift` | Ollama/llama.cpp integration |
-| `curriculum/spec/vlcf-schema.json` | VLCF JSON Schema (1,847 lines) |
+| `curriculum/spec/umlcf-schema.json` | UMLCF JSON Schema (1,847 lines) |
 
 ---
 

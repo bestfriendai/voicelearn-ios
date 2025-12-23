@@ -8,9 +8,10 @@ import {
   Smartphone,
   Server,
   FlaskConical,
+  Activity,
 } from 'lucide-react';
 
-export type TabId = 'dashboard' | 'metrics' | 'logs' | 'clients' | 'servers' | 'models';
+export type TabId = 'dashboard' | 'metrics' | 'logs' | 'clients' | 'servers' | 'models' | 'health';
 
 interface NavTabsProps {
   activeTab: TabId;
@@ -19,6 +20,7 @@ interface NavTabsProps {
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'health', label: 'System Health', icon: Activity },
   { id: 'metrics', label: 'Metrics', icon: BarChart3 },
   { id: 'logs', label: 'Logs', icon: FileText },
   { id: 'clients', label: 'Clients', icon: Smartphone },

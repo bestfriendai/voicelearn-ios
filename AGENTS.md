@@ -1,4 +1,4 @@
-# AI Development Guidelines for VoiceLearn
+# AI Development Guidelines for UnaMentis
 
 ## Development Model
 
@@ -26,7 +26,7 @@ AI-assisted development enables:
 
 ### Calibration Data (This Project)
 
-On December 11, 2025, the entire VoiceLearn iOS app (Phases 1-5 of a 12-week roadmap) was implemented in approximately 5 hours:
+On December 11, 2025, the entire UnaMentis iOS app (Phases 1-5 of a 12-week roadmap) was implemented in approximately 5 hours:
 
 | Scope | Traditional Estimate | AI-Assisted Actual |
 |-------|---------------------|-------------------|
@@ -56,7 +56,7 @@ On December 11, 2025, the entire VoiceLearn iOS app (Phases 1-5 of a 12-week roa
 
 ### Key Directories
 ```
-VoiceLearn/
+UnaMentis/
 ├── Core/           # Core business logic
 │   ├── Audio/      # Audio pipeline, VAD integration
 │   ├── Curriculum/ # Curriculum management, progress tracking
@@ -65,7 +65,7 @@ VoiceLearn/
 ├── UI/             # SwiftUI views
 └── Persistence/    # Core Data stack
 
-VoiceLearnTests/
+UnaMentisTests/
 ├── Unit/           # Unit tests (run frequently)
 ├── Integration/    # Integration tests
 └── Helpers/        # Test utilities, mock services
@@ -74,17 +74,17 @@ VoiceLearnTests/
 ### Build & Test Commands
 ```bash
 # Build for simulator
-xcodebuild -project VoiceLearn.xcodeproj -scheme VoiceLearn \
+xcodebuild -project UnaMentis.xcodeproj -scheme UnaMentis \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 
 # Run all tests
-xcodebuild test -project VoiceLearn.xcodeproj -scheme VoiceLearn \
+xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 
 # Run specific test class
-xcodebuild test -project VoiceLearn.xcodeproj -scheme VoiceLearn \
+xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  -only-testing:VoiceLearnTests/ProgressTrackerTests
+  -only-testing:UnaMentisTests/ProgressTrackerTests
 ```
 
 ---
@@ -94,7 +94,7 @@ xcodebuild test -project VoiceLearn.xcodeproj -scheme VoiceLearn \
 ### Before Implementation
 1. Read relevant tests first - they document expected behavior
 2. Check existing patterns in similar components
-3. Reference `docs/VoiceLearn_TDD.md` for architectural decisions
+3. Reference `docs/UnaMentis_TDD.md` for architectural decisions
 
 ### During Implementation
 1. Write tests first (TDD)
@@ -122,7 +122,7 @@ xcodebuild test -project VoiceLearn.xcodeproj -scheme VoiceLearn \
 - Balanced preset: <$3/hour
 - Cost-optimized: <$1.50/hour
 
-See `docs/VoiceLearn_TDD.md` for complete specifications.
+See `docs/UnaMentis_TDD.md` for complete specifications.
 
 ---
 
@@ -311,11 +311,11 @@ actor FaithfulMockLLM: LLMService {
 ### Current Mock Inventory
 
 **Valid mocks (external paid APIs):**
-- `MockLLMService` - LLM API calls cost money (in `VoiceLearnTests/Helpers/MockServices.swift`)
-- `MockEmbeddingService` - Embedding API calls cost money (in `VoiceLearnTests/Helpers/MockServices.swift`)
+- `MockLLMService` - LLM API calls cost money (in `UnaMentisTests/Helpers/MockServices.swift`)
+- `MockEmbeddingService` - Embedding API calls cost money (in `UnaMentisTests/Helpers/MockServices.swift`)
 
 **Test Spies (for behavior verification):**
-- `MockVADService` - A test spy (not a mock) that tracks method calls for verification while providing controllable VAD results. Located in `VoiceLearnTests/Unit/AudioEngineTests.swift`. This is acceptable because:
+- `MockVADService` - A test spy (not a mock) that tracks method calls for verification while providing controllable VAD results. Located in `UnaMentisTests/Unit/AudioEngineTests.swift`. This is acceptable because:
   - VAD is on-device (Silero model), not a paid API
   - The spy allows testing AudioEngine's VAD integration without loading the ML model
   - It tracks `configureWasCalled`, `processBufferWasCalled`, and `lastConfiguration` for test assertions
@@ -329,7 +329,7 @@ actor FaithfulMockLLM: LLMService {
 
 ### Test Data Helpers
 
-`TestDataFactory` (in `VoiceLearnTests/Helpers/MockServices.swift`) provides helpers for creating test data:
+`TestDataFactory` (in `UnaMentisTests/Helpers/MockServices.swift`) provides helpers for creating test data:
 - `createCurriculum(in:name:topicCount:)` - Creates test curricula with optional topics
 - `createTopic(in:title:orderIndex:mastery:)` - Creates test topics
 - `createDocument(in:title:type:content:summary:)` - Creates test documents

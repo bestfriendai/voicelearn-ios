@@ -268,16 +268,16 @@ UnaMentis uses the **UnaMentis Curriculum Format (VLCF)** for structured educati
 | Document | Description |
 |----------|-------------|
 | [Curriculum README](../curriculum/README.md) | **Comprehensive overview** |
-| [VLCF Specification](../curriculum/spec/VLCF_SPECIFICATION.md) | Format specification |
-| [JSON Schema](../curriculum/spec/vlcf-schema.json) | Schema for validation |
+| [UMLCF Specification](../curriculum/spec/VLCF_SPECIFICATION.md) | Format specification |
+| [JSON Schema](../curriculum/spec/umlcf-schema.json) | Schema for validation |
 | [Examples](../curriculum/examples/) | Minimal and realistic examples |
 
 ### Import System
 
-VLCF includes importers for external content:
+UMLCF includes importers for external content:
 - **CK-12**: K-12 FlexBooks (EPUB)
 - **Fast.ai**: Jupyter notebooks for AI/ML
-- **AI Enrichment**: Transform sparse content to rich VLCF
+- **AI Enrichment**: Transform sparse content to rich UMLCF
 
 See [Import Architecture](../curriculum/importers/IMPORTER_ARCHITECTURE.md) for details.
 

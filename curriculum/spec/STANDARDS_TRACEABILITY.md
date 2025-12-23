@@ -1,6 +1,6 @@
-# VLCF Standards Traceability Matrix
+# UMLCF Standards Traceability Matrix
 
-This document provides field-by-field traceability from VLCF to established educational standards.
+This document provides field-by-field traceability from UMLCF to established educational standards.
 
 ## Standards Referenced
 
@@ -17,13 +17,13 @@ This document provides field-by-field traceability from VLCF to established educ
 | **CC** | Creative Commons | [CC Licenses](https://creativecommons.org/licenses/) |
 | **ISO 8601** | Date/Time Format | [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) |
 | **BCP 47** | Language Tags | [BCP 47](https://www.rfc-editor.org/info/bcp47) |
-| **VLCF** | VoiceLearn Curriculum Format | Native (this specification) |
+| **UMLCF** | UnaMentis Markup Language Curriculum Format | Native (this specification) |
 
 ---
 
 ## Top-Level Fields
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `vlcf` | JSON Schema | `$schema` convention | Version identifier |
 | `id` | LOM, DC | LOM General.Identifier, dc:identifier | Combined |
@@ -40,7 +40,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Lifecycle
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `lifecycle.status` | LOM | LifeCycle.Status | Vocabulary: draft, final, revised, unavailable |
 | `lifecycle.contributors` | LOM, DC | LifeCycle.Contribute, dc:contributor | Array of contributors |
@@ -51,7 +51,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ### Contributor
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `contributor.id` | vCard, ORCID | vCard UID | Optional identifier |
 | `contributor.name` | LOM | Contribute.Entity (vCard FN) | Display name |
@@ -64,7 +64,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Metadata
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `metadata.language` | LOM, DC | General.Language, dc:language | BCP 47 format |
 | `metadata.keywords` | LOM, DC | General.Keyword, dc:subject | Array of strings |
@@ -76,7 +76,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Educational Context
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `educational.interactivityType` | LOM | Educational.InteractivityType | active/expositive/mixed |
 | `educational.interactivityLevel` | LOM | Educational.InteractivityLevel | 5-level scale |
@@ -90,7 +90,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ### Educational Alignment
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `educationalAlignment.alignmentType` | LRMI | AlignmentObject.alignmentType | Vocabulary from LRMI |
 | `educationalAlignment.educationalFramework` | LRMI, CASE | AlignmentObject.educationalFramework, CFDocument.title | Framework name |
@@ -100,7 +100,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ### Audience Profile
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `audienceProfile.educationLevel` | LRMI | schema:educationalLevel | ISCED-inspired |
 | `audienceProfile.gradeLevel` | LRMI | schema:typicalGradeLevel | US grade system |
@@ -111,7 +111,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Rights
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `rights.cost` | LOM | Rights.Cost | Boolean |
 | `rights.copyrightAndOtherRestrictions` | LOM | Rights.CopyrightAndOtherRestrictions | Boolean |
@@ -125,7 +125,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Compliance Requirements
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `compliance.certification` | OB | BadgeClass | Badge/certificate config |
 | `compliance.regulatoryFrameworks` | Corporate | Industry standards | SOC2, HIPAA, etc. |
@@ -134,7 +134,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ### Certification
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `certification.id` | OB | BadgeClass.id | Badge identifier |
 | `certification.name` | OB | BadgeClass.name | Display name |
@@ -148,7 +148,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ### Audit Requirements
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `auditRequirements.enabled` | Corporate | Compliance practice | Toggle |
 | `auditRequirements.retentionPeriod` | Corporate | Legal requirements | ISO 8601 duration |
@@ -161,7 +161,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Content Node
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `contentNode.id` | SCORM, LOM | item.identifier, General.Identifier | Required |
 | `contentNode.title` | SCORM, LOM | item.title, General.Title | Required |
@@ -186,7 +186,7 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ## Learning Objective
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `learningObjective.id` | CASE | CFItem.identifier | Unique ID |
 | `learningObjective.statement` | CASE | CFItem.fullStatement | Full text |
@@ -198,9 +198,9 @@ This document provides field-by-field traceability from VLCF to established educ
 
 ---
 
-## Transcript (VLCF Native)
+## Transcript (UMLCF Native)
 
-These elements are native to VLCF, designed for conversational AI tutoring.
+These elements are native to UMLCF, designed for conversational AI tutoring.
 
 | VLCF Field | Source Standard | Inspiration/Rationale |
 |------------|-----------------|----------------------|
@@ -216,7 +216,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 | `transcriptSegment.alternativeExplanations` | VLCF | Rephrasing support |
 | `transcriptSegment.estimatedDuration` | ISO 8601 | Standard duration format |
 
-### Checkpoint (VLCF Native, QTI-Inspired)
+### Checkpoint (UMLCF Native, QTI-Inspired)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
@@ -226,7 +226,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 | `checkpoint.transitions` | VLCF | Branching logic |
 | `checkpoint.fallbackBehavior` | VLCF | Error handling |
 
-### Speaking Notes (VLCF Native)
+### Speaking Notes (UMLCF Native)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
@@ -238,7 +238,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ---
 
-## Misconception (VLCF Native)
+## Misconception (UMLCF Native)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
@@ -253,7 +253,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ---
 
-## Example (VLCF Native)
+## Example (UMLCF Native)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
@@ -271,7 +271,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ## Assessment (QTI-Aligned)
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `assessment.id` | QTI | assessmentItem.identifier | Required |
 | `assessment.type` | QTI | interaction types | Basic set only |
@@ -297,7 +297,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ## Glossary
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `glossary.terms` | VLCF | Native | Term array |
 | `glossaryTerm.id` | VLCF | Native | Unique ID |
@@ -314,7 +314,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ## Resource (LOM-Aligned)
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `resource.type` | LOM | Relation.Kind | Relationship type |
 | `resource.identifier` | LOM | Relation.Resource.Identifier | Resource ID |
@@ -325,11 +325,11 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ---
 
-## Tutoring Config (VLCF Native)
+## Tutoring Config (UMLCF Native)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
-| `tutoringConfig.contentDepth` | VoiceLearn ContentDepth | Depth level enum |
+| `tutoringConfig.contentDepth` | UnaMentis ContentDepth | Depth level enum |
 | `tutoringConfig.adaptiveDepth` | VLCF | Allow dynamic adjustment |
 | `tutoringConfig.systemPromptOverride` | VLCF | Custom AI instructions |
 | `tutoringConfig.interactionMode` | VLCF | lecture/socratic/practice/etc. |
@@ -339,7 +339,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ---
 
-## Node Compliance (VLCF Native + Corporate)
+## Node Compliance (UMLCF Native + Corporate)
 
 | VLCF Field | Inspiration | Notes |
 |------------|-------------|-------|
@@ -353,7 +353,7 @@ These elements are native to VLCF, designed for conversational AI tutoring.
 
 ## Extensions (xAPI Pattern)
 
-| VLCF Field | Source Standard | Standard Path | Notes |
+| UMLCF Field | Source Standard | Standard Path | Notes |
 |------------|-----------------|---------------|-------|
 | `extensions` | xAPI | extensions pattern | Namespaced custom data |
 
@@ -403,4 +403,4 @@ All duration fields use ISO 8601 duration format:
 | Example | 10 | 0 | 10 |
 | **TOTAL** | **152** | **82 (54%)** | **70 (46%)** |
 
-This balance reflects VLCF's design goal: leverage established standards for interoperability while adding native support for conversational AI tutoring features not covered by existing specifications.
+This balance reflects UMLCF's design goal: leverage established standards for interoperability while adding native support for conversational AI tutoring features not covered by existing specifications.

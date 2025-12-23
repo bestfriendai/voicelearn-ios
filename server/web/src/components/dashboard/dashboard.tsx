@@ -10,6 +10,7 @@ import { ServersPanelCompact, ServersPanel } from './servers-panel';
 import { ClientsPanelCompact, ClientsPanel } from './clients-panel';
 import { MetricsPanel, LatencyOverview } from './metrics-panel';
 import { ModelsPanel } from './models-panel';
+import { HealthPanel } from './health-panel';
 import type { DashboardStats } from '@/types';
 import { getStats } from '@/lib/api-client';
 import { formatDuration } from '@/lib/utils';
@@ -150,6 +151,13 @@ export function Dashboard() {
           {activeTab === 'models' && (
             <div className="animate-in fade-in duration-300">
               <ModelsPanel />
+            </div>
+          )}
+
+          {/* System Health Tab */}
+          {activeTab === 'health' && (
+            <div className="animate-in fade-in duration-300">
+              <HealthPanel />
             </div>
           )}
         </main>

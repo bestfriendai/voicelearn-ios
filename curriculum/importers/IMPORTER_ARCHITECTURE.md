@@ -1,4 +1,4 @@
-# VLCF Import System Architecture
+# UMLCF Import System Architecture
 
 **Version:** 1.0.0
 **Status:** Draft
@@ -21,7 +21,7 @@
 
 ## Overview
 
-The VLCF Import System is a **pluggable, cross-platform** toolkit for converting external curriculum formats into the VoiceLearn Curriculum Format (VLCF). It follows a "hub-and-spoke" model where VLCF is the canonical format and importers are plugins that convert from various sources.
+The UMLCF Import System is a **pluggable, cross-platform** toolkit for converting external curriculum formats into the UnaMentis Curriculum Format (UMLCF). It follows a "hub-and-spoke" model where UMLCF is the canonical format and importers are plugins that convert from various sources.
 
 ### Goals
 
@@ -52,9 +52,9 @@ The VLCF Import System is a **pluggable, cross-platform** toolkit for converting
         │             │             │
         ▼             ▼             ▼
 ┌──────────────────────────────────────────────────┐
-│                    VLCF                           │
+│                    UMLCF                           │
 │              (Canonical Format)                   │
-│                   .vlcf                           │
+│                   .umlcf                           │
 └──────────────────────────────────────────────────┘
         │
         ▼
@@ -115,7 +115,7 @@ All data models use Pydantic:
 ### Directory Structure
 
 ```
-voicelearn_curriculum_importer/
+unamentis_curriculum_importer/
 │
 ├── pyproject.toml              # Package config + entry points
 ├── README.md
@@ -167,7 +167,7 @@ voicelearn_curriculum_importer/
 │       │   ├── notebook_parser.py   # Jupyter .ipynb
 │       │   └── markdown_parser.py
 │       │
-│       ├── transformers/            # VLCF model transformers
+│       ├── transformers/            # UMLCF model transformers
 │       │   ├── __init__.py
 │       │   ├── content_transformer.py
 │       │   ├── assessment_transformer.py
@@ -214,7 +214,7 @@ voicelearn_curriculum_importer/
 [project]
 name = "vlcf-importer"
 version = "1.0.0"
-description = "Pluggable curriculum importer for VoiceLearn"
+description = "Pluggable curriculum importer for UnaMentis"
 requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0",
@@ -329,7 +329,7 @@ class MyFormatImporter(CurriculumImporter):
         ...
 
     async def parse(self, content: bytes) -> CurriculumData:
-        # Full parse and transform to VLCF
+        # Full parse and transform to UMLCF
         ...
 ```
 
@@ -346,7 +346,7 @@ pip install vlcf-importer[cli]
 # Usage
 vlcf-import list                           # List available importers
 vlcf-import validate file.epub --format ck12
-vlcf-import convert file.epub -o output.vlcf --format ck12
+vlcf-import convert file.epub -o output.umlcf --format ck12
 vlcf-import import file.epub --format ck12 --storage filesystem
 ```
 
@@ -379,7 +379,7 @@ print(f"Imported: {result.curriculum.title}")
 from fastapi import FastAPI, UploadFile, File, Query
 from vlcf_importer.core.registry import ImporterRegistry
 
-app = FastAPI(title="VLCF Import API")
+app = FastAPI(title="UMLCF Import API")
 
 @app.post("/import")
 async def import_curriculum(
@@ -478,7 +478,7 @@ class CurriculumImporter(ABC):
         """
         Extract raw data from format.
 
-        Returns intermediate representation before VLCF transformation.
+        Returns intermediate representation before UMLCF transformation.
         Useful for debugging and format inspection.
         """
         pass
@@ -486,7 +486,7 @@ class CurriculumImporter(ABC):
     @abstractmethod
     async def parse(self, content: bytes) -> "CurriculumData":
         """
-        Parse content and transform to VLCF format.
+        Parse content and transform to UMLCF format.
 
         This is the main parsing method that produces a complete
         CurriculumData object ready for storage.
@@ -635,13 +635,13 @@ class StorageBackend(ABC):
 ### Step 1: Set Up Package Structure
 
 ```bash
-mkdir -p voicelearn_curriculum_importer/src/vlcf_importer/{core,importers,parsers,storage}
-touch voicelearn_curriculum_importer/pyproject.toml
+mkdir -p unamentis_curriculum_importer/src/vlcf_importer/{core,importers,parsers,storage}
+touch unamentis_curriculum_importer/pyproject.toml
 ```
 
 ### Step 2: Implement Core Models
 
-Create Pydantic models matching VLCF schema (already defined in vlcf-schema.json).
+Create Pydantic models matching UMLCF schema (already defined in umlcf-schema.json).
 
 ### Step 3: Implement Base Classes
 

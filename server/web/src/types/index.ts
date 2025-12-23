@@ -148,3 +148,147 @@ export interface ModelsResponse {
     tts: number;
   };
 }
+
+// System Health & Resource Monitoring Types
+export interface PowerMetrics {
+  current_battery_draw_w: number;
+  avg_battery_draw_w: number;
+  battery_percent: number;
+  battery_charging: boolean;
+  estimated_service_power_w: number;
+}
+
+export interface ThermalMetrics {
+  pressure: 'nominal' | 'fair' | 'serious' | 'critical';
+  pressure_level: number;
+  cpu_temp_c: number;
+  gpu_temp_c: number;
+  fan_speed_rpm: number;
+}
+
+export interface CpuMetrics {
+  total_percent: number;
+  by_service: Record<string, number>;
+}
+
+export interface ServiceResourceMetrics {
+  service_id: string;
+  service_name: string;
+  status: string;
+  cpu_percent: number;
+  memory_mb: number;
+  gpu_memory_mb: number;
+  last_request_time: number | null;
+  request_count_5m: number;
+  model_loaded: boolean;
+  estimated_power_w: number;
+}
+
+export interface SystemMetricsSummary {
+  timestamp: number;
+  power: PowerMetrics;
+  thermal: ThermalMetrics;
+  cpu: CpuMetrics;
+  services: Record<string, ServiceResourceMetrics>;
+  history_minutes: number;
+}
+
+export interface IdleStatus {
+  enabled: boolean;
+  current_state: 'active' | 'warm' | 'cool' | 'cold' | 'dormant';
+  current_mode: string;
+  seconds_idle: number;
+  last_activity_type: string;
+  last_activity_time: number;
+  thresholds: {
+    warm: number;
+    cool: number;
+    cold: number;
+    dormant: number;
+  };
+  keep_awake_remaining: number;
+  next_state_in: {
+    state: string;
+    seconds_remaining: number;
+  } | null;
+}
+
+export interface PowerMode {
+  name: string;
+  description: string;
+  thresholds: {
+    warm: number;
+    cool: number;
+    cold: number;
+    dormant: number;
+  };
+  enabled: boolean;
+}
+
+export interface PowerModesResponse {
+  modes: Record<string, PowerMode>;
+  current: string;
+}
+
+export interface IdleTransition {
+  timestamp: number;
+  from_state: string;
+  to_state: string;
+  idle_seconds: number;
+  trigger: string;
+}
+
+export interface HourlyMetrics {
+  hour: string;
+  avg_battery_draw_w: number;
+  max_battery_draw_w: number;
+  min_battery_percent: number;
+  max_battery_percent: number;
+  avg_thermal_level: number;
+  max_thermal_level: number;
+  avg_cpu_temp_c: number;
+  max_cpu_temp_c: number;
+  avg_cpu_percent: number;
+  max_cpu_percent: number;
+  service_cpu_avg: Record<string, number>;
+  service_cpu_max: Record<string, number>;
+  total_requests: number;
+  total_inferences: number;
+  idle_state_seconds: Record<string, number>;
+  sample_count: number;
+}
+
+export interface DailyMetrics {
+  date: string;
+  avg_battery_draw_w: number;
+  max_battery_draw_w: number;
+  min_battery_percent: number;
+  battery_drain_percent: number;
+  avg_thermal_level: number;
+  max_thermal_level: number;
+  thermal_events_count: number;
+  avg_cpu_temp_c: number;
+  max_cpu_temp_c: number;
+  avg_cpu_percent: number;
+  max_cpu_percent: number;
+  service_cpu_avg: Record<string, number>;
+  total_requests: number;
+  total_inferences: number;
+  active_hours: number;
+  idle_state_hours: Record<string, number>;
+  hours_aggregated: number;
+}
+
+export interface MetricsHistorySummary {
+  today: DailyMetrics | null;
+  yesterday: DailyMetrics | null;
+  this_week: {
+    days_recorded: number;
+    avg_cpu_percent: number;
+    total_requests: number;
+    max_thermal_level: number;
+  } | null;
+  total_days_tracked: number;
+  total_hours_tracked: number;
+  oldest_record: string | null;
+}

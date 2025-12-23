@@ -28,7 +28,7 @@
 
 ## Overview
 
-The AI Enrichment Pipeline transforms **sparse curriculum content** (plain text, simple outlines, flat documents) into **richly structured VLCF** with all tutoring-specific elements required for effective conversational AI tutoring.
+The AI Enrichment Pipeline transforms **sparse curriculum content** (plain text, simple outlines, flat documents) into **richly structured UMLCF** with all tutoring-specific elements required for effective conversational AI tutoring.
 
 ### What "Sparse" Content Lacks
 
@@ -72,7 +72,7 @@ The AI Enrichment Pipeline transforms **sparse curriculum content** (plain text,
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      RICH VLCF OUTPUT                           │
+│                      RICH UMLCF OUTPUT                          │
 │  • Hierarchical content (modules → topics → subtopics)         │
 │  • Transcript segments with stopping points                    │
 │  • Learning objectives (Bloom-aligned)                         │
@@ -99,7 +99,7 @@ Most curriculum content exists in forms optimized for **reading**, not **tutorin
 4. **PDFs**: Formatting preserved, structure lost
 5. **Slides**: Bullet points without context
 
-VoiceLearn's conversational AI needs:
+UnaMentis's conversational AI needs:
 - **Chunked content** for turn-by-turn delivery
 - **Checkpoints** to verify understanding before proceeding
 - **Multiple explanation styles** for different learners
@@ -1949,7 +1949,7 @@ class ReviewManifest:
 
 ### Editor Interface (Web-Based)
 
-The enrichment pipeline produces VLCF that can be reviewed and edited:
+The enrichment pipeline produces UMLCF that can be reviewed and edited:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -2000,7 +2000,7 @@ The enrichment pipeline produces VLCF that can be reviewed and edited:
 │  │  ⬜ Atoms → Molecules (confidence: 0.72) [Confirm?]     │  │
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                 │
-│  [Save Draft]  [Export VLCF]  [Publish]                        │
+│  [Save Draft]  [Export UMLCF]  [Publish]                       │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```

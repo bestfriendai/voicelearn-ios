@@ -19,6 +19,11 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Set
 from pathlib import Path
 
+# Import resource monitoring and idle management
+from resource_monitor import resource_monitor, ResourceMonitor
+from idle_manager import idle_manager, IdleManager, IdleState
+from metrics_history import metrics_history, MetricsHistory
+
 # Add aiohttp for async HTTP server with WebSocket support
 try:
     from aiohttp import web
@@ -1905,6 +1910,314 @@ async def handle_health(request: web.Request) -> web.Response:
 
 
 # =============================================================================
+# API Handlers - System Metrics & Idle Management
+# =============================================================================
+
+async def handle_get_system_metrics(request: web.Request) -> web.Response:
+    """Get current system resource metrics summary."""
+    try:
+        # Record activity
+        idle_manager.record_activity("api_request", "management")
+        resource_monitor.record_service_activity("management", "request")
+
+        summary = resource_monitor.get_summary()
+        return web.json_response(summary)
+
+    except Exception as e:
+        logger.error(f"Error getting system metrics: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_system_snapshot(request: web.Request) -> web.Response:
+    """Get detailed current metrics snapshot."""
+    try:
+        idle_manager.record_activity("api_request", "management")
+
+        snapshot = resource_monitor.get_current_snapshot()
+        return web.json_response(snapshot)
+
+    except Exception as e:
+        logger.error(f"Error getting system snapshot: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_power_history(request: web.Request) -> web.Response:
+    """Get power metrics history for charts."""
+    try:
+        limit = int(request.query.get("limit", "100"))
+        history = resource_monitor.get_power_history(limit)
+        return web.json_response({
+            "history": history,
+            "count": len(history),
+            "interval_seconds": resource_monitor.collection_interval,
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting power history: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_process_history(request: web.Request) -> web.Response:
+    """Get per-process metrics history."""
+    try:
+        limit = int(request.query.get("limit", "100"))
+        history = resource_monitor.get_process_history(limit)
+        return web.json_response({
+            "history": history,
+            "count": len(history),
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting process history: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_idle_status(request: web.Request) -> web.Response:
+    """Get current idle manager status."""
+    try:
+        status = idle_manager.get_status()
+        return web.json_response(status)
+
+    except Exception as e:
+        logger.error(f"Error getting idle status: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_set_idle_config(request: web.Request) -> web.Response:
+    """Configure idle management settings."""
+    try:
+        data = await request.json()
+
+        # Set power mode
+        if "mode" in data:
+            mode = data["mode"]
+            if not idle_manager.set_mode(mode):
+                return web.json_response({"error": f"Unknown mode: {mode}"}, status=400)
+
+        # Set custom thresholds
+        if "thresholds" in data:
+            idle_manager.set_thresholds(data["thresholds"])
+
+        # Enable/disable
+        if "enabled" in data:
+            idle_manager.enabled = data["enabled"]
+
+        await broadcast_message("idle_config_changed", idle_manager.get_status())
+        return web.json_response({"status": "ok", "config": idle_manager.get_status()})
+
+    except Exception as e:
+        logger.error(f"Error setting idle config: {e}")
+        return web.json_response({"error": str(e)}, status=400)
+
+
+async def handle_idle_keep_awake(request: web.Request) -> web.Response:
+    """Keep system awake for specified duration."""
+    try:
+        data = await request.json()
+        duration = int(data.get("duration_seconds", 3600))  # Default 1 hour
+
+        idle_manager.keep_awake(duration)
+        await broadcast_message("idle_keep_awake", {"duration": duration})
+
+        return web.json_response({
+            "status": "ok",
+            "keeping_awake_for": duration,
+        })
+
+    except Exception as e:
+        logger.error(f"Error setting keep awake: {e}")
+        return web.json_response({"error": str(e)}, status=400)
+
+
+async def handle_idle_cancel_keep_awake(request: web.Request) -> web.Response:
+    """Cancel keep-awake override."""
+    try:
+        idle_manager.cancel_keep_awake()
+        await broadcast_message("idle_keep_awake_cancelled", {})
+        return web.json_response({"status": "ok"})
+
+    except Exception as e:
+        logger.error(f"Error cancelling keep awake: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_idle_force_state(request: web.Request) -> web.Response:
+    """Force transition to a specific idle state."""
+    try:
+        data = await request.json()
+        state_name = data.get("state", "").lower()
+
+        state_map = {
+            "active": IdleState.ACTIVE,
+            "warm": IdleState.WARM,
+            "cool": IdleState.COOL,
+            "cold": IdleState.COLD,
+            "dormant": IdleState.DORMANT,
+        }
+
+        if state_name not in state_map:
+            return web.json_response({
+                "error": f"Unknown state: {state_name}",
+                "valid_states": list(state_map.keys())
+            }, status=400)
+
+        await idle_manager.force_state(state_map[state_name])
+        await broadcast_message("idle_state_changed", idle_manager.get_status())
+
+        return web.json_response({
+            "status": "ok",
+            "new_state": state_name,
+        })
+
+    except Exception as e:
+        logger.error(f"Error forcing idle state: {e}")
+        return web.json_response({"error": str(e)}, status=400)
+
+
+async def handle_get_power_modes(request: web.Request) -> web.Response:
+    """Get available power modes."""
+    try:
+        modes = idle_manager.get_available_modes()
+        return web.json_response({
+            "modes": modes,
+            "current": idle_manager.current_mode,
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting power modes: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_idle_history(request: web.Request) -> web.Response:
+    """Get idle state transition history."""
+    try:
+        limit = int(request.query.get("limit", "50"))
+        history = idle_manager.get_transition_history(limit)
+        return web.json_response({
+            "history": history,
+            "count": len(history),
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting idle history: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_metrics_history_hourly(request: web.Request) -> web.Response:
+    """Get hourly aggregated metrics history."""
+    try:
+        days = int(request.query.get("days", "7"))
+        history = metrics_history.get_hourly_history(days)
+        return web.json_response({
+            "history": history,
+            "count": len(history),
+            "days_requested": days,
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting hourly history: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_metrics_history_daily(request: web.Request) -> web.Response:
+    """Get daily aggregated metrics history."""
+    try:
+        days = int(request.query.get("days", "30"))
+        history = metrics_history.get_daily_history(days)
+        return web.json_response({
+            "history": history,
+            "count": len(history),
+            "days_requested": days,
+        })
+
+    except Exception as e:
+        logger.error(f"Error getting daily history: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_get_metrics_history_summary(request: web.Request) -> web.Response:
+    """Get summary statistics of historical metrics."""
+    try:
+        summary = metrics_history.get_summary_stats()
+        return web.json_response(summary)
+
+    except Exception as e:
+        logger.error(f"Error getting metrics summary: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_unload_models(request: web.Request) -> web.Response:
+    """Manually unload all models to save resources."""
+    try:
+        results = {"ollama": False, "vibevoice": False}
+
+        # Unload Ollama models
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get("http://localhost:11434/api/ps", timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        for model in data.get("models", []):
+                            model_name = model.get("name")
+                            if model_name:
+                                await session.post(
+                                    "http://localhost:11434/api/generate",
+                                    json={"model": model_name, "keep_alive": 0},
+                                    timeout=aiohttp.ClientTimeout(total=10)
+                                )
+                                logger.info(f"Unloaded Ollama model: {model_name}")
+                        results["ollama"] = True
+        except Exception as e:
+            logger.debug(f"Ollama unload failed: {e}")
+
+        # Signal VibeVoice to unload (if it supports the endpoint)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    "http://localhost:8880/admin/unload",
+                    timeout=aiohttp.ClientTimeout(total=5)
+                ) as resp:
+                    results["vibevoice"] = resp.status == 200
+        except Exception as e:
+            logger.debug(f"VibeVoice unload failed: {e}")
+
+        await broadcast_message("models_unloaded", results)
+        return web.json_response({
+            "status": "ok",
+            "results": results,
+        })
+
+    except Exception as e:
+        logger.error(f"Error unloading models: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+# =============================================================================
+# Background Tasks
+# =============================================================================
+
+async def _metrics_recording_loop():
+    """Background task to record metrics samples to history"""
+    logger.info("[MetricsRecorder] Starting metrics recording loop")
+    while True:
+        try:
+            await asyncio.sleep(30)  # Record every 30 seconds
+
+            # Get current metrics summary
+            summary = resource_monitor.get_summary()
+            idle_state = idle_manager.current_state.value
+
+            # Record to persistent history
+            metrics_history.record_sample(summary, idle_state)
+
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"[MetricsRecorder] Error: {e}")
+            await asyncio.sleep(30)
+
+
+# =============================================================================
 # Application Setup
 # =============================================================================
 
@@ -1974,6 +2287,27 @@ def create_app() -> web.Application:
     # WebSocket
     app.router.add_get("/ws", handle_websocket)
 
+    # System Metrics & Resource Monitoring
+    app.router.add_get("/api/system/metrics", handle_get_system_metrics)
+    app.router.add_get("/api/system/snapshot", handle_get_system_snapshot)
+    app.router.add_get("/api/system/power/history", handle_get_power_history)
+    app.router.add_get("/api/system/processes/history", handle_get_process_history)
+
+    # Idle Management & Power Modes
+    app.router.add_get("/api/system/idle/status", handle_get_idle_status)
+    app.router.add_post("/api/system/idle/config", handle_set_idle_config)
+    app.router.add_get("/api/system/idle/history", handle_get_idle_history)
+    app.router.add_get("/api/system/idle/modes", handle_get_power_modes)
+    app.router.add_post("/api/system/idle/keep-awake", handle_idle_keep_awake)
+    app.router.add_post("/api/system/idle/cancel-keep-awake", handle_idle_cancel_keep_awake)
+    app.router.add_post("/api/system/idle/force-state", handle_idle_force_state)
+    app.router.add_post("/api/system/unload-models", handle_unload_models)
+
+    # Historical Metrics (persisted)
+    app.router.add_get("/api/system/history/hourly", handle_get_metrics_history_hourly)
+    app.router.add_get("/api/system/history/daily", handle_get_metrics_history_daily)
+    app.router.add_get("/api/system/history/summary", handle_get_metrics_history_summary)
+
     # Static files and dashboard
     static_dir = Path(__file__).parent / "static"
     if static_dir.exists():
@@ -1985,7 +2319,25 @@ def create_app() -> web.Application:
         await detect_existing_processes()
         state._load_curricula()  # Load all UMLCF curricula on startup
 
+        # Start resource monitoring and idle management
+        await resource_monitor.start()
+        await idle_manager.start()
+        await metrics_history.start()
+
+        # Start metrics recording task
+        asyncio.create_task(_metrics_recording_loop())
+
+        logger.info("[Startup] Resource monitoring, idle management, and metrics history started")
+
+    # Cleanup hook to stop background tasks
+    async def on_cleanup(app):
+        await resource_monitor.stop()
+        await idle_manager.stop()
+        await metrics_history.stop()
+        logger.info("[Cleanup] Background tasks stopped")
+
     app.on_startup.append(on_startup)
+    app.on_cleanup.append(on_cleanup)
 
     return app
 

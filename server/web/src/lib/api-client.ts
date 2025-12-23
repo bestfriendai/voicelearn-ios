@@ -8,6 +8,13 @@ import type {
   DashboardStats,
   LogEntry,
   MetricsSnapshot,
+  SystemMetricsSummary,
+  IdleStatus,
+  PowerModesResponse,
+  IdleTransition,
+  HourlyMetrics,
+  DailyMetrics,
+  MetricsHistorySummary,
 } from '@/types';
 import {
   mockLogs,
@@ -250,4 +257,225 @@ export function isUsingMockData(): boolean {
 // Get backend URL
 export function getBackendUrl(): string {
   return BACKEND_URL || '(not configured)';
+}
+
+// =============================================================================
+// System Health & Resource Monitoring APIs
+// =============================================================================
+
+const mockSystemMetrics: SystemMetricsSummary = {
+  timestamp: Date.now() / 1000,
+  power: {
+    current_battery_draw_w: 8.5,
+    avg_battery_draw_w: 7.2,
+    battery_percent: 78,
+    battery_charging: false,
+    estimated_service_power_w: 5.3,
+  },
+  thermal: {
+    pressure: 'nominal',
+    pressure_level: 0,
+    cpu_temp_c: 45.2,
+    gpu_temp_c: 42.1,
+    fan_speed_rpm: 0,
+  },
+  cpu: {
+    total_percent: 12.5,
+    by_service: {
+      ollama: 2.1,
+      vibevoice: 5.3,
+      management: 1.2,
+      nextjs: 3.9,
+    },
+  },
+  services: {
+    ollama: {
+      service_id: 'ollama',
+      service_name: 'Ollama',
+      status: 'running',
+      cpu_percent: 2.1,
+      memory_mb: 245,
+      gpu_memory_mb: 0,
+      last_request_time: Date.now() / 1000 - 300,
+      request_count_5m: 0,
+      model_loaded: false,
+      estimated_power_w: 0.5,
+    },
+    vibevoice: {
+      service_id: 'vibevoice',
+      service_name: 'VibeVoice',
+      status: 'running',
+      cpu_percent: 5.3,
+      memory_mb: 2100,
+      gpu_memory_mb: 1800,
+      last_request_time: Date.now() / 1000 - 120,
+      request_count_5m: 3,
+      model_loaded: true,
+      estimated_power_w: 2.5,
+    },
+  },
+  history_minutes: 60,
+};
+
+const mockIdleStatus: IdleStatus = {
+  enabled: true,
+  current_state: 'warm',
+  current_mode: 'balanced',
+  seconds_idle: 45,
+  last_activity_type: 'request',
+  last_activity_time: Date.now() / 1000 - 45,
+  thresholds: {
+    warm: 30,
+    cool: 300,
+    cold: 1800,
+    dormant: 7200,
+  },
+  keep_awake_remaining: 0,
+  next_state_in: {
+    state: 'cool',
+    seconds_remaining: 255,
+  },
+};
+
+const mockPowerModes: PowerModesResponse = {
+  modes: {
+    performance: {
+      name: 'Performance',
+      description: 'Never idle, always ready. Maximum responsiveness, highest power.',
+      thresholds: { warm: 9999999, cool: 9999999, cold: 9999999, dormant: 9999999 },
+      enabled: false,
+    },
+    balanced: {
+      name: 'Balanced',
+      description: 'Default settings. Good balance of responsiveness and power saving.',
+      thresholds: { warm: 30, cool: 300, cold: 1800, dormant: 7200 },
+      enabled: true,
+    },
+    power_saver: {
+      name: 'Power Saver',
+      description: 'Aggressive power saving. Longer wake times but much lower power.',
+      thresholds: { warm: 10, cool: 60, cold: 300, dormant: 1800 },
+      enabled: true,
+    },
+  },
+  current: 'balanced',
+};
+
+export async function getSystemMetrics(): Promise<SystemMetricsSummary> {
+  return fetchWithFallback('/api/system/metrics', () => mockSystemMetrics);
+}
+
+export async function getIdleStatus(): Promise<IdleStatus> {
+  return fetchWithFallback('/api/system/idle/status', () => mockIdleStatus);
+}
+
+export async function getPowerModes(): Promise<PowerModesResponse> {
+  return fetchWithFallback('/api/system/idle/modes', () => mockPowerModes);
+}
+
+export async function setIdleConfig(config: {
+  mode?: string;
+  thresholds?: { warm?: number; cool?: number; cold?: number; dormant?: number };
+  enabled?: boolean;
+}): Promise<{ status: string; config: IdleStatus }> {
+  if (USE_MOCK) {
+    return { status: 'ok', config: mockIdleStatus };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/idle/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config),
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function keepAwake(durationSeconds: number): Promise<{ status: string }> {
+  if (USE_MOCK) {
+    return { status: 'ok' };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/idle/keep-awake`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ duration_seconds: durationSeconds }),
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function cancelKeepAwake(): Promise<{ status: string }> {
+  if (USE_MOCK) {
+    return { status: 'ok' };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/idle/cancel-keep-awake`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function forceIdleState(state: string): Promise<{ status: string }> {
+  if (USE_MOCK) {
+    return { status: 'ok' };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/idle/force-state`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state }),
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function unloadAllModels(): Promise<{ status: string; results: Record<string, boolean> }> {
+  if (USE_MOCK) {
+    return { status: 'ok', results: { ollama: true, vibevoice: true } };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/unload-models`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function getIdleHistory(limit: number = 50): Promise<{ history: IdleTransition[]; count: number }> {
+  return fetchWithFallback(`/api/system/idle/history?limit=${limit}`, () => ({
+    history: [],
+    count: 0,
+  }));
+}
+
+export async function getHourlyHistory(days: number = 7): Promise<{ history: HourlyMetrics[]; count: number }> {
+  return fetchWithFallback(`/api/system/history/hourly?days=${days}`, () => ({
+    history: [],
+    count: 0,
+  }));
+}
+
+export async function getDailyHistory(days: number = 30): Promise<{ history: DailyMetrics[]; count: number }> {
+  return fetchWithFallback(`/api/system/history/daily?days=${days}`, () => ({
+    history: [],
+    count: 0,
+  }));
+}
+
+export async function getMetricsHistorySummary(): Promise<MetricsHistorySummary> {
+  return fetchWithFallback('/api/system/history/summary', () => ({
+    today: null,
+    yesterday: null,
+    this_week: null,
+    total_days_tracked: 0,
+    total_hours_tracked: 0,
+    oldest_record: null,
+  }));
 }

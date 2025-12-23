@@ -96,6 +96,11 @@ See [docs/TASK_STATUS.md](docs/TASK_STATUS.md) for detailed task tracking.
 - [Patch Panel Architecture](docs/PATCH_PANEL_ARCHITECTURE.md) - LLM routing system
 - [Technical Design Document](docs/UnaMentis_TDD.md) - Complete TDD
 
+### Standards & Guidelines
+- [iOS Style Guide](docs/IOS_STYLE_GUIDE.md) - **MANDATORY** coding standards, accessibility, i18n
+- [iOS Best Practices Review](docs/IOS_BEST_PRACTICES_REVIEW.md) - Platform compliance audit
+- [AI Development Guidelines](AGENTS.md) - Guidelines for AI-assisted development
+
 ### Project
 - [Contributing](docs/CONTRIBUTING.md)
 - [Security Policy](SECURITY.md)

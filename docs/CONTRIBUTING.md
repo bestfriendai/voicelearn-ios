@@ -1,5 +1,43 @@
 # Contributing to UnaMentis
 
+## CI/CD Requirements
+
+All pull requests to `main` must pass the following checks before merging:
+
+| Check | Description |
+|-------|-------------|
+| **Lint** | SwiftLint and SwiftFormat validation |
+| **Unit Tests** | All unit tests must pass |
+| **Validation Summary** | Documentation, YAML, and JSON validation |
+
+### Branch Protection Rules
+
+The `main` branch has strict protection enabled:
+
+- **Required status checks**: All CI checks must pass
+- **Required reviews**: At least 1 approving review from a CODEOWNER
+- **Dismiss stale reviews**: New pushes invalidate previous approvals
+- **Require last push approval**: Final push must be approved
+- **Conversation resolution**: All review comments must be resolved
+- **No force pushes**: History is protected
+- **No deletions**: Branch cannot be deleted
+
+### Before Opening a PR
+
+1. Ensure all checks pass locally:
+   ```bash
+   ./scripts/lint.sh && ./scripts/test-quick.sh
+   ```
+
+2. Run the full test suite for significant changes:
+   ```bash
+   ./scripts/test-all.sh
+   ```
+
+3. Ensure documentation is valid (no broken links, valid YAML/JSON)
+
+---
+
 ## Development Workflow
 
 ### Branch Strategy

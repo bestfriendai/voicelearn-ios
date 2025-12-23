@@ -1,3 +1,22 @@
+/**
+ * UnaMentis Operations Console
+ *
+ * This is the OPERATIONS interface for system administrators and DevOps.
+ * It focuses on:
+ * - System health monitoring (CPU, memory, thermal, battery)
+ * - Service status and management (Ollama, VibeVoice, Piper, etc.)
+ * - Power/idle management profiles and thresholds
+ * - Logs, metrics, and performance data
+ * - Client connection monitoring
+ *
+ * The PRIMARY MANAGEMENT interface (port 8766) is for:
+ * - Curriculum management and content administration
+ * - User-facing features and educational content
+ * - Day-to-day administrative tasks
+ * - Acquisition and publishing workflows
+ *
+ * These two interfaces serve different audiences and purposes.
+ */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,6 +30,7 @@ import { ClientsPanelCompact, ClientsPanel } from './clients-panel';
 import { MetricsPanel, LatencyOverview } from './metrics-panel';
 import { ModelsPanel } from './models-panel';
 import { HealthPanel } from './health-panel';
+import { CurriculumPanel } from './curriculum-panel';
 import type { DashboardStats } from '@/types';
 import { getStats } from '@/lib/api-client';
 import { formatDuration } from '@/lib/utils';
@@ -35,14 +55,15 @@ export function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      {/* Background Pattern */}
+    <div className="h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">
+      {/* Background Pattern - fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-indigo-500/5 via-transparent to-transparent" />
-        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-violet-500/5 via-transparent to-transparent" />
+        <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-orange-500/5 via-transparent to-transparent" />
+        <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-amber-500/5 via-transparent to-transparent" />
       </div>
 
-      <div className="relative z-10">
+      {/* Sticky Header - never scrolls */}
+      <div className="relative z-20 flex-shrink-0">
         <Header
           stats={{
             logsCount: stats?.total_logs ?? 0,
@@ -51,13 +72,16 @@ export function Dashboard() {
           connected={true}
         />
         <NavTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
-        <main className="max-w-[1920px] mx-auto p-6">
+      {/* Scrollable Content Area */}
+      <main className="relative z-10 flex-1 overflow-y-auto">
+        <div className="max-w-[1920px] mx-auto p-4 sm:p-6">
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-300">
+              {/* Stats Grid - responsive columns */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 <StatCard
                   icon={Zap}
                   value={stats ? formatDuration(stats.uptime_seconds) : '--'}
@@ -102,8 +126,8 @@ export function Dashboard() {
                 />
               </div>
 
-              {/* Dashboard Content */}
-              <div className="grid lg:grid-cols-3 gap-6">
+              {/* Dashboard Content - responsive grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Latency Chart */}
                 <LatencyOverview />
 
@@ -160,8 +184,15 @@ export function Dashboard() {
               <HealthPanel />
             </div>
           )}
-        </main>
-      </div>
+
+          {/* Curriculum Tab */}
+          {activeTab === 'curriculum' && (
+            <div className="animate-in fade-in duration-300">
+              <CurriculumPanel />
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

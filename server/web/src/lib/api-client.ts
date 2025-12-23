@@ -479,3 +479,395 @@ export async function getMetricsHistorySummary(): Promise<MetricsHistorySummary>
     oldest_record: null,
   }));
 }
+
+// =============================================================================
+// Profile Management APIs
+// =============================================================================
+
+import type {
+  CreateProfileRequest,
+  UpdateProfileRequest,
+  ProfileResponse,
+  PowerModeWithId,
+} from '@/types';
+
+export async function getProfile(profileId: string): Promise<PowerModeWithId> {
+  if (USE_MOCK) {
+    const modes = mockPowerModes.modes;
+    const mode = modes[profileId as keyof typeof modes];
+    if (!mode) throw new Error('Profile not found');
+    return { ...mode, id: profileId, is_builtin: true, is_custom: false };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/profiles/${profileId}`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+export async function createProfile(profile: CreateProfileRequest): Promise<ProfileResponse> {
+  if (USE_MOCK) {
+    return {
+      status: 'created',
+      profile: {
+        id: profile.id,
+        name: profile.name,
+        description: profile.description || '',
+        thresholds: profile.thresholds,
+        enabled: profile.enabled ?? true,
+        is_builtin: false,
+        is_custom: true,
+      },
+    };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/profiles`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function updateProfile(
+  profileId: string,
+  updates: UpdateProfileRequest
+): Promise<ProfileResponse> {
+  if (USE_MOCK) {
+    return {
+      status: 'updated',
+      profile: {
+        id: profileId,
+        name: updates.name || 'Updated Profile',
+        description: updates.description || '',
+        thresholds: {
+          warm: updates.thresholds?.warm || 30,
+          cool: updates.thresholds?.cool || 300,
+          cold: updates.thresholds?.cold || 1800,
+          dormant: updates.thresholds?.dormant || 7200,
+        },
+        enabled: updates.enabled ?? true,
+        is_builtin: false,
+        is_custom: true,
+      },
+    };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/profiles/${profileId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function deleteProfile(profileId: string): Promise<{ status: string; profile_id: string }> {
+  if (USE_MOCK) {
+    return { status: 'deleted', profile_id: profileId };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/profiles/${profileId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function duplicateProfile(
+  sourceId: string,
+  newId: string,
+  newName: string
+): Promise<ProfileResponse> {
+  if (USE_MOCK) {
+    const modes = mockPowerModes.modes;
+    const source = modes[sourceId as keyof typeof modes];
+    return {
+      status: 'duplicated',
+      profile: {
+        id: newId,
+        name: newName,
+        description: source ? `Based on ${source.name}` : '',
+        thresholds: source?.thresholds || { warm: 30, cool: 300, cold: 1800, dormant: 7200 },
+        enabled: true,
+        is_builtin: false,
+        is_custom: true,
+      },
+    };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/system/profiles/${sourceId}/duplicate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ new_id: newId, new_name: newName }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+// =============================================================================
+// Curriculum & Visual Asset Management APIs
+// =============================================================================
+
+import type {
+  CurriculaResponse,
+  CurriculumSummary,
+  CurriculumDetail,
+  CurriculumDetailResponse,
+  UMLCFDocument,
+  VisualAsset,
+  AssetUploadResponse,
+  CurriculumSaveResponse,
+} from '@/types';
+
+// Mock curriculum data for demo mode
+const mockCurricula: CurriculumSummary[] = [
+  {
+    id: 'e5f6a7b8-c9d0-1234-ef56-789012345678',
+    title: 'The Renaissance: Europe\'s Rebirth',
+    description: 'Explore the Renaissance, a period of extraordinary cultural, artistic, and scientific achievement.',
+    version: '1.0.0',
+    status: 'final',
+    topicCount: 7,
+    totalDuration: 'PT45M',
+    difficulty: 'medium',
+    gradeLevel: '8',
+    keywords: ['Renaissance', 'history', 'art', 'Leonardo da Vinci'],
+    hasVisualAssets: true,
+    visualAssetCount: 46,
+  },
+];
+
+/**
+ * Fetch list of available curricula
+ */
+export async function getCurricula(params?: {
+  search?: string;
+  status?: string;
+}): Promise<CurriculaResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.set('search', params.search);
+  if (params?.status) queryParams.set('status', params.status);
+
+  const query = queryParams.toString();
+  const endpoint = `/api/curricula${query ? `?${query}` : ''}`;
+
+  return fetchWithFallback(endpoint, () => {
+    let curricula = [...mockCurricula];
+
+    if (params?.search) {
+      const search = params.search.toLowerCase();
+      curricula = curricula.filter(c =>
+        c.title.toLowerCase().includes(search) ||
+        c.description.toLowerCase().includes(search) ||
+        c.keywords?.some(k => k.toLowerCase().includes(search))
+      );
+    }
+
+    if (params?.status) {
+      curricula = curricula.filter(c => c.status === params.status);
+    }
+
+    return {
+      curricula,
+      total: curricula.length,
+    };
+  });
+}
+
+/**
+ * Fetch detailed curriculum data including full UMLCF document
+ */
+export async function getCurriculumDetail(id: string): Promise<CurriculumDetailResponse> {
+  return fetchWithFallback(`/api/curricula/${id}/full`, () => {
+    const summary = mockCurricula.find(c => c.id === id);
+    if (!summary) throw new Error('Curriculum not found');
+
+    // Return minimal mock detail - in real usage, this loads the full UMLCF document
+    return {
+      curriculum: {
+        ...summary,
+        document: {
+          umlcf: '1.0.0',
+          id: { value: id },
+          title: summary.title,
+          description: summary.description,
+        } as UMLCFDocument,
+        topics: [],
+      },
+    };
+  });
+}
+
+/**
+ * Save curriculum changes
+ */
+export async function saveCurriculum(
+  curriculumId: string,
+  document: UMLCFDocument
+): Promise<CurriculumSaveResponse> {
+  if (USE_MOCK) {
+    return {
+      status: 'success',
+      savedAt: new Date().toISOString(),
+    };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/curricula/${curriculumId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(document),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+/**
+ * Upload a visual asset for a topic
+ */
+export async function uploadVisualAsset(
+  curriculumId: string,
+  topicId: string,
+  file: File,
+  metadata: {
+    type: string;
+    title?: string;
+    alt: string;
+    caption?: string;
+    displayMode: string;
+    startSegment?: number;
+    endSegment?: number;
+    isReference?: boolean;
+    keywords?: string[];
+  }
+): Promise<AssetUploadResponse> {
+  if (USE_MOCK) {
+    return {
+      status: 'success',
+      asset: {
+        id: `img-${Date.now()}`,
+        type: metadata.type as 'image' | 'diagram',
+        url: URL.createObjectURL(file),
+        title: metadata.title,
+        alt: metadata.alt,
+        caption: metadata.caption,
+        mimeType: file.type,
+        segmentTiming: metadata.startSegment !== undefined ? {
+          startSegment: metadata.startSegment,
+          endSegment: metadata.endSegment ?? metadata.startSegment,
+          displayMode: metadata.displayMode as 'persistent' | 'inline',
+        } : undefined,
+        keywords: metadata.keywords,
+      },
+      url: URL.createObjectURL(file),
+    };
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('topicId', topicId);
+  formData.append('metadata', JSON.stringify(metadata));
+
+  const response = await fetch(
+    `${BACKEND_URL}/api/curricula/${curriculumId}/topics/${topicId}/assets`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+    return {
+      status: 'error',
+      error: error.error || `HTTP ${response.status}`,
+    };
+  }
+  return response.json();
+}
+
+/**
+ * Delete a visual asset
+ */
+export async function deleteVisualAsset(
+  curriculumId: string,
+  topicId: string,
+  assetId: string
+): Promise<{ status: string }> {
+  if (USE_MOCK) {
+    return { status: 'success' };
+  }
+
+  const response = await fetch(
+    `${BACKEND_URL}/api/curricula/${curriculumId}/topics/${topicId}/assets/${assetId}`,
+    { method: 'DELETE' }
+  );
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+/**
+ * Update visual asset metadata
+ */
+export async function updateVisualAsset(
+  curriculumId: string,
+  topicId: string,
+  assetId: string,
+  updates: Partial<VisualAsset>
+): Promise<{ status: string; asset: VisualAsset }> {
+  if (USE_MOCK) {
+    return {
+      status: 'success',
+      asset: { id: assetId, ...updates } as VisualAsset,
+    };
+  }
+
+  const response = await fetch(
+    `${BACKEND_URL}/api/curricula/${curriculumId}/topics/${topicId}/assets/${assetId}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    }
+  );
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
+/**
+ * Reload curricula from disk
+ */
+export async function reloadCurricula(): Promise<{ status: string; loaded: number }> {
+  if (USE_MOCK) {
+    return { status: 'success', loaded: mockCurricula.length };
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/curricula/reload`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UnaMentis Management Console",
-  description: "Management interface for monitoring and configuring UnaMentis services",
+  title: "UnaMentis Operations Console",
+  description: "Operations console for monitoring system health, resources, and service status",
   icons: {
     icon: "/favicon.ico",
   },

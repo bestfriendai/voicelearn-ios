@@ -124,136 +124,156 @@
         .status-dot {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+        /* Hide scrollbar for nav tabs on mobile */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        /* Safe area padding for mobile devices with notches */
+        @supports (padding: env(safe-area-inset-top)) {
+            .safe-area-top {
+                padding-top: env(safe-area-inset-top);
+            }
+            .safe-area-bottom {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
     </style>
 </head>
-<body class="bg-dark-950 text-dark-100 font-sans min-h-screen">
-    <!-- Background Pattern -->
+<body class="bg-dark-950 text-dark-100 font-sans h-screen flex flex-col overflow-hidden">
+    <!-- Background Pattern - fixed behind everything -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-accent-primary/5 via-transparent to-transparent"></div>
         <div class="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-accent-secondary/5 via-transparent to-transparent"></div>
     </div>
 
-    <div class="relative z-10">
+    <!-- Sticky Header Section - never scrolls -->
+    <div class="relative z-20 flex-shrink-0">
         <!-- Header -->
-        <header class="border-b border-dark-800/50 glass sticky top-0 z-50">
-            <div class="max-w-[1920px] mx-auto px-6 py-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h1 class="text-xl font-bold gradient-text">UnaMentis</h1>
-                                <p class="text-xs text-dark-400">Management Console</p>
-                            </div>
+        <header class="border-b border-dark-700/50 bg-dark-900/95 backdrop-blur-xl safe-area-top">
+            <div class="max-w-[1920px] mx-auto px-3 sm:px-6 py-2 sm:py-3">
+                <div class="flex items-center justify-between gap-2">
+                    <!-- Logo and Title -->
+                    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center shadow-lg shadow-accent-primary/20 flex-shrink-0">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h1 class="text-sm sm:text-lg font-bold text-dark-100 truncate">
+                                Management Console
+                            </h1>
+                            <p class="text-[9px] sm:text-[10px] text-dark-500 uppercase tracking-wider hidden sm:block">
+                                UnaMentis Curriculum Admin
+                            </p>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-6">
-                        <!-- Connection Status -->
-                        <div id="connection-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-dark-800/50 border border-dark-700/50">
-                            <div id="connection-dot" class="w-2 h-2 rounded-full bg-dark-500"></div>
-                            <span id="connection-text" class="text-sm text-dark-400">Connecting...</span>
+                    <!-- Right side controls -->
+                    <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                        <!-- Connection Status - compact on mobile -->
+                        <div id="connection-status" class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-dark-800/50 border border-dark-700/50 text-xs sm:text-sm">
+                            <div id="connection-dot" class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-dark-500"></div>
+                            <span id="connection-text" class="text-dark-400">
+                                <span class="sm:hidden">...</span>
+                                <span class="hidden sm:inline">Connecting...</span>
+                            </span>
                         </div>
 
-                        <!-- Quick Stats -->
-                        <div class="hidden md:flex items-center gap-4 text-sm">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-accent-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path>
+                        <!-- Quick Stats - hidden on small screens -->
+                        <div class="hidden md:flex items-center gap-3 text-sm">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-accent-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
-                                <span class="text-dark-300"><span id="header-logs" class="font-semibold text-dark-100">0</span> logs</span>
+                                <span class="text-dark-300"><span id="header-logs" class="font-semibold text-dark-100">0</span></span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="w-4 h-4 text-accent-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-accent-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                 </svg>
-                                <span class="text-dark-300"><span id="header-clients" class="font-semibold text-dark-100">0</span> clients</span>
+                                <span class="text-dark-300"><span id="header-clients" class="font-semibold text-dark-100">0</span></span>
                             </div>
                         </div>
 
-                        <!-- Time -->
-                        <div class="text-sm text-dark-400 font-mono" id="current-time">--:--:--</div>
+                        <!-- Time - always visible but smaller on mobile -->
+                        <div class="text-xs sm:text-sm text-dark-400 font-mono tabular-nums" id="current-time">--:--:--</div>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="border-b border-dark-800/50 bg-dark-900/50">
-            <div class="max-w-[1920px] mx-auto px-6">
-                <div class="flex gap-1">
-                    <button class="nav-tab active" data-tab="dashboard">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <nav class="bg-dark-800/50 border-b border-dark-700/50">
+            <div class="max-w-[1920px] mx-auto px-2 sm:px-4">
+                <!-- Horizontally scrollable on mobile -->
+                <div class="flex items-center gap-1 py-2 overflow-x-auto scrollbar-hide">
+                    <button class="nav-tab active flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 bg-dark-700/80 text-white border-dark-600 shadow-sm" data-tab="dashboard">
+                        <svg class="w-4 h-4 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
                         </svg>
-                        Dashboard
+                        <span class="sm:hidden">Home</span>
+                        <span class="hidden sm:inline">Dashboard</span>
                     </button>
-                    <button class="nav-tab" data-tab="metrics">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="curriculum">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Curriculum</span>
+                    </button>
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="metrics">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
-                        Metrics
+                        <span>Metrics</span>
                     </button>
-                    <button class="nav-tab" data-tab="logs">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="logs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        Logs
+                        <span>Logs</span>
                     </button>
-                    <button class="nav-tab" data-tab="clients">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="clients">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
-                        Clients
+                        <span>Clients</span>
                     </button>
-                    <button class="nav-tab" data-tab="servers">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="servers">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
                         </svg>
-                        Servers
+                        <span>Servers</span>
                     </button>
-                    <button class="nav-tab" data-tab="models">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="models">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                         </svg>
-                        Models
+                        <span>Models</span>
                     </button>
-                    <button class="nav-tab" data-tab="services">
+                    <button class="nav-tab flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-150 border whitespace-nowrap flex-shrink-0 text-dark-400 border-transparent hover:text-dark-200 hover:bg-dark-700/40 hover:border-dark-600/50" data-tab="services">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        Services
-                    </button>
-                    <button class="nav-tab" data-tab="curriculum">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                        Curriculum
+                        <span>Services</span>
                     </button>
                 </div>
             </div>
         </nav>
+    </div>
 
-        <style>
-            .nav-tab {
-                @apply flex items-center gap-2 px-4 py-3 text-sm font-medium text-dark-400 border-b-2 border-transparent transition-all duration-200 hover:text-dark-200 hover:bg-dark-800/30;
-            }
-            .nav-tab.active {
-                @apply text-accent-primary border-accent-primary bg-dark-800/20;
-            }
-        </style>
-
-        <!-- Main Content -->
-        <main class="max-w-[1920px] mx-auto p-6">
+    <!-- Scrollable Content Area -->
+    <main class="relative z-10 flex-1 overflow-y-auto">
+        <div class="max-w-[1920px] mx-auto p-4 sm:p-6">
             <!-- Dashboard Tab -->
             <div id="tab-dashboard" class="tab-content">
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+                <!-- Stats Grid - responsive columns -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div class="stat-card">
                         <div class="stat-icon bg-accent-primary/20 text-accent-primary">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1070,7 +1090,8 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
+    </main>
 
         <style>
             .card {
@@ -1336,6 +1357,6 @@
         </div>
     </div>
 
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=2"></script>
 </body>
 </html>

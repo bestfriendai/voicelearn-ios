@@ -19,6 +19,9 @@ import {
   BatteryCharging,
   Gauge,
   HardDrive,
+  Settings,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +43,7 @@ import type {
   MetricsHistorySummary,
 } from '@/types';
 import { formatDuration } from '@/lib/utils';
+import { PowerSettingsPanel } from './power-settings-panel';
 
 // Thermal pressure colors
 const thermalColors = {
@@ -65,6 +69,7 @@ export function HealthPanel() {
   const [historySummary, setHistorySummary] = useState<MetricsHistorySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -553,6 +558,30 @@ export function HealthPanel() {
           </CardContent>
         </Card>
       )}
+
+      {/* Advanced Power Settings Toggle */}
+      <button
+        onClick={() => setShowAdvanced(!showAdvanced)}
+        className="w-full p-4 bg-slate-800/30 border border-slate-700/50 rounded-lg hover:bg-slate-800/50 transition-colors flex items-center justify-between"
+      >
+        <div className="flex items-center gap-3">
+          <Settings className="w-5 h-5 text-indigo-400" />
+          <div className="text-left">
+            <p className="font-medium text-slate-200">Advanced Power Settings</p>
+            <p className="text-xs text-slate-400">
+              Create custom profiles, tune thresholds, manage power modes
+            </p>
+          </div>
+        </div>
+        {showAdvanced ? (
+          <ChevronUp className="w-5 h-5 text-slate-400" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-slate-400" />
+        )}
+      </button>
+
+      {/* Power Settings Panel */}
+      {showAdvanced && <PowerSettingsPanel />}
     </div>
   );
 }

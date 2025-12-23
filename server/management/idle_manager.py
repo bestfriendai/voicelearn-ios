@@ -15,15 +15,20 @@ States:
 """
 
 import asyncio
+import json
 import time
 import logging
 from collections import deque
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Callable, Dict, List, Optional, Any, Set
+from pathlib import Path
+from typing import Callable, Dict, List, Optional, Any
 import aiohttp
 
 logger = logging.getLogger(__name__)
+
+# Storage for custom profiles
+PROFILES_FILE = Path(__file__).parent / "data" / "power_profiles.json"
 
 
 class IdleState(Enum):
@@ -79,8 +84,8 @@ class PowerMode:
         }
 
 
-# Predefined power modes
-POWER_MODES = {
+# Predefined power modes (built-in, cannot be deleted)
+BUILTIN_POWER_MODES = {
     "performance": PowerMode(
         name="Performance",
         description="Never idle, always ready. Maximum responsiveness, highest power.",
@@ -97,7 +102,20 @@ POWER_MODES = {
         description="Aggressive power saving. Longer wake times but much lower power.",
         thresholds=IdleThresholds(warm=10, cool=60, cold=300, dormant=1800),
     ),
+    "development": PowerMode(
+        name="Development",
+        description="Optimized for active development. Quick transitions but saves power during breaks.",
+        thresholds=IdleThresholds(warm=60, cool=180, cold=600, dormant=3600),
+    ),
+    "presentation": PowerMode(
+        name="Presentation",
+        description="For demos and presentations. Stays responsive longer.",
+        thresholds=IdleThresholds(warm=300, cool=900, cold=3600, dormant=7200),
+    ),
 }
+
+# Mutable copy that includes custom profiles
+POWER_MODES: Dict[str, PowerMode] = dict(BUILTIN_POWER_MODES)
 
 
 @dataclass
@@ -454,8 +472,198 @@ class IdleManager:
 
     def get_available_modes(self) -> Dict[str, Dict[str, Any]]:
         """Get all available power modes"""
-        return {name: mode.to_dict() for name, mode in POWER_MODES.items()}
+        result = {}
+        for name, mode in POWER_MODES.items():
+            mode_dict = mode.to_dict()
+            mode_dict["is_builtin"] = name in BUILTIN_POWER_MODES
+            mode_dict["is_custom"] = name not in BUILTIN_POWER_MODES
+            result[name] = mode_dict
+        return result
+
+    def create_profile(self, profile_id: str, name: str, description: str,
+                       thresholds: Dict[str, int], enabled: bool = True) -> bool:
+        """
+        Create a new custom power profile.
+
+        Args:
+            profile_id: Unique identifier (lowercase, no spaces)
+            name: Display name
+            description: Description of the profile
+            thresholds: Dict with warm, cool, cold, dormant values in seconds
+            enabled: Whether idle management is enabled for this profile
+
+        Returns:
+            True if created successfully, False if profile_id already exists
+        """
+        # Sanitize profile_id
+        profile_id = profile_id.lower().replace(" ", "_")
+
+        if profile_id in BUILTIN_POWER_MODES:
+            logger.warning(f"[IdleManager] Cannot overwrite built-in profile: {profile_id}")
+            return False
+
+        # Create the profile
+        profile = PowerMode(
+            name=name,
+            description=description,
+            thresholds=IdleThresholds.from_dict(thresholds),
+            enabled=enabled,
+        )
+
+        POWER_MODES[profile_id] = profile
+        self._save_custom_profiles()
+
+        logger.info(f"[IdleManager] Created custom profile: {profile_id}")
+        return True
+
+    def update_profile(self, profile_id: str, name: Optional[str] = None,
+                       description: Optional[str] = None,
+                       thresholds: Optional[Dict[str, int]] = None,
+                       enabled: Optional[bool] = None) -> bool:
+        """
+        Update an existing custom profile.
+
+        Returns:
+            True if updated, False if profile doesn't exist or is built-in
+        """
+        if profile_id in BUILTIN_POWER_MODES:
+            logger.warning(f"[IdleManager] Cannot modify built-in profile: {profile_id}")
+            return False
+
+        if profile_id not in POWER_MODES:
+            return False
+
+        existing = POWER_MODES[profile_id]
+
+        # Update fields
+        updated_name = name if name is not None else existing.name
+        updated_desc = description if description is not None else existing.description
+        updated_enabled = enabled if enabled is not None else existing.enabled
+
+        if thresholds is not None:
+            # Merge with existing thresholds
+            current_thresholds = existing.thresholds.to_dict()
+            current_thresholds.update(thresholds)
+            updated_thresholds = IdleThresholds.from_dict(current_thresholds)
+        else:
+            updated_thresholds = existing.thresholds
+
+        POWER_MODES[profile_id] = PowerMode(
+            name=updated_name,
+            description=updated_desc,
+            thresholds=updated_thresholds,
+            enabled=updated_enabled,
+        )
+
+        self._save_custom_profiles()
+        logger.info(f"[IdleManager] Updated profile: {profile_id}")
+        return True
+
+    def delete_profile(self, profile_id: str) -> bool:
+        """
+        Delete a custom profile.
+
+        Returns:
+            True if deleted, False if profile doesn't exist or is built-in
+        """
+        if profile_id in BUILTIN_POWER_MODES:
+            logger.warning(f"[IdleManager] Cannot delete built-in profile: {profile_id}")
+            return False
+
+        if profile_id not in POWER_MODES:
+            return False
+
+        # If this is the current mode, switch to balanced
+        if self.current_mode == profile_id:
+            self.set_mode("balanced")
+
+        del POWER_MODES[profile_id]
+        self._save_custom_profiles()
+
+        logger.info(f"[IdleManager] Deleted profile: {profile_id}")
+        return True
+
+    def duplicate_profile(self, source_id: str, new_id: str, new_name: str) -> bool:
+        """
+        Duplicate an existing profile (built-in or custom) as a new custom profile.
+
+        Args:
+            source_id: ID of the profile to duplicate
+            new_id: ID for the new profile
+            new_name: Name for the new profile
+
+        Returns:
+            True if duplicated successfully
+        """
+        if source_id not in POWER_MODES:
+            return False
+
+        source = POWER_MODES[source_id]
+        return self.create_profile(
+            profile_id=new_id,
+            name=new_name,
+            description=f"Based on {source.name}",
+            thresholds=source.thresholds.to_dict(),
+            enabled=source.enabled,
+        )
+
+    def _save_custom_profiles(self):
+        """Save custom profiles to disk"""
+        custom_profiles = {
+            pid: profile.to_dict()
+            for pid, profile in POWER_MODES.items()
+            if pid not in BUILTIN_POWER_MODES
+        }
+
+        try:
+            PROFILES_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(PROFILES_FILE, 'w') as f:
+                json.dump(custom_profiles, f, indent=2)
+            logger.debug(f"[IdleManager] Saved {len(custom_profiles)} custom profiles")
+        except Exception as e:
+            logger.error(f"[IdleManager] Failed to save profiles: {e}")
+
+    def _load_custom_profiles(self):
+        """Load custom profiles from disk"""
+        if not PROFILES_FILE.exists():
+            return
+
+        try:
+            with open(PROFILES_FILE) as f:
+                data = json.load(f)
+
+            for pid, profile_data in data.items():
+                if pid not in BUILTIN_POWER_MODES:
+                    POWER_MODES[pid] = PowerMode(
+                        name=profile_data.get("name", pid),
+                        description=profile_data.get("description", ""),
+                        thresholds=IdleThresholds.from_dict(profile_data.get("thresholds", {})),
+                        enabled=profile_data.get("enabled", True),
+                    )
+
+            logger.info(f"[IdleManager] Loaded {len(data)} custom profiles")
+        except Exception as e:
+            logger.error(f"[IdleManager] Failed to load profiles: {e}")
+
+    def get_profile(self, profile_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific profile by ID"""
+        if profile_id not in POWER_MODES:
+            return None
+
+        mode = POWER_MODES[profile_id]
+        result = mode.to_dict()
+        result["id"] = profile_id
+        result["is_builtin"] = profile_id in BUILTIN_POWER_MODES
+        result["is_custom"] = profile_id not in BUILTIN_POWER_MODES
+        return result
+
+
+def _init_idle_manager() -> IdleManager:
+    """Initialize the idle manager and load custom profiles"""
+    manager = IdleManager()
+    manager._load_custom_profiles()
+    return manager
 
 
 # Singleton instance
-idle_manager = IdleManager()
+idle_manager = _init_idle_manager()

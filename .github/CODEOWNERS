@@ -1,0 +1,25 @@
+# CODEOWNERS - Define who must review changes to specific files/directories
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @sirfifer
+
+# Core app architecture - requires owner review
+/UnaMentis/ @sirfifer
+/UnaMentisTests/ @sirfifer
+
+# Server components
+/server/ @sirfifer
+
+# CI/CD and infrastructure - be extra careful
+/.github/ @sirfifer
+/scripts/ @sirfifer
+
+# Documentation can have broader contributions
+# but still needs review
+/docs/ @sirfifer
+
+# Package and project configuration
+Package.swift @sirfifer
+project.yml @sirfifer
+*.xcodeproj/** @sirfifer

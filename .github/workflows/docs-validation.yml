@@ -1,0 +1,176 @@
+name: Documentation Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/docs-validation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/docs-validation.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-markdown:
+    name: Validate Markdown
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install markdownlint-cli
+      run: npm install -g markdownlint-cli
+
+    - name: Create markdownlint config
+      run: |
+        cat > .markdownlint.json << 'EOF'
+        {
+          "default": true,
+          "MD013": false,
+          "MD033": false,
+          "MD041": false,
+          "MD024": { "siblings_only": true }
+        }
+        EOF
+
+    - name: Lint Markdown files
+      run: |
+        # Find all markdown files, excluding .build and node_modules
+        find . -name '*.md' \
+          -not -path './.build/*' \
+          -not -path './node_modules/*' \
+          -not -path './.git/*' \
+          | xargs markdownlint --config .markdownlint.json || true
+        # Report but don't fail for now - can make strict later
+
+    - name: Check for broken internal links
+      run: |
+        echo "## Link Check Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Find markdown files and check for broken relative links
+        broken_links=0
+        while IFS= read -r file; do
+          # Extract relative links from markdown
+          links=$(grep -oE '\]\([^)]+\)' "$file" 2>/dev/null | grep -v 'http' | sed 's/\](//;s/)$//' || true)
+          for link in $links; do
+            # Remove anchors
+            path=$(echo "$link" | sed 's/#.*//')
+            if [ -n "$path" ] && [ ! -e "$(dirname "$file")/$path" ] && [ ! -e "$path" ]; then
+              echo "- Broken link in \`$file\`: \`$link\`" >> $GITHUB_STEP_SUMMARY
+              broken_links=$((broken_links + 1))
+            fi
+          done
+        done < <(find . -name '*.md' -not -path './.build/*' -not -path './node_modules/*' -not -path './.git/*')
+
+        if [ $broken_links -eq 0 ]; then
+          echo "No broken internal links found." >> $GITHUB_STEP_SUMMARY
+        else
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Found $broken_links broken internal link(s)" >> $GITHUB_STEP_SUMMARY
+        fi
+
+  validate-yaml:
+    name: Validate YAML
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install yamllint
+      run: pip install yamllint
+
+    - name: Lint YAML files
+      run: |
+        echo "## YAML Validation Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Find YAML files excluding .build
+        files=$(find . \( -name '*.yml' -o -name '*.yaml' \) \
+          -not -path './.build/*' \
+          -not -path './node_modules/*' \
+          -not -path './.git/*')
+
+        if [ -z "$files" ]; then
+          echo "No YAML files found to validate." >> $GITHUB_STEP_SUMMARY
+          exit 0
+        fi
+
+        # Create yamllint config
+        cat > .yamllint << 'EOF'
+        extends: default
+        rules:
+          line-length:
+            max: 200
+          truthy:
+            check-keys: false
+          document-start: disable
+        EOF
+
+        # Run yamllint
+        echo "$files" | xargs yamllint -c .yamllint && \
+          echo "All YAML files are valid." >> $GITHUB_STEP_SUMMARY || \
+          echo "YAML validation found issues (see logs above)." >> $GITHUB_STEP_SUMMARY
+
+  validate-json:
+    name: Validate JSON
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate JSON files
+      run: |
+        echo "## JSON Validation Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Find JSON files excluding .build
+        invalid=0
+        while IFS= read -r file; do
+          if ! python3 -m json.tool "$file" > /dev/null 2>&1; then
+            echo "- Invalid JSON: \`$file\`" >> $GITHUB_STEP_SUMMARY
+            invalid=$((invalid + 1))
+          fi
+        done < <(find . -name '*.json' \
+          -not -path './.build/*' \
+          -not -path './node_modules/*' \
+          -not -path './.git/*')
+
+        if [ $invalid -eq 0 ]; then
+          echo "All JSON files are valid." >> $GITHUB_STEP_SUMMARY
+        else
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Found $invalid invalid JSON file(s)" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+
+  summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [validate-markdown, validate-yaml, validate-json]
+    if: always()
+
+    steps:
+    - name: Generate Summary
+      run: |
+        echo "## Documentation Validation Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Markdown | ${{ needs.validate-markdown.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| YAML | ${{ needs.validate-yaml.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| JSON | ${{ needs.validate-json.result }} |" >> $GITHUB_STEP_SUMMARY

@@ -92,15 +92,17 @@ xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
 ## Working with This Codebase
 
 ### Before Implementation
-1. Read relevant tests first - they document expected behavior
-2. Check existing patterns in similar components
-3. Reference `docs/UnaMentis_TDD.md` for architectural decisions
+1. **Read the iOS Style Guide**: `docs/IOS_STYLE_GUIDE.md` (MANDATORY)
+2. Read relevant tests first - they document expected behavior
+3. Check existing patterns in similar components
+4. Reference `docs/UnaMentis_TDD.md` for architectural decisions
 
 ### During Implementation
 1. Write tests first (TDD)
 2. Ensure Swift 6 concurrency compliance (@MainActor, Sendable, actors)
 3. Run build frequently to catch issues early
 4. Use TodoWrite to track progress on multi-step tasks
+5. **Follow iOS Style Guide requirements for accessibility and i18n**
 
 ### Quality Gates
 - All tests pass
@@ -108,6 +110,9 @@ xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
 - No force unwraps (!)
 - Public APIs documented with /// comments
 - Code follows existing patterns in the codebase
+- **Accessibility labels on all interactive elements** (per iOS Style Guide)
+- **Localizable strings for all user-facing text** (per iOS Style Guide)
+- **iPad adaptive layouts using size class detection** (per iOS Style Guide)
 
 ---
 

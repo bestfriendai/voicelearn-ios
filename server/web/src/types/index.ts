@@ -223,11 +223,47 @@ export interface PowerMode {
     dormant: number;
   };
   enabled: boolean;
+  is_builtin?: boolean;
+  is_custom?: boolean;
+}
+
+export interface PowerModeWithId extends PowerMode {
+  id: string;
 }
 
 export interface PowerModesResponse {
   modes: Record<string, PowerMode>;
   current: string;
+}
+
+export interface CreateProfileRequest {
+  id: string;
+  name: string;
+  description?: string;
+  thresholds: {
+    warm: number;
+    cool: number;
+    cold: number;
+    dormant: number;
+  };
+  enabled?: boolean;
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  description?: string;
+  thresholds?: Partial<{
+    warm: number;
+    cool: number;
+    cold: number;
+    dormant: number;
+  }>;
+  enabled?: boolean;
+}
+
+export interface ProfileResponse {
+  status: string;
+  profile: PowerModeWithId;
 }
 
 export interface IdleTransition {
@@ -291,4 +327,366 @@ export interface MetricsHistorySummary {
   total_days_tracked: number;
   total_hours_tracked: number;
   oldest_record: string | null;
+}
+
+// =============================================================================
+// Curriculum & Visual Asset Types
+// =============================================================================
+
+/** Types of visual assets supported in UMLCF */
+export type VisualAssetType =
+  | 'image'
+  | 'diagram'
+  | 'equation'
+  | 'chart'
+  | 'slideImage'
+  | 'slideDeck'
+  | 'generated';
+
+/** How visual assets are displayed during playback */
+export type VisualDisplayMode =
+  | 'persistent'  // Stays on screen for entire segment range
+  | 'highlight'   // Appears prominently, then fades to thumbnail
+  | 'popup'       // Dismissible overlay
+  | 'inline';     // Embedded in transcript text flow
+
+/** Image dimensions */
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
+/** Segment timing for embedded media */
+export interface SegmentTiming {
+  startSegment: number;
+  endSegment: number;
+  displayMode: VisualDisplayMode;
+}
+
+/** Visual asset definition in UMLCF format */
+export interface VisualAsset {
+  id: string;
+  type: VisualAssetType;
+  url?: string;
+  localPath?: string;
+  title?: string;
+  alt: string;  // Required for accessibility
+  caption?: string;
+  mimeType?: string;
+  dimensions?: Dimensions;
+  segmentTiming?: SegmentTiming;
+  latex?: string;  // For equation type
+  audioDescription?: string;  // Extended accessibility description
+  keywords?: string[];  // For reference assets (search matching)
+  description?: string;  // For reference assets
+}
+
+/** Media collection for a topic */
+export interface MediaCollection {
+  embedded?: VisualAsset[];
+  reference?: VisualAsset[];
+}
+
+/** Transcript segment */
+export interface TranscriptSegment {
+  id: string;
+  type: 'introduction' | 'lecture' | 'explanation' | 'summary' | 'checkpoint' | 'example';
+  content: string;
+  speakingNotes?: {
+    emotionalTone?: string;
+    pace?: string;
+    emphasis?: string[];
+  };
+  checkpoint?: {
+    type: string;
+    prompt: string;
+    expectedResponsePatterns?: string[];
+    fallbackBehavior?: string;
+  };
+  stoppingPoint?: {
+    type: string;
+    promptForContinue?: boolean;
+    suggestedPrompt?: string;
+  };
+}
+
+/** Topic transcript */
+export interface TopicTranscript {
+  segments: TranscriptSegment[];
+  voiceProfile?: {
+    tone: string;
+    pace: string;
+  };
+}
+
+/** Topic example */
+export interface TopicExample {
+  id: string;
+  type: 'analogy' | 'historical' | 'practical' | 'visual';
+  title: string;
+  spokenContent: string;
+}
+
+/** Assessment choice */
+export interface AssessmentChoice {
+  id: string;
+  text: string;
+  correct: boolean;
+  feedback?: string;
+}
+
+/** Topic assessment */
+export interface TopicAssessment {
+  id: { catalog?: string; value: string };
+  type: 'choice' | 'shortAnswer' | 'oral';
+  prompt: string;
+  spokenPrompt?: string;
+  choices?: AssessmentChoice[];
+  difficulty?: number;
+  objectivesAssessed?: string[];
+}
+
+/** Misconception correction */
+export interface Misconception {
+  id: string;
+  misconception: string;
+  triggerPhrases: string[];
+  correction: string;
+  spokenCorrection: string;
+  severity: 'minor' | 'moderate' | 'major';
+}
+
+/** Learning objective */
+export interface LearningObjective {
+  id: { value: string };
+  statement: string;
+  bloomsLevel: 'remember' | 'understand' | 'apply' | 'analyze' | 'evaluate' | 'create';
+}
+
+/** Topic time estimates */
+export interface TimeEstimates {
+  overview?: string;
+  introductory?: string;
+  intermediate?: string;
+  advanced?: string;
+}
+
+/** Topic prerequisite */
+export interface TopicPrerequisite {
+  nodeId: string;
+  required: boolean;
+}
+
+/** Topic within a curriculum */
+export interface CurriculumTopic {
+  id: { value: string };
+  title: string;
+  type: 'topic';
+  orderIndex: number;
+  description?: string;
+  prerequisites?: TopicPrerequisite[];
+  timeEstimates?: TimeEstimates;
+  transcript?: TopicTranscript;
+  examples?: TopicExample[];
+  assessments?: TopicAssessment[];
+  misconceptions?: Misconception[];
+  media?: MediaCollection;
+}
+
+/** Curriculum tutoring configuration */
+export interface TutoringConfig {
+  contentDepth: 'overview' | 'introductory' | 'intermediate' | 'advanced' | 'graduate' | 'research';
+  adaptiveDepth: boolean;
+  interactionMode: 'socratic' | 'lecture' | 'mixed';
+  allowTangents: boolean;
+  checkpointFrequency: 'low' | 'medium' | 'high';
+}
+
+/** Curriculum content node */
+export interface CurriculumContent {
+  id: { value: string };
+  title: string;
+  type: 'curriculum';
+  description?: string;
+  learningObjectives?: LearningObjective[];
+  tutoringConfig?: TutoringConfig;
+  children?: CurriculumTopic[];
+}
+
+/** Curriculum version info */
+export interface CurriculumVersion {
+  number: string;
+  date: string;
+  changelog?: string;
+}
+
+/** Curriculum lifecycle info */
+export interface CurriculumLifecycle {
+  status: 'draft' | 'review' | 'final' | 'deprecated';
+  contributors?: Array<{
+    name: string;
+    role: string;
+    organization?: string;
+  }>;
+  created?: string;
+}
+
+/** Curriculum metadata */
+export interface CurriculumMetadata {
+  language: string;
+  keywords?: string[];
+  structure?: string;
+  aggregationLevel?: number;
+}
+
+/** Curriculum educational info */
+export interface CurriculumEducational {
+  interactivityType?: string;
+  interactivityLevel?: string;
+  learningResourceType?: string[];
+  intendedEndUserRole?: string[];
+  context?: string[];
+  typicalAgeRange?: string;
+  difficulty?: string;
+  typicalLearningTime?: string;
+  educationalAlignment?: Array<{
+    alignmentType: string;
+    educationalFramework: string;
+    targetName: string;
+    targetDescription?: string;
+  }>;
+  audienceProfile?: {
+    educationLevel?: string;
+    gradeLevel?: string;
+    prerequisites?: Array<{
+      description: string;
+      required: boolean;
+    }>;
+  };
+}
+
+/** Curriculum rights info */
+export interface CurriculumRights {
+  cost: boolean;
+  license: {
+    type: string;
+    url?: string;
+  };
+  holder?: string;
+}
+
+/** Glossary term */
+export interface GlossaryTerm {
+  id: string;
+  term: string;
+  pronunciation?: string;
+  definition: string;
+  spokenDefinition?: string;
+  simpleDefinition?: string;
+  etymology?: string;
+  relatedTerms?: string[];
+}
+
+/** Full UMLCF curriculum document */
+export interface UMLCFDocument {
+  umlcf: string;  // Version string
+  id: { catalog?: string; value: string };
+  title: string;
+  description?: string;
+  version?: CurriculumVersion;
+  lifecycle?: CurriculumLifecycle;
+  metadata?: CurriculumMetadata;
+  educational?: CurriculumEducational;
+  rights?: CurriculumRights;
+  glossary?: { terms: GlossaryTerm[] };
+  content?: CurriculumContent[];
+  extensions?: Record<string, unknown>;
+  sourceProvenance?: {
+    originType?: string;
+    primarySources?: Array<{
+      title: string;
+      type: string;
+      authors?: string[];
+      url?: string;
+      publisher?: string;
+      publicationDate?: string;
+      relationshipToContent?: string;
+      notes?: string;
+    }>;
+    aiGenerationMetadata?: {
+      model: string;
+      generationDate: string;
+      prompt?: string;
+      humanReviewed: boolean;
+    };
+  };
+}
+
+/** Curriculum summary for list views */
+export interface CurriculumSummary {
+  id: string;
+  title: string;
+  description: string;
+  version?: string;
+  status?: string;
+  topicCount: number;
+  totalDuration?: string;
+  difficulty?: string;
+  gradeLevel?: string;
+  keywords?: string[];
+  hasVisualAssets: boolean;
+  visualAssetCount: number;
+}
+
+/** Curriculum detail for editor */
+export interface CurriculumDetail extends CurriculumSummary {
+  document: UMLCFDocument;
+  topics: CurriculumTopic[];
+}
+
+/** API response for curriculum list */
+export interface CurriculaResponse {
+  curricula: CurriculumSummary[];
+  total: number;
+}
+
+/** API response for curriculum detail */
+export interface CurriculumDetailResponse {
+  curriculum: CurriculumDetail;
+}
+
+/** Visual asset upload request */
+export interface AssetUploadRequest {
+  file: File;
+  topicId: string;
+  type: VisualAssetType;
+  title?: string;
+  alt: string;
+  caption?: string;
+  displayMode: VisualDisplayMode;
+  startSegment?: number;
+  endSegment?: number;
+  isReference?: boolean;
+  keywords?: string[];
+}
+
+/** Visual asset upload response */
+export interface AssetUploadResponse {
+  status: 'success' | 'error';
+  asset?: VisualAsset;
+  url?: string;
+  error?: string;
+}
+
+/** Curriculum save request */
+export interface CurriculumSaveRequest {
+  curriculumId: string;
+  document: UMLCFDocument;
+}
+
+/** Curriculum save response */
+export interface CurriculumSaveResponse {
+  status: 'success' | 'error';
+  error?: string;
+  savedAt?: string;
 }

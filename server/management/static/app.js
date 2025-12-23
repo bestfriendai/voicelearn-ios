@@ -1144,6 +1144,32 @@ function calculateAggregates(metrics) {
 // Tab Navigation
 // =============================================================================
 
+// CSS classes for tab states (CDN Tailwind doesn't support @apply in <style> tags)
+// Note: Classes with special chars like / work fine with classList - the issue was elsewhere
+const TAB_ACTIVE_CLASSES = ['bg-dark-700\\/80', 'text-white', 'border-dark-600', 'shadow-sm'];
+const TAB_INACTIVE_CLASSES = ['text-dark-400', 'border-transparent', 'hover:text-dark-200', 'hover:bg-dark-700\\/40', 'hover:border-dark-600\\/50'];
+
+// Actual class names as they appear in the DOM (unescaped for classList operations)
+const TAB_ACTIVE_CLASSES_RAW = ['bg-dark-700/80', 'text-white', 'border-dark-600', 'shadow-sm'];
+const TAB_INACTIVE_CLASSES_RAW = ['text-dark-400', 'border-transparent', 'hover:text-dark-200', 'hover:bg-dark-700/40', 'hover:border-dark-600/50'];
+
+function setTabActive(tab, isActive) {
+    const svg = tab.querySelector('svg');
+    if (isActive) {
+        // Remove inactive classes, add active classes
+        TAB_INACTIVE_CLASSES_RAW.forEach(cls => tab.classList.remove(cls));
+        TAB_ACTIVE_CLASSES_RAW.forEach(cls => tab.classList.add(cls));
+        tab.classList.add('active');
+        if (svg) svg.classList.add('text-accent-primary');
+    } else {
+        // Remove active classes, add inactive classes
+        TAB_ACTIVE_CLASSES_RAW.forEach(cls => tab.classList.remove(cls));
+        TAB_INACTIVE_CLASSES_RAW.forEach(cls => tab.classList.add(cls));
+        tab.classList.remove('active');
+        if (svg) svg.classList.remove('text-accent-primary');
+    }
+}
+
 function initTabs() {
     const tabs = document.querySelectorAll('.nav-tab');
 
@@ -1151,9 +1177,9 @@ function initTabs() {
         tab.addEventListener('click', () => {
             const tabId = tab.dataset.tab;
 
-            // Update tab buttons
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+            // Update tab buttons - toggle active/inactive styles
+            tabs.forEach(t => setTabActive(t, false));
+            setTabActive(tab, true);
 
             // Show/hide tab content
             document.querySelectorAll('.tab-content').forEach(content => {

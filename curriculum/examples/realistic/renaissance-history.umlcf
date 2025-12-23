@@ -662,7 +662,117 @@
               "spokenCorrection": "Actually, people in the Middle Ages had no idea that fleas on rats spread the plague. They blamed bad smells, God's punishment, or the positions of planets. The real cause wasn't discovered until about 500 years later, in the 1890s.",
               "severity": "minor"
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-feudal-pyramid",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Feudal_pyramid.svg/800px-Feudal_pyramid.svg.png",
+                "title": "The Feudal System Pyramid",
+                "alt": "Diagram showing the hierarchical structure of medieval feudal society, with the king at top, followed by nobles, knights, and peasants at the base",
+                "caption": "The feudal pyramid: King at top, peasants at the bottom making up 90% of the population",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 2,
+                  "endSegment": 4,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "A pyramid diagram showing medieval social hierarchy. At the tiny peak sits the king. Below him, a small layer of nobles and lords. Below them, knights in armor. The massive base of the pyramid represents peasants and serfs, making up about ninety percent of the population."
+              },
+              {
+                "id": "img-medieval-manuscript",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Monk_at_work_in_a_scriptorium.jpg/800px-Monk_at_work_in_a_scriptorium.jpg",
+                "title": "Medieval Monk in Scriptorium",
+                "alt": "Illustration of a medieval monk copying manuscripts by hand in a monastery scriptorium",
+                "caption": "A monk copying books by hand in a scriptorium - each book could take months or years to complete",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 6,
+                  "endSegment": 7,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "An illustration showing a medieval monk hunched over a desk in a monastery scriptorium, carefully copying text by hand onto parchment. The room has a small window for light, and the monk uses a quill pen and inkwell."
+              },
+              {
+                "id": "img-plague-doctor",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Paul_F%C3%BCrst%2C_Der_Doctor_Schnabel_von_Rom_%28Coloured_version%29.png/520px-Paul_F%C3%BCrst%2C_Der_Doctor_Schnabel_von_Rom_%28Coloured_version%29.png",
+                "title": "The Plague Doctor",
+                "alt": "17th century engraving of a plague doctor wearing the characteristic beaked mask and long coat",
+                "caption": "Doctor Schnabel of Rome - the iconic plague doctor with his beaked mask filled with herbs",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 520,
+                  "height": 739
+                },
+                "segmentTiming": {
+                  "startSegment": 10,
+                  "endSegment": 11,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "A haunting engraving of a plague doctor from Rome, wearing a long dark coat, a wide-brimmed hat, and the distinctive bird-like mask with a long beak. The beak was filled with aromatic herbs that doctors believed would protect them from disease."
+              },
+              {
+                "id": "img-black-death-spread",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/1346-1353_spread_of_the_Black_Death_in_Europe_map.svg/800px-1346-1353_spread_of_the_Black_Death_in_Europe_map.svg.png",
+                "title": "Spread of the Black Death (1346-1353)",
+                "alt": "Map of Europe showing the progressive spread of the Black Death plague from 1346 to 1353",
+                "caption": "How the Black Death spread across Europe between 1346 and 1353",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 571
+                },
+                "segmentTiming": {
+                  "startSegment": 8,
+                  "endSegment": 10,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "A map of Europe with color-coded regions showing the year-by-year spread of the Black Death plague from 1346 to 1353. The plague started in the East and progressively moved westward and northward, eventually covering nearly all of Europe."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-medieval-europe-map",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Europe_1000.jpg/1200px-Europe_1000.jpg",
+                "title": "Map of Medieval Europe around 1000 AD",
+                "description": "Detailed political map showing the kingdoms, duchies, and empires of medieval Europe",
+                "keywords": [
+                  "map",
+                  "medieval",
+                  "europe",
+                  "kingdoms",
+                  "geography"
+                ]
+              },
+              {
+                "id": "ref-medieval-cathedral",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Notre-Dame_de_Paris_2013-07-24.jpg/800px-Notre-Dame_de_Paris_2013-07-24.jpg",
+                "title": "Notre-Dame Cathedral, Paris",
+                "description": "Example of Gothic cathedral architecture from the medieval period",
+                "keywords": [
+                  "cathedral",
+                  "gothic",
+                  "architecture",
+                  "church",
+                  "medieval building"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -1246,7 +1356,118 @@
               ],
               "difficulty": 0.5
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-italian-city-states",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Italy_1494_v2.png/800px-Italy_1494_v2.png",
+                "title": "Italian City-States in 1494",
+                "alt": "Map of the Italian peninsula showing the major city-states during the Renaissance including Florence, Venice, Milan, and the Papal States",
+                "caption": "The Italian Peninsula divided among powerful city-states - the birthplace of the Renaissance",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 990
+                },
+                "segmentTiming": {
+                  "startSegment": 0,
+                  "endSegment": 3,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "A colorful map of the Italian peninsula in 1494 showing the major Renaissance city-states. Florence is shown in central Italy, Venice controls the northeast, Milan dominates the north, and the Papal States stretch across the center. Naples controls the south."
+              },
+              {
+                "id": "img-florence-duomo",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Florence_duomo_fc01.jpg/1200px-Florence_duomo_fc01.jpg",
+                "title": "Florence Cathedral (Duomo)",
+                "alt": "The Florence Cathedral with Brunelleschi's famous dome rising above the city",
+                "caption": "Brunelleschi's dome on the Florence Cathedral - an engineering marvel of the Renaissance",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 1200,
+                  "height": 800
+                },
+                "segmentTiming": {
+                  "startSegment": 8,
+                  "endSegment": 10,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "The magnificent Florence Cathedral, known as the Duomo, with its iconic terracotta-colored dome designed by Filippo Brunelleschi. The dome dominates the city skyline and was the largest dome built since ancient Rome."
+              },
+              {
+                "id": "img-medici-lorenzo",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Lorenzo_de%27_Medici-ritratto.jpg/460px-Lorenzo_de%27_Medici-ritratto.jpg",
+                "title": "Lorenzo de' Medici (Lorenzo the Magnificent)",
+                "alt": "Portrait of Lorenzo de' Medici, the powerful Florentine ruler and art patron",
+                "caption": "Lorenzo the Magnificent - ruler of Florence and one of the greatest art patrons in history",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 460,
+                  "height": 599
+                },
+                "segmentTiming": {
+                  "startSegment": 5,
+                  "endSegment": 8,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A Renaissance portrait of Lorenzo de' Medici, known as Lorenzo the Magnificent. He has a strong, distinctive face with a prominent nose. Lorenzo was the de facto ruler of Florence and used his banking fortune to support artists like Michelangelo, Botticelli, and Leonardo da Vinci."
+              },
+              {
+                "id": "img-venice-grand-canal",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Canaletto%2C_Entrance_to_the_Grand_Canal_from_the_Piazzetta.jpg/1200px-Canaletto%2C_Entrance_to_the_Grand_Canal_from_the_Piazzetta.jpg",
+                "title": "Venice: Entrance to the Grand Canal",
+                "alt": "Painting by Canaletto showing the entrance to Venice's Grand Canal with gondolas and grand architecture",
+                "caption": "Venice's Grand Canal - the wealthy trading republic that rivaled Florence",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 1200,
+                  "height": 800
+                },
+                "segmentTiming": {
+                  "startSegment": 3,
+                  "endSegment": 5,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A painting by Canaletto depicting the entrance to Venice's famous Grand Canal. Gondolas float on sparkling water, surrounded by magnificent palaces and the iconic architecture of the Venetian Republic, one of the wealthiest trading powers of the Renaissance."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-medici-bank",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Medici_family_tree.png/800px-Medici_family_tree.png",
+                "title": "Medici Family Tree",
+                "description": "Genealogical chart showing the Medici family's banking empire and political connections",
+                "keywords": [
+                  "medici",
+                  "family",
+                  "banking",
+                  "florence",
+                  "dynasty"
+                ]
+              },
+              {
+                "id": "ref-constantinople-fall",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Siege_of_Constantinople_by_the_Turks_%281453%29.jpg/1200px-Siege_of_Constantinople_by_the_Turks_%281453%29.jpg",
+                "title": "Fall of Constantinople (1453)",
+                "description": "Painting depicting the Ottoman siege of Constantinople in 1453, which drove Greek scholars to Italy",
+                "keywords": [
+                  "constantinople",
+                  "ottoman",
+                  "byzantine",
+                  "1453",
+                  "scholars",
+                  "greek"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -1493,7 +1714,170 @@
                 "obj-identify-changes"
               ]
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-mona-lisa",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+                "title": "Mona Lisa by Leonardo da Vinci",
+                "alt": "The Mona Lisa painting by Leonardo da Vinci, showing a woman with an enigmatic smile",
+                "caption": "The Mona Lisa - Leonardo's masterpiece demonstrating sfumato technique and psychological depth",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 1200
+                },
+                "segmentTiming": {
+                  "startSegment": 4,
+                  "endSegment": 7,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "Leonardo da Vinci's world-famous Mona Lisa. A woman sits with her hands folded, gazing at the viewer with her famous enigmatic smile. The painting demonstrates Leonardo's sfumato technique, where colors and edges blend softly like smoke. The misty landscape behind her adds depth and mystery."
+              },
+              {
+                "id": "img-last-supper",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/1200px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg",
+                "title": "The Last Supper by Leonardo da Vinci",
+                "alt": "Leonardo da Vinci's famous mural depicting Jesus and his twelve apostles at their final meal together",
+                "caption": "The Last Supper - demonstrating linear perspective with all lines pointing to Jesus",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 1200,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 7,
+                  "endSegment": 9,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "Leonardo da Vinci's monumental painting of The Last Supper. Jesus sits in the center with his twelve apostles on either side, reacting to his announcement that one will betray him. The room's architecture creates perfect linear perspective, with all lines converging on Jesus's head."
+              },
+              {
+                "id": "img-david-michelangelo",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/%27David%27_by_Michelangelo_JBU0001.JPG/460px-%27David%27_by_Michelangelo_JBU0001.JPG",
+                "title": "David by Michelangelo",
+                "alt": "Michelangelo's marble sculpture of David, the Biblical hero who defeated Goliath",
+                "caption": "Michelangelo's David - 17 feet of marble perfection carved by a 26-year-old genius",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 460,
+                  "height": 920
+                },
+                "segmentTiming": {
+                  "startSegment": 9,
+                  "endSegment": 12,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "Michelangelo's towering marble sculpture of David stands 17 feet tall. The young hero is captured in the moment before his battle with Goliath, his muscles tensed, his gaze focused. Every vein, tendon, and muscle is carved with anatomical perfection."
+              },
+              {
+                "id": "img-sistine-chapel",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Creación_de_Adán_%28Miguel_Ángel%29.jpg/1200px-Creación_de_Adán_%28Miguel_Ángel%29.jpg",
+                "title": "Creation of Adam - Sistine Chapel",
+                "alt": "The famous Creation of Adam fresco by Michelangelo showing God reaching out to touch Adam's finger",
+                "caption": "The Creation of Adam from the Sistine Chapel ceiling - perhaps the most famous image in Western art",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 1200,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 12,
+                  "endSegment": 14,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "The iconic Creation of Adam from Michelangelo's Sistine Chapel ceiling. On the right, God reaches out from heaven, surrounded by angels. On the left, Adam reclines on Earth, his finger extended. Their fingers nearly touch in one of art's most powerful moments."
+              },
+              {
+                "id": "img-perspective-diagram",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/One-point_perspective.svg/800px-One-point_perspective.svg.png",
+                "title": "Linear Perspective Diagram",
+                "alt": "Diagram showing how one-point linear perspective works, with lines converging to a single vanishing point",
+                "caption": "Linear perspective - the mathematical technique that made Renaissance paintings look three-dimensional",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 2,
+                  "endSegment": 4,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A technical diagram showing linear perspective. Parallel lines in the scene all converge to a single vanishing point on the horizon. This mathematical technique, perfected during the Renaissance, creates the illusion of three-dimensional depth on a flat surface."
+              },
+              {
+                "id": "img-medieval-vs-renaissance",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Medieval_and_Renaissance_Art_Comparison.svg/1000px-Medieval_and_Renaissance_Art_Comparison.svg.png",
+                "title": "Medieval vs Renaissance Art Comparison",
+                "alt": "Side-by-side comparison showing the flat style of medieval art versus the realistic depth of Renaissance art",
+                "caption": "The dramatic difference: flat medieval art versus realistic Renaissance techniques",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 1000,
+                  "height": 500
+                },
+                "segmentTiming": {
+                  "startSegment": 0,
+                  "endSegment": 2,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "A side-by-side comparison of medieval and Renaissance art styles. The medieval example shows flat, stylized figures with gold backgrounds and no sense of depth. The Renaissance example shows realistic human forms with proper proportions, natural lighting, and convincing three-dimensional space."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-botticelli-birth-venus",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1200px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+                "title": "Birth of Venus by Botticelli",
+                "description": "Botticelli's famous painting of the goddess Venus emerging from the sea on a shell",
+                "keywords": [
+                  "botticelli",
+                  "venus",
+                  "mythology",
+                  "classical",
+                  "florence"
+                ]
+              },
+              {
+                "id": "ref-school-of-athens",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/1200px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+                "title": "The School of Athens by Raphael",
+                "description": "Raphael's masterpiece showing ancient Greek philosophers gathered in an idealized architectural setting",
+                "keywords": [
+                  "raphael",
+                  "philosophy",
+                  "plato",
+                  "aristotle",
+                  "classical",
+                  "athens"
+                ]
+              },
+              {
+                "id": "ref-vitruvian-man",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg",
+                "title": "Vitruvian Man by Leonardo da Vinci",
+                "description": "Leonardo's famous drawing showing ideal human proportions inscribed in a circle and square",
+                "keywords": [
+                  "vitruvian",
+                  "proportion",
+                  "anatomy",
+                  "leonardo",
+                  "human body"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -1684,7 +2068,117 @@
                 "obj-identify-changes"
               ]
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-leonardo-flying",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Leonardo_da_Vinci_-_Codice_sul_volo_degli_uccelli_-_ca._1505.jpg/800px-Leonardo_da_Vinci_-_Codice_sul_volo_degli_uccelli_-_ca._1505.jpg",
+                "title": "Leonardo's Flying Machine Designs",
+                "alt": "Pages from Leonardo da Vinci's notebooks showing his designs for flying machines",
+                "caption": "Leonardo's flying machine sketches - science and art combined in one genius",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 2,
+                  "endSegment": 5,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "Pages from Leonardo da Vinci's famous notebooks showing his designs for flying machines. The pages are covered with detailed sketches of wings, mechanisms, and notes written in his characteristic mirror script. He studied bird flight to create these remarkably advanced concepts."
+              },
+              {
+                "id": "img-leonardo-anatomy",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Leonardo_da_vinci%2C_Studies_of_the_Arm_showing_the_Movements_made_by_the_Biceps.jpg/460px-Leonardo_da_vinci%2C_Studies_of_the_Arm_showing_the_Movements_made_by_the_Biceps.jpg",
+                "title": "Leonardo's Anatomical Studies",
+                "alt": "Leonardo da Vinci's detailed anatomical drawings of the human arm and muscles",
+                "caption": "Leonardo's anatomical drawings - he dissected over 30 human bodies to understand how we work",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 460,
+                  "height": 660
+                },
+                "segmentTiming": {
+                  "startSegment": 5,
+                  "endSegment": 7,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "Leonardo da Vinci's extraordinarily detailed anatomical drawings of the human arm. Multiple views show the bones, muscles, and tendons, with notes explaining how they work together. Leonardo dissected over thirty human bodies to create these scientifically accurate studies."
+              },
+              {
+                "id": "img-copernicus-heliocentric",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Heliocentric.jpg/800px-Heliocentric.jpg",
+                "title": "Copernicus's Heliocentric Model",
+                "alt": "Diagram from Copernicus showing the Sun at the center with planets orbiting around it",
+                "caption": "Copernicus's revolutionary idea: The Sun, not Earth, is at the center of our solar system",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 800
+                },
+                "segmentTiming": {
+                  "startSegment": 8,
+                  "endSegment": 10,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "A historical diagram showing Copernicus's heliocentric model of the solar system. The Sun sits at the center, with Earth and other planets orbiting around it. This was revolutionary because for centuries, people believed Earth was the center of the universe."
+              },
+              {
+                "id": "img-galileo-telescope",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Galileo.arp.300pix.jpg/330px-Galileo.arp.300pix.jpg",
+                "title": "Portrait of Galileo Galilei",
+                "alt": "Portrait of the scientist Galileo Galilei, who improved the telescope and made astronomical discoveries",
+                "caption": "Galileo Galilei - he turned the telescope to the sky and changed our understanding of the universe",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 330,
+                  "height": 425
+                },
+                "segmentTiming": {
+                  "startSegment": 10,
+                  "endSegment": 12,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A portrait of Galileo Galilei, the famous Italian scientist. He has a full beard and wears the clothing of a Renaissance scholar. Galileo improved the telescope and used it to discover the moons of Jupiter and the phases of Venus, proving Copernicus was right."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-leonardo-codex",
+                "type": "slideDeck",
+                "url": "https://www.bl.uk/collection-items/leonardo-da-vinci-notebook",
+                "title": "Leonardo da Vinci's Notebooks (British Library)",
+                "description": "Digital collection of Leonardo's famous notebooks with inventions, observations, and drawings",
+                "keywords": [
+                  "leonardo",
+                  "notebook",
+                  "codex",
+                  "inventions",
+                  "sketches"
+                ]
+              },
+              {
+                "id": "ref-vesalius-anatomy",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Vesalius_Fabrica_fronticepiece.jpg/800px-Vesalius_Fabrica_fronticepiece.jpg",
+                "title": "Vesalius's De Humani Corporis Fabrica",
+                "description": "Frontispiece of the revolutionary anatomy textbook that transformed medical knowledge",
+                "keywords": [
+                  "vesalius",
+                  "anatomy",
+                  "medicine",
+                  "dissection",
+                  "science"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -1880,7 +2374,117 @@
                 "obj-analyze-impact"
               ]
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-gutenberg-press",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Printer_in_1568-ce.png/800px-Printer_in_1568-ce.png",
+                "title": "The Printing Press in Operation",
+                "alt": "Historical illustration showing printers operating a Gutenberg-style printing press",
+                "caption": "A Renaissance printing press in action - the machine that changed the world",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 0,
+                  "endSegment": 3,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "An illustration of a Renaissance-era printing shop. Workers operate a wooden printing press similar to Gutenberg's original design. One worker inks the type, another operates the press mechanism, and a third hangs freshly printed pages to dry."
+              },
+              {
+                "id": "img-gutenberg-bible",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/800px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg",
+                "title": "The Gutenberg Bible",
+                "alt": "An open Gutenberg Bible showing two pages of beautifully printed text",
+                "caption": "The Gutenberg Bible - the first major book printed with movable type in Europe",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 3,
+                  "endSegment": 5,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "An open copy of the Gutenberg Bible, the first major book printed with movable type in Europe. The pages show beautifully printed Latin text in two columns. Though printed by machine, each copy was hand-illuminated with colored decorations, making each one unique."
+              },
+              {
+                "id": "img-movable-type",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Metal_movable_type.jpg/800px-Metal_movable_type.jpg",
+                "title": "Movable Metal Type",
+                "alt": "Close-up photograph of metal movable type letters used in printing presses",
+                "caption": "Movable type - individual metal letters that could be arranged, printed, and reused",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 1,
+                  "endSegment": 2,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A close-up view of metal movable type pieces. Each small metal block has a single letter cast in reverse on its surface. Printers would arrange these letters into words and sentences, ink them, and press paper against them to create printed pages."
+              },
+              {
+                "id": "img-luther-95-theses",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Luther95theses.jpg/550px-Luther95theses.jpg",
+                "title": "Martin Luther's 95 Theses",
+                "alt": "Printed copy of Martin Luther's 95 Theses that sparked the Protestant Reformation",
+                "caption": "Luther's 95 Theses spread across Europe within weeks thanks to the printing press",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 550,
+                  "height": 757
+                },
+                "segmentTiming": {
+                  "startSegment": 8,
+                  "endSegment": 10,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "A printed copy of Martin Luther's 95 Theses from 1517. The text is printed in dense Latin columns. When Luther nailed his criticisms of the Church to a door in Wittenberg, printers quickly copied and distributed them. Within weeks, his ideas had spread across Europe."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-book-production-timeline",
+                "type": "chart",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/European_Output_of_Manuscripts_And_Printed_Books.png/800px-European_Output_of_Manuscripts_And_Printed_Books.png",
+                "title": "European Book Production Before and After Gutenberg",
+                "description": "Chart showing the dramatic increase in book production after the invention of the printing press",
+                "keywords": [
+                  "books",
+                  "production",
+                  "printing",
+                  "statistics",
+                  "gutenberg"
+                ]
+              },
+              {
+                "id": "ref-printing-spread",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Printing_towns_incunabula.svg/1200px-Printing_towns_incunabula.svg.png",
+                "title": "Spread of Printing Across Europe",
+                "description": "Map showing how printing technology spread from Mainz across Europe by 1500",
+                "keywords": [
+                  "printing",
+                  "spread",
+                  "map",
+                  "europe",
+                  "incunabula"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -2067,7 +2671,118 @@
                 "obj-identify-changes"
               ]
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-arnolfini-portrait",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Van_Eyck_-_Arnolfini_Portrait.jpg/800px-Van_Eyck_-_Arnolfini_Portrait.jpg",
+                "title": "Arnolfini Portrait by Jan van Eyck",
+                "alt": "The Arnolfini Portrait showing a wealthy couple in their home, demonstrating incredible oil painting technique",
+                "caption": "Jan van Eyck's Arnolfini Portrait - a masterpiece of oil painting technique from the Netherlands",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 1150
+                },
+                "segmentTiming": {
+                  "startSegment": 2,
+                  "endSegment": 5,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "Jan van Eyck's famous Arnolfini Portrait from 1434. A wealthy merchant and his wife stand in their home, surrounded by intricate details: a small dog, a chandelier, oranges on the windowsill, and a convex mirror reflecting the whole room. The oil painting technique captures light and texture with unprecedented realism."
+              },
+              {
+                "id": "img-durer-self-portrait",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Albrecht_D%C3%BCrer_-_Self-Portrait_at_28_%281500%29.jpg/460px-Albrecht_D%C3%BCrer_-_Self-Portrait_at_28_%281500%29.jpg",
+                "title": "Self-Portrait by Albrecht Dürer",
+                "alt": "Albrecht Dürer's famous self-portrait showing the German artist in a Christ-like pose",
+                "caption": "Dürer's Self-Portrait at 28 - the German artist who brought Renaissance ideas north",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 460,
+                  "height": 635
+                },
+                "segmentTiming": {
+                  "startSegment": 5,
+                  "endSegment": 7,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "Albrecht Dürer's striking self-portrait from 1500. The German artist depicts himself facing forward in a Christ-like pose, with long curling hair and a rich fur coat. Dürer traveled to Italy to study Renaissance techniques and brought these ideas back to Germany."
+              },
+              {
+                "id": "img-shakespeare-portrait",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shakespeare.jpg/440px-Shakespeare.jpg",
+                "title": "William Shakespeare",
+                "alt": "The Chandos portrait believed to show William Shakespeare, England's greatest playwright",
+                "caption": "William Shakespeare - the Bard of Avon who invented over 1,700 English words",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 440,
+                  "height": 536
+                },
+                "segmentTiming": {
+                  "startSegment": 10,
+                  "endSegment": 13,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "The Chandos portrait, believed to show William Shakespeare. The playwright has a receding hairline, a small beard, and wears a gold earring. Shakespeare wrote at least 37 plays and 154 sonnets, and invented over 1,700 words that we still use today."
+              },
+              {
+                "id": "img-globe-theatre",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Globetheatre.jpg/800px-Globetheatre.jpg",
+                "title": "The Globe Theatre",
+                "alt": "The reconstructed Globe Theatre in London where Shakespeare's plays were performed",
+                "caption": "The Globe Theatre - where Shakespeare's plays came to life for Elizabethan audiences",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 11,
+                  "endSegment": 12,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "The reconstructed Globe Theatre in London. The circular wooden structure has an open-air central area where groundlings stood to watch performances. Wealthier patrons sat in the covered galleries surrounding the stage. This is where audiences first watched Hamlet, Macbeth, and Romeo and Juliet."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-northern-europe-map",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Europe_in_1519.png/1200px-Europe_in_1519.png",
+                "title": "Northern Europe in 1519",
+                "description": "Map showing the political divisions of Northern Europe during the Renaissance",
+                "keywords": [
+                  "map",
+                  "northern europe",
+                  "germany",
+                  "england",
+                  "netherlands",
+                  "renaissance"
+                ]
+              },
+              {
+                "id": "ref-durer-engravings",
+                "type": "slideDeck",
+                "url": "https://www.metmuseum.org/art/collection/search/336228",
+                "title": "Dürer's Engravings and Woodcuts (Met Museum)",
+                "description": "Collection of Albrecht Dürer's famous prints including Knight, Death and the Devil",
+                "keywords": [
+                  "durer",
+                  "engravings",
+                  "woodcuts",
+                  "prints",
+                  "german art"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": {
@@ -2251,7 +2966,131 @@
                 "obj-analyze-impact"
               ]
             }
-          ]
+          ],
+          "media": {
+            "embedded": [
+              {
+                "id": "img-us-capitol",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/US_Capitol_west_side.JPG/1200px-US_Capitol_west_side.JPG",
+                "title": "United States Capitol Building",
+                "alt": "The US Capitol Building in Washington DC showing Renaissance-inspired classical architecture with its famous dome",
+                "caption": "The US Capitol - Renaissance ideals in architecture still shape our government buildings today",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 1200,
+                  "height": 800
+                },
+                "segmentTiming": {
+                  "startSegment": 2,
+                  "endSegment": 4,
+                  "displayMode": "persistent"
+                },
+                "audioDescription": "The United States Capitol Building in Washington DC. The building features Renaissance-inspired classical architecture, with its famous dome directly modeled on the dome of St. Peter's Basilica in Rome. The columns, symmetry, and proportions all reflect Renaissance ideals of beauty and order."
+              },
+              {
+                "id": "img-scientific-method",
+                "type": "diagram",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/The_Scientific_Method.svg/800px-The_Scientific_Method.svg.png",
+                "title": "The Scientific Method",
+                "alt": "Diagram showing the steps of the scientific method: observation, hypothesis, experiment, analysis, conclusion",
+                "caption": "The Scientific Method - Renaissance thinkers pioneered this approach to understanding the world",
+                "mimeType": "image/png",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 5,
+                  "endSegment": 7,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A circular diagram showing the steps of the scientific method. Starting with observation, it moves through forming a hypothesis, designing experiments, collecting data, analyzing results, and drawing conclusions. This systematic approach to knowledge began during the Renaissance."
+              },
+              {
+                "id": "img-declaration-independence",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/US_Declaration_of_Independence.jpg/800px-US_Declaration_of_Independence.jpg",
+                "title": "The Declaration of Independence",
+                "alt": "The original Declaration of Independence document from 1776",
+                "caption": "The Declaration of Independence - built on Renaissance humanist ideas about individual rights",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 972
+                },
+                "segmentTiming": {
+                  "startSegment": 7,
+                  "endSegment": 9,
+                  "displayMode": "highlight"
+                },
+                "audioDescription": "The original Declaration of Independence from 1776. This founding document of the United States reflects Renaissance humanist ideas about the worth and rights of individuals. Concepts like natural rights and government by consent of the governed trace back to Renaissance political philosophy."
+              },
+              {
+                "id": "img-mona-lisa-museum",
+                "type": "image",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Mona_Lisa_viewing%2C_mus%C3%A9e_du_Louvre.jpg/800px-Mona_Lisa_viewing%2C_mus%C3%A9e_du_Louvre.jpg",
+                "title": "Visitors Viewing the Mona Lisa",
+                "alt": "Crowds of museum visitors photographing the Mona Lisa at the Louvre in Paris",
+                "caption": "The Mona Lisa today - still captivating millions of visitors at the Louvre 500 years later",
+                "mimeType": "image/jpeg",
+                "dimensions": {
+                  "width": 800,
+                  "height": 600
+                },
+                "segmentTiming": {
+                  "startSegment": 9,
+                  "endSegment": 11,
+                  "displayMode": "inline"
+                },
+                "audioDescription": "A crowd of visitors at the Louvre museum in Paris, all facing the Mona Lisa and taking photos. The painting hangs behind protective glass on its own wall. This scene demonstrates how Renaissance art continues to captivate audiences more than 500 years after it was created."
+              }
+            ],
+            "reference": [
+              {
+                "id": "ref-renaissance-timeline",
+                "type": "chart",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Renaissance_timeline.svg/1200px-Renaissance_timeline.svg.png",
+                "title": "Renaissance Timeline",
+                "description": "Comprehensive timeline showing major events, figures, and developments of the Renaissance",
+                "keywords": [
+                  "timeline",
+                  "history",
+                  "dates",
+                  "events",
+                  "overview"
+                ]
+              },
+              {
+                "id": "ref-museum-virtual-tours",
+                "type": "slideDeck",
+                "url": "https://artsandculture.google.com/partner/uffizi-gallery",
+                "title": "Virtual Tour: Uffizi Gallery, Florence",
+                "description": "Google Arts & Culture virtual tour of Florence's Uffizi Gallery with Renaissance masterpieces",
+                "keywords": [
+                  "museum",
+                  "virtual tour",
+                  "uffizi",
+                  "florence",
+                  "art"
+                ]
+              },
+              {
+                "id": "ref-comparison-table",
+                "type": "chart",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Medieval_to_Renaissance_comparison_table.svg/800px-Medieval_to_Renaissance_comparison_table.svg.png",
+                "title": "Medieval vs Renaissance Comparison Table",
+                "description": "Table comparing key aspects of medieval and Renaissance society, art, and thought",
+                "keywords": [
+                  "comparison",
+                  "table",
+                  "medieval",
+                  "renaissance",
+                  "differences"
+                ]
+              }
+            ]
+          }
         }
       ]
     }

@@ -1838,6 +1838,237 @@ async def handle_import_curriculum(request: web.Request) -> web.Response:
 
 
 # =============================================================================
+# API Handlers - Visual Assets
+# =============================================================================
+
+async def handle_upload_visual_asset(request: web.Request) -> web.Response:
+    """Upload a visual asset for a curriculum topic."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+        topic_id = request.match_info.get("topic_id")
+
+        if curriculum_id not in state.curriculum_raw:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        # Parse multipart form data
+        reader = await request.multipart()
+        file_data = None
+        file_name = None
+        file_content_type = None
+        metadata = {}
+
+        while True:
+            part = await reader.next()
+            if part is None:
+                break
+
+            if part.name == "file":
+                file_name = part.filename
+                file_content_type = part.headers.get("Content-Type", "image/png")
+                file_data = await part.read()
+            elif part.name == "metadata":
+                metadata_str = await part.text()
+                metadata = json.loads(metadata_str)
+            elif part.name == "topicId":
+                topic_id = await part.text()
+
+        if not file_data or not file_name:
+            return web.json_response({"error": "No file uploaded"}, status=400)
+
+        if not metadata.get("alt"):
+            return web.json_response({"error": "Alt text is required for accessibility"}, status=400)
+
+        # Create assets directory if needed
+        assets_dir = PROJECT_ROOT / "curriculum" / "assets" / curriculum_id / topic_id
+        assets_dir.mkdir(parents=True, exist_ok=True)
+
+        # Generate unique asset ID
+        asset_id = f"img-{int(time.time() * 1000)}"
+        ext = Path(file_name).suffix or ".png"
+        local_path = assets_dir / f"{asset_id}{ext}"
+
+        # Save the file
+        with open(local_path, "wb") as f:
+            f.write(file_data)
+
+        logger.info(f"Saved visual asset: {local_path}")
+
+        # Create the asset object
+        asset = {
+            "id": asset_id,
+            "type": metadata.get("type", "image"),
+            "localPath": str(local_path.relative_to(PROJECT_ROOT)),
+            "title": metadata.get("title", file_name),
+            "alt": metadata["alt"],
+            "caption": metadata.get("caption"),
+            "mimeType": file_content_type,
+        }
+
+        # Add segment timing for embedded assets
+        if not metadata.get("isReference", False):
+            asset["segmentTiming"] = {
+                "startSegment": metadata.get("startSegment", 0),
+                "endSegment": metadata.get("endSegment", 0),
+                "displayMode": metadata.get("displayMode", "inline")
+            }
+        else:
+            asset["keywords"] = metadata.get("keywords", [])
+
+        # Update the curriculum file
+        umlcf = state.curriculum_raw[curriculum_id]
+        content = umlcf.get("content", [])
+
+        if content:
+            root = content[0]
+            children = root.get("children", [])
+
+            for child in children:
+                child_id = child.get("id", {}).get("value", "")
+                if child_id == topic_id:
+                    # Initialize media if needed
+                    if "media" not in child:
+                        child["media"] = {"embedded": [], "reference": []}
+
+                    # Add to appropriate list
+                    if metadata.get("isReference", False):
+                        child["media"]["reference"].append(asset)
+                    else:
+                        child["media"]["embedded"].append(asset)
+
+                    break
+
+            # Save the updated curriculum
+            if curriculum_id in state.curriculums:
+                file_path = Path(state.curriculums[curriculum_id].file_path)
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(umlcf, f, indent=2, ensure_ascii=False)
+
+                # Reload to update state
+                state._load_curriculum_file(file_path)
+
+        return web.json_response({
+            "status": "success",
+            "asset": asset,
+            "localPath": str(local_path)
+        })
+
+    except Exception as e:
+        logger.error(f"Error uploading visual asset: {e}")
+        import traceback
+        traceback.print_exc()
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_delete_visual_asset(request: web.Request) -> web.Response:
+    """Delete a visual asset from a curriculum topic."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+        topic_id = request.match_info.get("topic_id")
+        asset_id = request.match_info.get("asset_id")
+
+        if curriculum_id not in state.curriculum_raw:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        umlcf = state.curriculum_raw[curriculum_id]
+        content = umlcf.get("content", [])
+
+        if content:
+            root = content[0]
+            children = root.get("children", [])
+
+            for child in children:
+                child_id = child.get("id", {}).get("value", "")
+                if child_id == topic_id:
+                    media = child.get("media", {})
+
+                    # Remove from embedded
+                    embedded = media.get("embedded", [])
+                    media["embedded"] = [a for a in embedded if a.get("id") != asset_id]
+
+                    # Remove from reference
+                    reference = media.get("reference", [])
+                    media["reference"] = [a for a in reference if a.get("id") != asset_id]
+
+                    break
+
+            # Save the updated curriculum
+            if curriculum_id in state.curriculums:
+                file_path = Path(state.curriculums[curriculum_id].file_path)
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(umlcf, f, indent=2, ensure_ascii=False)
+
+                state._load_curriculum_file(file_path)
+
+        return web.json_response({"status": "success"})
+
+    except Exception as e:
+        logger.error(f"Error deleting visual asset: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_update_visual_asset(request: web.Request) -> web.Response:
+    """Update visual asset metadata."""
+    try:
+        curriculum_id = request.match_info.get("curriculum_id")
+        topic_id = request.match_info.get("topic_id")
+        asset_id = request.match_info.get("asset_id")
+        updates = await request.json()
+
+        if curriculum_id not in state.curriculum_raw:
+            return web.json_response({"error": "Curriculum not found"}, status=404)
+
+        umlcf = state.curriculum_raw[curriculum_id]
+        content = umlcf.get("content", [])
+        updated_asset = None
+
+        if content:
+            root = content[0]
+            children = root.get("children", [])
+
+            for child in children:
+                child_id = child.get("id", {}).get("value", "")
+                if child_id == topic_id:
+                    media = child.get("media", {})
+
+                    # Update in embedded
+                    for asset in media.get("embedded", []):
+                        if asset.get("id") == asset_id:
+                            asset.update(updates)
+                            updated_asset = asset
+                            break
+
+                    # Update in reference
+                    if not updated_asset:
+                        for asset in media.get("reference", []):
+                            if asset.get("id") == asset_id:
+                                asset.update(updates)
+                                updated_asset = asset
+                                break
+
+                    break
+
+            # Save the updated curriculum
+            if updated_asset and curriculum_id in state.curriculums:
+                file_path = Path(state.curriculums[curriculum_id].file_path)
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(umlcf, f, indent=2, ensure_ascii=False)
+
+                state._load_curriculum_file(file_path)
+
+        if not updated_asset:
+            return web.json_response({"error": "Asset not found"}, status=404)
+
+        return web.json_response({
+            "status": "success",
+            "asset": updated_asset
+        })
+
+    except Exception as e:
+        logger.error(f"Error updating visual asset: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+# =============================================================================
 # WebSocket Handler
 # =============================================================================
 
@@ -2103,6 +2334,170 @@ async def handle_get_idle_history(request: web.Request) -> web.Response:
         return web.json_response({"error": str(e)}, status=500)
 
 
+# =============================================================================
+# Profile Management API Endpoints
+# =============================================================================
+
+
+async def handle_get_profile(request: web.Request) -> web.Response:
+    """Get a specific power profile by ID."""
+    try:
+        profile_id = request.match_info.get("profile_id")
+        profile = idle_manager.get_profile(profile_id)
+
+        if profile is None:
+            return web.json_response({"error": "Profile not found"}, status=404)
+
+        return web.json_response(profile)
+
+    except Exception as e:
+        logger.error(f"Error getting profile: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_create_profile(request: web.Request) -> web.Response:
+    """Create a new custom power profile."""
+    try:
+        data = await request.json()
+
+        # Validate required fields
+        required = ["id", "name", "thresholds"]
+        for field in required:
+            if field not in data:
+                return web.json_response(
+                    {"error": f"Missing required field: {field}"},
+                    status=400
+                )
+
+        # Validate thresholds
+        thresholds = data["thresholds"]
+        for key in ["warm", "cool", "cold", "dormant"]:
+            if key not in thresholds:
+                return web.json_response(
+                    {"error": f"Missing threshold: {key}"},
+                    status=400
+                )
+            if not isinstance(thresholds[key], (int, float)) or thresholds[key] < 0:
+                return web.json_response(
+                    {"error": f"Invalid threshold value for {key}"},
+                    status=400
+                )
+
+        success = idle_manager.create_profile(
+            profile_id=data["id"],
+            name=data["name"],
+            description=data.get("description", ""),
+            thresholds=thresholds,
+            enabled=data.get("enabled", True),
+        )
+
+        if not success:
+            return web.json_response(
+                {"error": "Could not create profile (ID may already exist or is reserved)"},
+                status=400
+            )
+
+        return web.json_response({
+            "status": "created",
+            "profile": idle_manager.get_profile(data["id"].lower().replace(" ", "_")),
+        })
+
+    except json.JSONDecodeError:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        logger.error(f"Error creating profile: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_update_profile(request: web.Request) -> web.Response:
+    """Update an existing custom power profile."""
+    try:
+        profile_id = request.match_info.get("profile_id")
+        data = await request.json()
+
+        success = idle_manager.update_profile(
+            profile_id=profile_id,
+            name=data.get("name"),
+            description=data.get("description"),
+            thresholds=data.get("thresholds"),
+            enabled=data.get("enabled"),
+        )
+
+        if not success:
+            return web.json_response(
+                {"error": "Could not update profile (not found or is built-in)"},
+                status=400
+            )
+
+        return web.json_response({
+            "status": "updated",
+            "profile": idle_manager.get_profile(profile_id),
+        })
+
+    except json.JSONDecodeError:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        logger.error(f"Error updating profile: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_delete_profile(request: web.Request) -> web.Response:
+    """Delete a custom power profile."""
+    try:
+        profile_id = request.match_info.get("profile_id")
+
+        success = idle_manager.delete_profile(profile_id)
+
+        if not success:
+            return web.json_response(
+                {"error": "Could not delete profile (not found or is built-in)"},
+                status=400
+            )
+
+        return web.json_response({"status": "deleted", "profile_id": profile_id})
+
+    except Exception as e:
+        logger.error(f"Error deleting profile: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_duplicate_profile(request: web.Request) -> web.Response:
+    """Duplicate an existing profile as a new custom profile."""
+    try:
+        source_id = request.match_info.get("profile_id")
+        data = await request.json()
+
+        if "new_id" not in data or "new_name" not in data:
+            return web.json_response(
+                {"error": "Missing required fields: new_id, new_name"},
+                status=400
+            )
+
+        success = idle_manager.duplicate_profile(
+            source_id=source_id,
+            new_id=data["new_id"],
+            new_name=data["new_name"],
+        )
+
+        if not success:
+            return web.json_response(
+                {"error": "Could not duplicate profile"},
+                status=400
+            )
+
+        new_id = data["new_id"].lower().replace(" ", "_")
+        return web.json_response({
+            "status": "duplicated",
+            "profile": idle_manager.get_profile(new_id),
+        })
+
+    except json.JSONDecodeError:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        logger.error(f"Error duplicating profile: {e}")
+        return web.json_response({"error": str(e)}, status=500)
+
+
 async def handle_get_metrics_history_hourly(request: web.Request) -> web.Response:
     """Get hourly aggregated metrics history."""
     try:
@@ -2284,6 +2679,11 @@ def create_app() -> web.Application:
     app.router.add_post("/api/curricula/import", handle_import_curriculum)
     app.router.add_put("/api/curricula/{curriculum_id}", handle_save_curriculum)
 
+    # Visual Asset Management
+    app.router.add_post("/api/curricula/{curriculum_id}/topics/{topic_id}/assets", handle_upload_visual_asset)
+    app.router.add_delete("/api/curricula/{curriculum_id}/topics/{topic_id}/assets/{asset_id}", handle_delete_visual_asset)
+    app.router.add_patch("/api/curricula/{curriculum_id}/topics/{topic_id}/assets/{asset_id}", handle_update_visual_asset)
+
     # WebSocket
     app.router.add_get("/ws", handle_websocket)
 
@@ -2302,6 +2702,13 @@ def create_app() -> web.Application:
     app.router.add_post("/api/system/idle/cancel-keep-awake", handle_idle_cancel_keep_awake)
     app.router.add_post("/api/system/idle/force-state", handle_idle_force_state)
     app.router.add_post("/api/system/unload-models", handle_unload_models)
+
+    # Profile Management
+    app.router.add_get("/api/system/profiles/{profile_id}", handle_get_profile)
+    app.router.add_post("/api/system/profiles", handle_create_profile)
+    app.router.add_put("/api/system/profiles/{profile_id}", handle_update_profile)
+    app.router.add_delete("/api/system/profiles/{profile_id}", handle_delete_profile)
+    app.router.add_post("/api/system/profiles/{profile_id}/duplicate", handle_duplicate_profile)
 
     # Historical Metrics (persisted)
     app.router.add_get("/api/system/history/hourly", handle_get_metrics_history_hourly)

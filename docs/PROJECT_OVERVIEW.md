@@ -248,6 +248,13 @@ UnaMentis/
 |   +-- Embeddings/      # OpenAIEmbeddingService
 |   +-- Curriculum/      # CurriculumService, VisualAssetCache, TranscriptStreamingService
 |   +-- Protocols/       # LLMService, STTService, TTSService, VADService
++-- Intents/             # Siri & App Intents integration (iOS 16+)
+|   +-- AppShortcutsProvider.swift   # Registers shortcuts with Siri
+|   +-- StartLessonIntent.swift      # "Hey Siri, start a lesson"
+|   +-- ResumeLearningIntent.swift   # "Hey Siri, resume my lesson"
+|   +-- ShowProgressIntent.swift     # "Hey Siri, show my progress"
+|   +-- CurriculumEntity.swift       # Exposes curricula to Siri
+|   +-- TopicEntity.swift            # Exposes topics to Siri
 +-- UI/
 |   +-- Session/         # SessionView, VisualAssetView
 |   +-- Curriculum/      # CurriculumView
@@ -283,6 +290,7 @@ UnaMentis/
 - Operations Console (React/TypeScript)
 - Management Console (Python/aiohttp)
 - iOS Simulator MCP for AI-driven testing
+- **Siri & App Intents integration** (voice commands, deep links)
 
 ### In Progress
 - MIT OCW import pipeline implementation
@@ -377,6 +385,7 @@ UnaMentis/
 ### Feature Documentation
 | Document | Purpose |
 |----------|---------|
+| [APPLE_INTELLIGENCE.md](APPLE_INTELLIGENCE.md) | Apple Intelligence integration guide |
 | [PATCH_PANEL_ARCHITECTURE.md](PATCH_PANEL_ARCHITECTURE.md) | LLM routing system |
 | [VISUAL_ASSET_SUPPORT.md](VISUAL_ASSET_SUPPORT.md) | Curriculum visual assets |
 | [GLM_ASR_ON_DEVICE_GUIDE.md](GLM_ASR_ON_DEVICE_GUIDE.md) | On-device STT setup |

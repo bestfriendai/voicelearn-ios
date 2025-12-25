@@ -108,6 +108,7 @@
 		9B2D0344F603FE6374A5AD82 /* ShowProgressIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE99DEACD70682FBFDDAC185 /* ShowProgressIntent.swift */; };
 		C98EF8EA4DC6D3C81607F6A3 /* StartLessonIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16503A70E42DE0BC81F08C21 /* StartLessonIntent.swift */; };
 		ADDED877DD6C660DA5B03FD5 /* TopicEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141E1CE7FED01904DABB416D /* TopicEntity.swift */; };
+		E6CBD689E679A8881DF96C0E /* AppIntentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F2F6FDDD57EA81615D0D41 /* AppIntentsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -224,6 +225,7 @@
 		BE99DEACD70682FBFDDAC185 /* ShowProgressIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnaMentis/Intents/ShowProgressIntent.swift"; sourceTree = SOURCE_ROOT; };
 		16503A70E42DE0BC81F08C21 /* StartLessonIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnaMentis/Intents/StartLessonIntent.swift"; sourceTree = SOURCE_ROOT; };
 		141E1CE7FED01904DABB416D /* TopicEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnaMentis/Intents/TopicEntity.swift"; sourceTree = SOURCE_ROOT; };
+		F0F2F6FDDD57EA81615D0D41 /* AppIntentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnaMentisTests/Unit/Intents/AppIntentsTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -809,6 +811,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6CBD689E679A8881DF96C0E /* AppIntentsTests.swift in Sources */,
 				6538195C252D1D331A78ED75 /* APIKeyManagerTests.swift in Sources */,
 				A7646430427520CB7751070E /* AnalyticsViewModelTests.swift in Sources */,
 				D6A00A90CF06357BD9FFFE37 /* AnthropicLLMServiceTests.swift in Sources */,

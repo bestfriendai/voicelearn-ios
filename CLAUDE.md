@@ -49,6 +49,7 @@ UnaMentis/
 │   ├── STT/        # Speech-to-text (AssemblyAI, Deepgram)
 │   ├── TTS/        # Text-to-speech (ElevenLabs, Deepgram Aura)
 │   └── LLM/        # Language models (OpenAI, Anthropic)
+├── Intents/        # Siri & App Intents (iOS 16+)
 ├── UI/             # SwiftUI views
 └── Persistence/    # Core Data stack
 

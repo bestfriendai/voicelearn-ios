@@ -15,12 +15,36 @@ UnaMentis leverages Apple's native AI capabilities to provide a seamless voice t
 
 ### Siri Voice Commands (iOS 16+)
 
-Users can control UnaMentis with voice commands:
+Users can control UnaMentis entirely hands-free with voice commands:
+
+#### Freeform Conversation (Hands-Free)
+
+Start a voice conversation without touching the phone:
+
+```
+"Hey Siri, talk to UnaMentis"
+"Hey Siri, start a conversation with UnaMentis"
+"Hey Siri, chat with UnaMentis"
+"Hey Siri, I want to learn something with UnaMentis"
+```
+
+This opens the app and immediately starts a voice session, perfect for spontaneous learning while walking or doing other activities.
+
+#### Curriculum-Based Lessons
+
+Start a structured lesson on a specific topic:
 
 ```
 "Hey Siri, start a lesson in UnaMentis"
 "Hey Siri, teach me about Quantum Mechanics in UnaMentis"
+"Hey Siri, study Physics with UnaMentis"
+```
+
+#### Resume & Progress
+
+```
 "Hey Siri, resume learning in UnaMentis"
+"Hey Siri, continue my lesson in UnaMentis"
 "Hey Siri, show my progress in UnaMentis"
 ```
 
@@ -29,6 +53,7 @@ Users can control UnaMentis with voice commands:
 | File | Purpose |
 |------|---------|
 | `UnaMentis/Intents/AppShortcutsProvider.swift` | Registers shortcuts with Siri |
+| `UnaMentis/Intents/StartConversationIntent.swift` | Handles freeform "talk to" commands |
 | `UnaMentis/Intents/StartLessonIntent.swift` | Handles "start lesson" commands |
 | `UnaMentis/Intents/ResumeLearningIntent.swift` | Handles "resume" commands |
 | `UnaMentis/Intents/ShowProgressIntent.swift` | Handles "show progress" commands |
@@ -40,9 +65,11 @@ Users can control UnaMentis with voice commands:
 The intents use deep links to navigate to specific screens:
 
 ```
-unamentis://lesson?id=<UUID>&depth=<level>
-unamentis://resume?id=<UUID>
-unamentis://analytics
+unamentis://chat                              # Start freeform conversation
+unamentis://chat?prompt=<encoded-question>    # Start with initial question
+unamentis://lesson?id=<UUID>&depth=<level>    # Start curriculum lesson
+unamentis://resume?id=<UUID>                  # Resume specific topic
+unamentis://analytics                         # Show progress
 ```
 
 Depth levels: `overview`, `introductory`, `intermediate`, `advanced`, `graduate`

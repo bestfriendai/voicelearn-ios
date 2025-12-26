@@ -29,7 +29,7 @@ UnaMentis is designed to be provider-agnostic with strong emphasis on on-device 
 
 - **STT (Speech-to-Text)**: On-device (Apple Speech, GLM-ASR), cloud (Deepgram, AssemblyAI), or self-hosted (Whisper)
 - **TTS (Text-to-Speech)**: On-device (Apple), cloud (ElevenLabs, Deepgram Aura), or self-hosted (VibeVoice, Piper)
-- **LLM**: On-device (Ministral-3B via llama.cpp), cloud (Anthropic, OpenAI), or self-hosted (Ollama)
+- **LLM**: On-device (Ministral-3B via llama.cpp), self-hosted (Mistral 7B via Ollama), or cloud (Anthropic, OpenAI)
 - **Embeddings**: OpenAI or compatible embedding services
 - **VAD**: Silero (Core ML, on-device)
 
@@ -198,11 +198,12 @@ Application and content management:
 ### Large Language Models (LLM)
 | Provider | Model | Type | Notes |
 |----------|-------|------|-------|
-| On-device | Ministral-3B-Instruct-Q4_K_M | On-device | Primary, via llama.cpp |
+| On-device | Ministral-3B-Instruct-Q4_K_M | On-device | Primary on-device, via llama.cpp |
 | On-device | TinyLlama-1.1B-Chat | On-device | Fallback, smaller footprint |
+| Ollama | Mistral 7B | Self-hosted | **Primary server model** |
+| Ollama | qwen2.5:32b, llama3.2:3b | Self-hosted | Alternative server models |
 | Anthropic | Claude 3.5 Sonnet | Cloud | Primary cloud model |
 | OpenAI | GPT-4o / GPT-4o-mini | Cloud | Alternative cloud option |
-| Ollama | qwen2.5, mistral:7b, llama3.2 | Self-hosted | Local server option |
 
 ### Voice Activity Detection (VAD)
 - **Silero VAD**: Core ML model for on-device speech detection

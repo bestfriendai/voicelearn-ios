@@ -25,19 +25,20 @@ UnaMentis is an iOS application that enables 60-90+ minute voice-based learning 
 
 ## Provider Flexibility
 
-UnaMentis is designed to be provider-agnostic. The system supports pluggable providers for every component of the voice AI pipeline:
+UnaMentis is designed to be provider-agnostic with strong emphasis on on-device capabilities. The system supports pluggable providers for every component of the voice AI pipeline:
 
-- **STT (Speech-to-Text)**: AssemblyAI, Deepgram, or any compatible provider
-- **TTS (Text-to-Speech)**: ElevenLabs, Deepgram Aura, or alternatives
-- **LLM**: OpenAI, Anthropic, or locally-hosted models
+- **STT (Speech-to-Text)**: On-device (Apple Speech, GLM-ASR), cloud (Deepgram, AssemblyAI), or self-hosted (Whisper)
+- **TTS (Text-to-Speech)**: On-device (Apple), cloud (ElevenLabs, Deepgram Aura), or self-hosted (VibeVoice, Piper)
+- **LLM**: On-device (Ministral-3B via llama.cpp), cloud (Anthropic, OpenAI), or self-hosted (Ollama)
 - **Embeddings**: OpenAI or compatible embedding services
-- **VAD**: Silero, TEN, or other voice activity detection
+- **VAD**: Silero (Core ML, on-device)
 
 The right model depends on the task, the moment, and the cost. The architecture prioritizes flexibility so you can:
 
 - Swap providers without code changes
 - Use different models for different tasks (fast/cheap for simple responses, powerful for complex explanations)
-- Run locally-hosted models when privacy or cost matters
+- Run entirely on-device for privacy, offline use, or zero API costs
+- Self-host models on local servers for cost control
 - A/B test provider combinations to find optimal setups
 
 ## Quick Start
@@ -168,13 +169,43 @@ Application and content management:
 
 ## Technology Stack
 
+### Core Platform
 - **Language**: Swift 6.0
 - **UI**: SwiftUI
 - **Audio**: AVFoundation
 - **Transport**: LiveKit WebRTC
-- **ML**: Core ML (Silero VAD)
+- **ML Framework**: Core ML, llama.cpp (C++ interop)
 - **Persistence**: Core Data
 - **Testing**: XCTest (no mocks, real implementations)
+
+### Speech-to-Text (STT)
+| Provider | Model | Type | Notes |
+|----------|-------|------|-------|
+| Apple Speech | Native | On-device | Zero cost, ~150ms latency |
+| GLM-ASR | Whisper encoder + GLM-ASR-Nano | On-device | CoreML + llama.cpp, requires A19 Pro |
+| Deepgram | Nova-3 | Cloud | WebSocket streaming, ~300ms latency |
+| AssemblyAI | Universal-2 | Cloud | Word-level timestamps |
+| Self-hosted | Whisper-compatible | Local | whisper.cpp, faster-whisper |
+
+### Text-to-Speech (TTS)
+| Provider | Model | Type | Notes |
+|----------|-------|------|-------|
+| Apple TTS | AVSpeechSynthesizer | On-device | Zero cost, ~50ms TTFB |
+| Deepgram | Aura-2 | Cloud | Multiple voices, 24kHz |
+| ElevenLabs | Turbo v2.5 | Cloud | Premium quality, WebSocket |
+| Microsoft | VibeVoice-Realtime-0.5B | Self-hosted | Via Piper/custom server |
+
+### Large Language Models (LLM)
+| Provider | Model | Type | Notes |
+|----------|-------|------|-------|
+| On-device | Ministral-3B-Instruct-Q4_K_M | On-device | Primary, via llama.cpp |
+| On-device | TinyLlama-1.1B-Chat | On-device | Fallback, smaller footprint |
+| Anthropic | Claude 3.5 Sonnet | Cloud | Primary cloud model |
+| OpenAI | GPT-4o / GPT-4o-mini | Cloud | Alternative cloud option |
+| Ollama | qwen2.5, mistral:7b, llama3.2 | Self-hosted | Local server option |
+
+### Voice Activity Detection (VAD)
+- **Silero VAD**: Core ML model for on-device speech detection
 
 ## Curriculum System (UMLCF)
 

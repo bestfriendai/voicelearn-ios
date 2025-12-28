@@ -17,8 +17,13 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from .models import (
     CourseCatalogEntry,
     CourseDetail,
+    CourseFeature,
+    ContentStructure,
+    ContentTopic,
+    ContentUnit,
     CurriculumSource,
     LicenseInfo,
+    NormalizedCourseDetail,
 )
 
 
@@ -121,6 +126,90 @@ class CurriculumSourceHandler(ABC):
             ValueError: If course not found
         """
         pass
+
+    async def get_normalized_course_detail(self, course_id: str) -> NormalizedCourseDetail:
+        """
+        Get normalized course detail for generic plugin UI.
+
+        This method returns a standardized course structure that works with
+        any plugin without source-specific UI code. Plugins should override
+        this method to provide proper content structure with source terminology.
+
+        Default implementation converts from get_course_detail() with a flat
+        lecture structure.
+
+        Args:
+            course_id: Source-specific course identifier
+
+        Returns:
+            NormalizedCourseDetail with standardized structure
+        """
+        # Get legacy course detail
+        detail = await self.get_course_detail(course_id)
+
+        # Convert lectures to flat content structure
+        topics = []
+        for lecture in detail.lectures:
+            topics.append(ContentTopic(
+                id=lecture.id,
+                title=lecture.title,
+                number=lecture.number,
+                duration=lecture.duration,
+                has_video=lecture.has_video,
+                has_transcript=lecture.has_transcript,
+                has_practice=False,
+            ))
+
+        # Create a single unit containing all lectures (flat structure)
+        units = []
+        if topics:
+            units.append(ContentUnit(
+                id="all-content",
+                title="All Content",
+                number=1,
+                topics=topics,
+            ))
+
+        content_structure = ContentStructure(
+            unit_label="Lecture",
+            topic_label="Lecture",
+            is_flat=True,
+            units=units,
+        )
+
+        # Convert features
+        features = []
+        for f in detail.features:
+            features.append(CourseFeature(
+                type=f.type,
+                count=f.count,
+                available=f.available,
+            ))
+
+        return NormalizedCourseDetail(
+            id=detail.id,
+            source_id=detail.source_id,
+            title=detail.title,
+            description=detail.description,
+            instructors=detail.instructors,
+            level=detail.level,
+            level_label=detail.level.replace("-", " ").title() if detail.level else "",
+            department=detail.department,
+            semester=detail.semester,
+            keywords=detail.keywords,
+            thumbnail_url=detail.thumbnail_url,
+            license=detail.license,
+            features=features,
+            content_structure=content_structure,
+            assignments=detail.assignments,
+            exams=detail.exams,
+            syllabus=detail.syllabus,
+            prerequisites=detail.prerequisites,
+            estimated_import_time=detail.estimated_import_time,
+            estimated_output_size=detail.estimated_output_size,
+            source_url=detail.download_url,
+            download_url=detail.download_url,
+        )
 
     @abstractmethod
     async def search_courses(

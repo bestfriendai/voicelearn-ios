@@ -1,0 +1,12 @@
+{
+  "mit_ocw": {
+    "enabled": true,
+    "priority": 100,
+    "settings": {}
+  },
+  "ck12_flexbook": {
+    "enabled": true,
+    "priority": 100,
+    "settings": {}
+  }
+}

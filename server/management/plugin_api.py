@@ -286,6 +286,185 @@ async def handle_get_first_run_status(request: web.Request) -> web.Response:
 
 
 # =============================================================================
+# Source Browser API Routes (for Generic Plugin UI)
+# =============================================================================
+
+async def handle_get_enabled_sources(request: web.Request) -> web.Response:
+    """
+    GET /api/sources
+
+    Get all enabled curriculum sources for the Source Browser.
+    """
+    try:
+        sources = SourceRegistry.get_all_sources()
+        return web.json_response({
+            "success": True,
+            "sources": [s.to_dict() for s in sources],
+        })
+    except Exception as e:
+        logger.exception("Error getting enabled sources")
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=500)
+
+
+async def handle_get_source_courses(request: web.Request) -> web.Response:
+    """
+    GET /api/sources/{source_id}/courses
+
+    Get paginated course catalog for a specific source.
+
+    Query params:
+    - page: Page number (default 1)
+    - page_size: Items per page (default 20)
+    - search: Search query
+    - subject: Filter by subject
+    - level: Filter by level
+    """
+    source_id = request.match_info["source_id"]
+
+    try:
+        handler = SourceRegistry.get_handler(source_id)
+        if not handler:
+            return web.json_response({
+                "success": False,
+                "error": f"Source not found or not enabled: {source_id}",
+            }, status=404)
+
+        # Parse query params
+        page = int(request.query.get("page", 1))
+        page_size = int(request.query.get("page_size", 20))
+        search = request.query.get("search", None)
+
+        # Build filters
+        filters = {}
+        if request.query.get("subject"):
+            filters["subject"] = request.query["subject"]
+        if request.query.get("level"):
+            filters["level"] = request.query["level"]
+        if request.query.get("features"):
+            filters["features"] = request.query["features"].split(",")
+
+        # Get courses
+        courses, total, filter_options = await handler.get_course_catalog(
+            page=page,
+            page_size=page_size,
+            filters=filters if filters else None,
+            search=search,
+        )
+
+        return web.json_response({
+            "success": True,
+            "courses": [c.to_dict() for c in courses],
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": (total + page_size - 1) // page_size,
+            "filters": filter_options,
+        })
+    except Exception as e:
+        logger.exception(f"Error getting courses for {source_id}")
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=500)
+
+
+async def handle_get_course_detail(request: web.Request) -> web.Response:
+    """
+    GET /api/sources/{source_id}/courses/{course_id}
+
+    Get normalized course detail for the generic plugin UI.
+    Returns standardized structure with source terminology hints.
+    """
+    source_id = request.match_info["source_id"]
+    course_id = request.match_info["course_id"]
+
+    try:
+        handler = SourceRegistry.get_handler(source_id)
+        if not handler:
+            return web.json_response({
+                "success": False,
+                "error": f"Source not found or not enabled: {source_id}",
+            }, status=404)
+
+        # Get normalized course detail
+        detail = await handler.get_normalized_course_detail(course_id)
+
+        return web.json_response({
+            "success": True,
+            "course": detail.to_dict(),
+        })
+    except ValueError as e:
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=404)
+    except Exception as e:
+        logger.exception(f"Error getting course detail for {source_id}/{course_id}")
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=500)
+
+
+async def handle_import_course(request: web.Request) -> web.Response:
+    """
+    POST /api/sources/{source_id}/courses/{course_id}/import
+
+    Start importing a course from a source.
+
+    Body: {
+        "selectedContent": ["ch1-lesson-1", "ch1-lesson-2", ...],  // Optional
+        "outputName": "my-course",  // Optional
+    }
+    """
+    source_id = request.match_info["source_id"]
+    course_id = request.match_info["course_id"]
+
+    try:
+        handler = SourceRegistry.get_handler(source_id)
+        if not handler:
+            return web.json_response({
+                "success": False,
+                "error": f"Source not found or not enabled: {source_id}",
+            }, status=404)
+
+        body = await request.json()
+        selected_content = body.get("selectedContent", [])
+        output_name = body.get("outputName", course_id)
+
+        # Get output directory
+        output_dir = Path(__file__).parent.parent / "importers" / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Download course
+        result_path = await handler.download_course(
+            course_id=course_id,
+            output_dir=output_dir,
+            selected_lectures=selected_content if selected_content else None,
+        )
+
+        return web.json_response({
+            "success": True,
+            "message": f"Course {course_id} imported successfully",
+            "output_path": str(result_path),
+        })
+    except ValueError as e:
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=404)
+    except Exception as e:
+        logger.exception(f"Error importing course {source_id}/{course_id}")
+        return web.json_response({
+            "success": False,
+            "error": str(e),
+        }, status=500)
+
+
+# =============================================================================
 # Route Registration
 # =============================================================================
 
@@ -305,5 +484,11 @@ def register_plugin_routes(app: web.Application):
     app.router.add_post("/api/plugins/{plugin_id}/enable", handle_enable_plugin)
     app.router.add_post("/api/plugins/{plugin_id}/disable", handle_disable_plugin)
     app.router.add_post("/api/plugins/{plugin_id}/configure", handle_configure_plugin)
+
+    # Source Browser API (Generic Plugin UI)
+    app.router.add_get("/api/sources", handle_get_enabled_sources)
+    app.router.add_get("/api/sources/{source_id}/courses", handle_get_source_courses)
+    app.router.add_get("/api/sources/{source_id}/courses/{course_id}", handle_get_course_detail)
+    app.router.add_post("/api/sources/{source_id}/courses/{course_id}/import", handle_import_course)
 
     logger.info("Plugin API routes registered")

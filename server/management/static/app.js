@@ -2535,40 +2535,693 @@ function showSourceCards() {
 }
 
 // Select a source and show its content
-function selectSource(sourceId) {
+async function selectSource(sourceId) {
     currentSourceId = sourceId;
 
     // Hide source cards, show content area
     document.getElementById('source-cards').classList.add('hidden');
+    document.getElementById('no-sources-message').classList.add('hidden');
     document.getElementById('source-content-area').classList.remove('hidden');
 
     // Hide all source views
     document.querySelectorAll('.source-view').forEach(v => v.classList.add('hidden'));
 
-    // Show selected source view
-    const sourceView = document.getElementById(`source-view-${sourceId}`);
-    if (sourceView) {
-        sourceView.classList.remove('hidden');
+    // Built-in sources that have special handling (not plugins)
+    const builtinSources = ['github', 'custom'];
+
+    if (builtinSources.includes(sourceId)) {
+        // Use dedicated view for built-in sources
+        const sourceView = document.getElementById(`source-view-${sourceId}`);
+        if (sourceView) {
+            sourceView.classList.remove('hidden');
+        }
+    } else {
+        // ALL plugin sources use the generic view
+        const genericView = document.getElementById('source-view-generic');
+        genericView.classList.remove('hidden');
+
+        // Get plugin info to populate the generic view header
+        try {
+            const data = await fetchAPI('/plugins');
+            if (data.success) {
+                const plugin = data.plugins.find(p => p.plugin_id === sourceId);
+                if (plugin) {
+                    document.getElementById('generic-source-name').textContent = plugin.name;
+                    document.getElementById('generic-source-desc').textContent = plugin.description;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch plugin info:', e);
+        }
+
+        // Load courses using the generic loader
+        loadSourceCourses(sourceId);
     }
 
     // Update header info
     const headerInfo = document.getElementById('source-header-info');
-    const sourceNames = {
-        'mit_ocw': 'MIT OpenCourseWare',
+    const builtinNames = {
         'github': 'GitHub',
         'custom': 'Custom URL'
     };
-    headerInfo.innerHTML = `<span class="text-lg font-semibold">${sourceNames[sourceId] || sourceId}</span>`;
 
-    // Load data for the source
-    if (sourceId === 'mit_ocw') {
-        loadMITCourses();
+    if (builtinNames[sourceId]) {
+        headerInfo.innerHTML = `<span class="text-lg font-semibold">${builtinNames[sourceId]}</span>`;
+    } else {
+        // For plugin sources, get the real name
+        try {
+            const data = await fetchAPI('/plugins');
+            if (data.success) {
+                const plugin = data.plugins.find(p => p.plugin_id === sourceId);
+                if (plugin) {
+                    headerInfo.innerHTML = `<span class="text-lg font-semibold">${escapeHtml(plugin.name)}</span>`;
+                } else {
+                    headerInfo.innerHTML = `<span class="text-lg font-semibold">${sourceId}</span>`;
+                }
+            }
+        } catch (e) {
+            headerInfo.innerHTML = `<span class="text-lg font-semibold">${sourceId}</span>`;
+        }
     }
 }
 
 // Initialize sources tab when it becomes active
-function initSourcesTab() {
+async function initSourcesTab() {
+    await loadEnabledSources();
     showSourceCards();
+}
+
+// Load enabled plugin sources and render them as cards
+async function loadEnabledSources() {
+    const container = document.getElementById('plugin-sources-container');
+    const noSourcesMsg = document.getElementById('no-sources-message');
+
+    try {
+        // Fetch enabled plugins
+        const data = await fetchAPI('/plugins');
+        if (!data.success) {
+            console.error('Failed to fetch plugins');
+            return;
+        }
+
+        // Filter to only enabled source plugins
+        const enabledSources = data.plugins.filter(p => p.enabled && p.plugin_type === 'sources');
+
+        if (enabledSources.length === 0) {
+            container.innerHTML = '';
+            noSourcesMsg.classList.remove('hidden');
+            return;
+        }
+
+        noSourcesMsg.classList.add('hidden');
+
+        // Render source cards for enabled plugins
+        container.innerHTML = enabledSources.map(plugin => `
+            <div class="source-card rounded-xl bg-dark-800/50 border border-dark-700/50 p-4 cursor-pointer hover:border-accent-primary/50 transition-all" onclick="selectSource('${plugin.plugin_id}')">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-accent-success/20 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-accent-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-dark-100">${escapeHtml(plugin.name)}</h3>
+                        <p class="text-sm text-dark-400 mt-1">${escapeHtml(plugin.description)}</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            ${plugin.license_type ? `<span class="px-2 py-0.5 text-xs rounded-full bg-accent-info/10 text-accent-info">${escapeHtml(plugin.license_type)}</span>` : ''}
+                            <span class="px-2 py-0.5 text-xs rounded-full bg-accent-success/10 text-accent-success">v${plugin.version}</span>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (e) {
+        console.error('Failed to load enabled sources:', e);
+    }
+}
+
+// Helper to switch to a different tab
+function switchToTab(tabId) {
+    const tab = document.querySelector(`[data-tab="${tabId}"]`);
+    if (tab) {
+        tab.click();
+    }
+}
+
+// ============================================================================
+// Generic Plugin UI Functions (Source-Agnostic)
+// ============================================================================
+
+// State for the current source being viewed
+let currentSourceId = null;
+let currentSourceCourses = [];
+let currentFilteredCourses = [];
+let currentSourcePage = 1;
+const COURSES_PER_PAGE = 20;
+
+/**
+ * Load courses for any enabled source plugin.
+ * Uses the generic /api/sources/{source_id}/courses endpoint.
+ */
+async function loadSourceCourses(sourceId) {
+    currentSourceId = sourceId;
+
+    // Get container elements
+    const loadingEl = document.getElementById('generic-courses-loading');
+    const emptyEl = document.getElementById('generic-courses-empty');
+    const listEl = document.getElementById('generic-courses-list');
+    const paginationEl = document.getElementById('generic-courses-pagination');
+
+    // Show loading state
+    if (loadingEl) loadingEl.classList.remove('hidden');
+    if (emptyEl) emptyEl.classList.add('hidden');
+    if (listEl) listEl.classList.add('hidden');
+    if (paginationEl) paginationEl.classList.add('hidden');
+
+    try {
+        const response = await fetchAPI(`/sources/${sourceId}/courses?page=1&page_size=100`);
+
+        currentSourceCourses = response.courses || [];
+
+        // Populate filter dropdowns if available
+        if (response.filters) {
+            populateFilterDropdowns(response.filters);
+        }
+
+        // Initialize filtered courses and display
+        currentFilteredCourses = currentSourceCourses;
+        currentSourcePage = 1;
+        renderGenericCoursesPage();
+
+        if (loadingEl) loadingEl.classList.add('hidden');
+    } catch (e) {
+        console.error(`Failed to load courses for ${sourceId}:`, e);
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (listEl) {
+            listEl.innerHTML = `
+                <div class="text-center text-dark-500 py-12">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-accent-danger opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-lg font-medium text-accent-danger">Failed to load courses</p>
+                    <p class="text-sm mt-1">${escapeHtml(e.message)}</p>
+                    <button class="btn-secondary mt-4" onclick="loadSourceCourses('${escapeHtml(sourceId)}')">Try Again</button>
+                </div>
+            `;
+            listEl.classList.remove('hidden');
+        }
+    }
+}
+
+/**
+ * Populate filter dropdowns from API response.
+ */
+function populateFilterDropdowns(filters) {
+    const subjectSelect = document.getElementById('generic-subject-filter');
+    const levelSelect = document.getElementById('generic-level-filter');
+
+    if (subjectSelect && filters.subjects) {
+        subjectSelect.innerHTML = '<option value="">All Subjects</option>' +
+            filters.subjects.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    }
+
+    if (levelSelect && filters.levels) {
+        levelSelect.innerHTML = '<option value="">All Levels</option>' +
+            filters.levels.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()))}</option>`).join('');
+    }
+}
+
+/**
+ * Filter courses based on search and filter inputs.
+ */
+function filterGenericCourses() {
+    const searchInput = document.getElementById('generic-search-input');
+    const subjectFilter = document.getElementById('generic-subject-filter');
+    const levelFilter = document.getElementById('generic-level-filter');
+
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const subject = subjectFilter ? subjectFilter.value : '';
+    const level = levelFilter ? levelFilter.value : '';
+
+    let filtered = currentSourceCourses;
+
+    // Filter by search term
+    if (search) {
+        filtered = filtered.filter(course =>
+            course.title?.toLowerCase().includes(search) ||
+            course.description?.toLowerCase().includes(search) ||
+            course.instructors?.some(i => i.toLowerCase().includes(search)) ||
+            course.keywords?.some(k => k.toLowerCase().includes(search))
+        );
+    }
+
+    // Filter by subject/department
+    if (subject) {
+        filtered = filtered.filter(course => course.department === subject);
+    }
+
+    // Filter by level
+    if (level) {
+        filtered = filtered.filter(course => course.level === level);
+    }
+
+    currentFilteredCourses = filtered;
+    currentSourcePage = 1;
+    renderGenericCoursesPage();
+}
+
+/**
+ * Render a page of courses with pagination.
+ */
+function renderGenericCoursesPage() {
+    const listEl = document.getElementById('generic-courses-list');
+    const emptyEl = document.getElementById('generic-courses-empty');
+    const paginationEl = document.getElementById('generic-courses-pagination');
+
+    if (!currentFilteredCourses || currentFilteredCourses.length === 0) {
+        if (emptyEl) emptyEl.classList.remove('hidden');
+        if (listEl) listEl.classList.add('hidden');
+        if (paginationEl) paginationEl.classList.add('hidden');
+        return;
+    }
+
+    if (emptyEl) emptyEl.classList.add('hidden');
+    if (listEl) listEl.classList.remove('hidden');
+
+    // Calculate pagination
+    const totalPages = Math.ceil(currentFilteredCourses.length / COURSES_PER_PAGE);
+    const start = (currentSourcePage - 1) * COURSES_PER_PAGE;
+    const end = start + COURSES_PER_PAGE;
+    const pageCourses = currentFilteredCourses.slice(start, end);
+
+    // Render course list
+    listEl.innerHTML = `
+        <div class="mb-4 text-sm text-dark-400">${currentFilteredCourses.length} course${currentFilteredCourses.length !== 1 ? 's' : ''} available</div>
+        <div class="space-y-3">
+            ${pageCourses.map(course => renderCourseCard(course)).join('')}
+        </div>
+    `;
+
+    // Render pagination
+    if (paginationEl && totalPages > 1) {
+        paginationEl.classList.remove('hidden');
+        paginationEl.innerHTML = `
+            <div class="flex items-center justify-between px-4 py-3 bg-dark-800/30 border border-dark-700/50 rounded-lg">
+                <button class="btn-secondary text-sm ${currentSourcePage <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        onclick="goToGenericPage(${currentSourcePage - 1})"
+                        ${currentSourcePage <= 1 ? 'disabled' : ''}>
+                    Previous
+                </button>
+                <span class="text-sm text-dark-400">Page ${currentSourcePage} of ${totalPages}</span>
+                <button class="btn-secondary text-sm ${currentSourcePage >= totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
+                        onclick="goToGenericPage(${currentSourcePage + 1})"
+                        ${currentSourcePage >= totalPages ? 'disabled' : ''}>
+                    Next
+                </button>
+            </div>
+        `;
+    } else if (paginationEl) {
+        paginationEl.classList.add('hidden');
+    }
+}
+
+/**
+ * Navigate to a specific page.
+ */
+function goToGenericPage(page) {
+    const totalPages = Math.ceil(currentFilteredCourses.length / COURSES_PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+    currentSourcePage = page;
+    renderGenericCoursesPage();
+    scrollToGenericCoursesTop();
+}
+
+function scrollToGenericCoursesTop() {
+    const container = document.getElementById('generic-courses-container');
+    if (container) {
+        container.scrollTop = 0;
+    }
+}
+
+/**
+ * Render a single course card.
+ */
+function renderCourseCard(course) {
+    return `
+        <div class="p-4 rounded-lg bg-dark-800/30 border border-dark-700/50 hover:border-accent-primary/50 transition-all cursor-pointer"
+             onclick="viewGenericCourseDetail('${escapeHtml(currentSourceId)}', '${escapeHtml(course.id)}')">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h4 class="font-medium text-dark-200 truncate">${escapeHtml(course.title)}</h4>
+                        ${course.level ? `<span class="px-2 py-0.5 text-xs rounded bg-accent-info/20 text-accent-info">${escapeHtml(course.level.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()))}</span>` : ''}
+                    </div>
+                    <div class="text-sm text-dark-400 mb-2">
+                        ${course.department ? `<span class="mr-3">${escapeHtml(course.department)}</span>` : ''}
+                        ${course.semester ? `<span class="text-dark-500">${escapeHtml(course.semester)}</span>` : ''}
+                    </div>
+                    ${course.instructors?.length ? `<div class="text-xs text-dark-500 mb-2">By: ${course.instructors.map(i => escapeHtml(i)).join(', ')}</div>` : ''}
+                    ${course.description ? `<p class="text-sm text-dark-400 line-clamp-2 mb-2">${escapeHtml(course.description)}</p>` : ''}
+                    <div class="flex flex-wrap gap-2">
+                        ${(course.features || []).filter(f => f.available).map(f => `
+                            <span class="flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-dark-700/50 text-dark-400">
+                                ${getFeatureIcon(f.type)}
+                                ${escapeHtml(f.type)}${f.count ? ` (${f.count})` : ''}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+                <svg class="w-5 h-5 text-dark-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * View course detail using normalized API response.
+ * Works with ANY source plugin.
+ */
+async function viewGenericCourseDetail(sourceId, courseId) {
+    try {
+        showToast('Loading course details...', 'info');
+        const response = await fetchAPI(`/sources/${sourceId}/courses/${courseId}`);
+        const course = response.course;
+
+        // Hide pagination when viewing course details
+        const paginationEl = document.getElementById('generic-courses-pagination');
+        if (paginationEl) paginationEl.classList.add('hidden');
+
+        // Render the detail view
+        const container = document.getElementById('generic-courses-list');
+        container.innerHTML = renderGenericCourseDetail(sourceId, course);
+        container.classList.remove('hidden');
+    } catch (e) {
+        showToast('Failed to load course details: ' + e.message, 'error');
+    }
+}
+
+/**
+ * Render the course detail view using normalized data.
+ */
+function renderGenericCourseDetail(sourceId, course) {
+    const contentStructure = course.contentStructure || {};
+    const unitLabel = contentStructure.unitLabel || 'Unit';
+    const topicLabel = contentStructure.topicLabel || 'Topic';
+    const isFlat = contentStructure.isFlat || false;
+    const units = contentStructure.units || [];
+
+    // Calculate total topics
+    const totalTopics = units.reduce((sum, u) => sum + (u.topics?.length || 0), 0);
+
+    return `
+        <div class="mb-4">
+            <button class="btn-secondary text-sm" onclick="renderGenericCoursesPage()">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Courses
+            </button>
+        </div>
+        <div class="rounded-lg bg-dark-800/50 border border-dark-700/50 overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-dark-700/50 bg-dark-800/30">
+                <h3 class="font-semibold text-dark-100">${escapeHtml(course.title)}</h3>
+                <span class="px-2 py-0.5 text-xs rounded bg-accent-info/20 text-accent-info">${escapeHtml(course.levelLabel || course.level || 'N/A')}</span>
+            </div>
+            <div class="p-4 space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-sm font-medium text-dark-400 mb-1">Subject</h4>
+                        <p class="text-dark-200">${escapeHtml(course.department || 'N/A')}</p>
+                    </div>
+                    ${course.semester ? `
+                    <div>
+                        <h4 class="text-sm font-medium text-dark-400 mb-1">Semester</h4>
+                        <p class="text-dark-200">${escapeHtml(course.semester)}</p>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${course.instructors?.length ? `
+                <div>
+                    <h4 class="text-sm font-medium text-dark-400 mb-1">By</h4>
+                    <p class="text-dark-200">${course.instructors.map(i => escapeHtml(i)).join(', ')}</p>
+                </div>
+                ` : ''}
+
+                <div>
+                    <h4 class="text-sm font-medium text-dark-400 mb-1">Description</h4>
+                    <p class="text-dark-200">${escapeHtml(course.description || 'No description available')}</p>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-medium text-dark-400 mb-2">Available Content</h4>
+                    <div class="flex flex-wrap gap-2">
+                        ${(course.features || []).map(f => `
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${f.available ? 'bg-accent-success/10 text-accent-success border border-accent-success/20' : 'bg-dark-800/50 text-dark-500 border border-dark-700/50'}">
+                                ${getFeatureIcon(f.type)}
+                                ${escapeHtml(f.type.replace('_', ' '))}
+                                ${f.count ? `<span class="text-xs opacity-75">(${f.count})</span>` : ''}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+
+                ${course.keywords?.length ? `
+                <div>
+                    <h4 class="text-sm font-medium text-dark-400 mb-2">Keywords</h4>
+                    <div class="flex flex-wrap gap-1">
+                        ${course.keywords.map(k => `<span class="px-2 py-0.5 text-xs rounded-full bg-dark-700/50 text-dark-400">${escapeHtml(k)}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="border-t border-dark-700/50 pt-4">
+                    <h4 class="text-sm font-medium text-dark-400 mb-2">License</h4>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="px-2 py-1 rounded bg-accent-info/10 text-accent-info border border-accent-info/20">${escapeHtml(course.license?.name || 'Unknown')}</span>
+                        ${course.license?.holder ? `<span class="text-dark-400">by ${escapeHtml(course.license.holder.name)}</span>` : ''}
+                    </div>
+                </div>
+
+                <!-- Content Selection using normalized structure -->
+                ${totalTopics > 0 ? `
+                <div class="border-t border-dark-700/50 pt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-medium text-dark-400">Select ${isFlat ? topicLabel + 's' : unitLabel + 's (' + topicLabel + 's)'} to Import</h4>
+                        <div class="flex items-center gap-2">
+                            <span id="content-selection-count" class="text-xs text-dark-500">0 of ${totalTopics} selected</span>
+                            <button class="text-xs text-accent-primary hover:text-accent-primary/80" onclick="selectAllGenericContent(true)">Select All</button>
+                            <span class="text-dark-600">|</span>
+                            <button class="text-xs text-dark-400 hover:text-dark-300" onclick="selectAllGenericContent(false)">Clear</button>
+                        </div>
+                    </div>
+                    <div class="max-h-80 overflow-y-auto rounded-lg border border-dark-700/50 bg-dark-900/50">
+                        ${renderContentStructure(units, unitLabel, topicLabel, isFlat)}
+                    </div>
+                    <p class="text-xs text-dark-500 mt-2">💡 Tip: Start with a few ${topicLabel.toLowerCase()}s to evaluate the content before importing everything.</p>
+                </div>
+                ` : ''}
+
+                <div class="border-t border-dark-700/50 pt-4">
+                    <h4 class="text-sm font-medium text-dark-400 mb-2">AI Enrichment Options</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="import-opt-objectives" checked class="rounded border-dark-600 bg-dark-800 text-accent-primary focus:ring-accent-primary">
+                            <span class="text-sm text-dark-300">Generate learning objectives</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="import-opt-checkpoints" checked class="rounded border-dark-600 bg-dark-800 text-accent-primary focus:ring-accent-primary">
+                            <span class="text-sm text-dark-300">Generate knowledge checkpoints</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="import-opt-spoken" class="rounded border-dark-600 bg-dark-800 text-accent-primary focus:ring-accent-primary">
+                            <span class="text-sm text-dark-300">Generate spoken text from notes</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button class="btn-primary flex-1" onclick="importGenericCourse('${escapeHtml(sourceId)}', '${escapeHtml(course.id)}')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Import Selected
+                    </button>
+                    ${course.sourceUrl ? `
+                    <a href="${escapeHtml(course.sourceUrl)}" target="_blank" rel="noopener" class="btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                        View Source
+                    </a>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Render the content structure (units and topics) for selection.
+ */
+function renderContentStructure(units, unitLabel, topicLabel, isFlat) {
+    if (isFlat && units.length === 1) {
+        // Flat structure: just show topics directly
+        const topics = units[0].topics || [];
+        return `
+            <div class="divide-y divide-dark-700/30">
+                ${topics.map((topic, idx) => renderTopicCheckbox(topic, topicLabel)).join('')}
+            </div>
+        `;
+    }
+
+    // Nested structure: show units with collapsible topics
+    return `
+        <div class="divide-y divide-dark-700/30">
+            ${units.map((unit, unitIdx) => `
+                <div class="bg-dark-800/20">
+                    <div class="flex items-center gap-2 px-3 py-2 bg-dark-700/30 cursor-pointer" onclick="toggleUnitExpand(${unitIdx})">
+                        <svg id="unit-chevron-${unitIdx}" class="w-4 h-4 text-dark-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                        <input type="checkbox" class="unit-checkbox rounded border-dark-600 bg-dark-800 text-accent-primary focus:ring-accent-primary"
+                               data-unit-idx="${unitIdx}"
+                               onchange="toggleUnitSelection(${unitIdx}); event.stopPropagation();">
+                        <span class="text-sm font-medium text-dark-300">${unitLabel} ${unit.number}: ${escapeHtml(unit.title)}</span>
+                        <span class="text-xs text-dark-500 ml-auto">${unit.topics?.length || 0} ${topicLabel.toLowerCase()}${(unit.topics?.length || 0) !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div id="unit-topics-${unitIdx}" class="hidden pl-6">
+                        ${(unit.topics || []).map(topic => renderTopicCheckbox(topic, topicLabel, unitIdx)).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+/**
+ * Render a topic checkbox.
+ */
+function renderTopicCheckbox(topic, topicLabel, unitIdx = null) {
+    return `
+        <label class="flex items-center gap-3 px-3 py-2 hover:bg-dark-800/50 cursor-pointer transition-colors">
+            <input type="checkbox" class="content-checkbox rounded border-dark-600 bg-dark-800 text-accent-primary focus:ring-accent-primary"
+                   data-content-id="${escapeHtml(topic.id)}"
+                   data-unit-idx="${unitIdx !== null ? unitIdx : ''}"
+                   onchange="updateGenericSelectionCount()">
+            <span class="flex-1 flex items-center gap-2">
+                ${topic.number ? `<span class="text-xs text-dark-500 w-6">${topic.number}.</span>` : ''}
+                <span class="text-sm text-dark-200">${escapeHtml(topic.title)}</span>
+            </span>
+            <span class="flex items-center gap-1 text-dark-500">
+                ${topic.hasVideo ? '<span title="Video available" class="text-accent-info">🎥</span>' : ''}
+                ${topic.hasTranscript ? '<span title="Transcript available" class="text-accent-success">📝</span>' : ''}
+                ${topic.hasPractice ? '<span title="Practice available" class="text-accent-warning">📝</span>' : ''}
+            </span>
+        </label>
+    `;
+}
+
+/**
+ * Toggle unit expansion.
+ */
+function toggleUnitExpand(unitIdx) {
+    const topicsDiv = document.getElementById(`unit-topics-${unitIdx}`);
+    const chevron = document.getElementById(`unit-chevron-${unitIdx}`);
+    if (topicsDiv) {
+        topicsDiv.classList.toggle('hidden');
+    }
+    if (chevron) {
+        chevron.classList.toggle('rotate-90');
+    }
+}
+
+/**
+ * Toggle all topics in a unit when unit checkbox changes.
+ */
+function toggleUnitSelection(unitIdx) {
+    const unitCheckbox = document.querySelector(`.unit-checkbox[data-unit-idx="${unitIdx}"]`);
+    const topicCheckboxes = document.querySelectorAll(`.content-checkbox[data-unit-idx="${unitIdx}"]`);
+    topicCheckboxes.forEach(cb => cb.checked = unitCheckbox.checked);
+    updateGenericSelectionCount();
+}
+
+/**
+ * Select/deselect all content.
+ */
+function selectAllGenericContent(checked) {
+    const checkboxes = document.querySelectorAll('.content-checkbox');
+    const unitCheckboxes = document.querySelectorAll('.unit-checkbox');
+    checkboxes.forEach(cb => cb.checked = checked);
+    unitCheckboxes.forEach(cb => cb.checked = checked);
+    updateGenericSelectionCount();
+}
+
+/**
+ * Update selection count display.
+ */
+function updateGenericSelectionCount() {
+    const checkboxes = document.querySelectorAll('.content-checkbox');
+    const checked = document.querySelectorAll('.content-checkbox:checked');
+    const countEl = document.getElementById('content-selection-count');
+    if (countEl) {
+        countEl.textContent = `${checked.length} of ${checkboxes.length} selected`;
+    }
+
+    // Update unit checkbox states
+    const unitCheckboxes = document.querySelectorAll('.unit-checkbox');
+    unitCheckboxes.forEach(unitCb => {
+        const unitIdx = unitCb.dataset.unitIdx;
+        const unitTopics = document.querySelectorAll(`.content-checkbox[data-unit-idx="${unitIdx}"]`);
+        const unitChecked = document.querySelectorAll(`.content-checkbox[data-unit-idx="${unitIdx}"]:checked`);
+        unitCb.checked = unitTopics.length > 0 && unitTopics.length === unitChecked.length;
+        unitCb.indeterminate = unitChecked.length > 0 && unitChecked.length < unitTopics.length;
+    });
+}
+
+/**
+ * Get selected content IDs.
+ */
+function getSelectedGenericContent() {
+    const checked = document.querySelectorAll('.content-checkbox:checked');
+    return Array.from(checked).map(cb => cb.dataset.contentId);
+}
+
+/**
+ * Import a course using the generic API.
+ */
+async function importGenericCourse(sourceId, courseId) {
+    const selectedContent = getSelectedGenericContent();
+
+    if (selectedContent.length === 0) {
+        showToast('Please select at least one item to import', 'warning');
+        return;
+    }
+
+    try {
+        showToast(`Importing ${selectedContent.length} item(s)...`, 'info');
+
+        const response = await fetchAPI(`/sources/${sourceId}/courses/${courseId}/import`, {
+            method: 'POST',
+            body: JSON.stringify({
+                selectedContent: selectedContent,
+            }),
+        });
+
+        if (response.success) {
+            showToast('Import started successfully!', 'success');
+        } else {
+            showToast('Import failed: ' + (response.error || 'Unknown error'), 'error');
+        }
+    } catch (e) {
+        showToast('Import failed: ' + e.message, 'error');
+    }
 }
 
 // ============================================================================
@@ -3024,6 +3677,117 @@ async function importMITCourse(courseId) {
     } catch (e) {
         showToast('Failed to import course: ' + e.message, 'error');
     }
+}
+
+// ============================================================================
+// CK-12 FlexBooks Functions
+// ============================================================================
+
+let ck12Courses = [];
+let ck12FilteredCourses = [];
+
+async function loadCK12Courses() {
+    // Show loading state
+    document.getElementById('ck12-courses-loading').classList.remove('hidden');
+    document.getElementById('ck12-courses-empty').classList.add('hidden');
+    document.getElementById('ck12-courses-list').classList.add('hidden');
+
+    try {
+        const response = await fetchAPI('/import/sources/ck12_flexbook/courses');
+
+        ck12Courses = response.courses || [];
+
+        document.getElementById('ck12-courses-loading').classList.add('hidden');
+
+        if (ck12Courses.length === 0) {
+            document.getElementById('ck12-courses-empty').classList.remove('hidden');
+            return;
+        }
+
+        // Initialize filtered courses and display
+        ck12FilteredCourses = ck12Courses;
+        renderCK12Courses();
+    } catch (e) {
+        console.error('Failed to load CK-12 courses:', e);
+        document.getElementById('ck12-courses-loading').classList.add('hidden');
+        document.getElementById('ck12-courses-list').innerHTML = `
+            <div class="text-center text-dark-500 py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-accent-danger opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-lg font-medium text-accent-danger">Failed to load CK-12 content</p>
+                <p class="text-sm mt-1">${escapeHtml(e.message)}</p>
+                <button class="btn-secondary mt-4" onclick="loadCK12Courses()">Try Again</button>
+            </div>
+        `;
+        document.getElementById('ck12-courses-list').classList.remove('hidden');
+    }
+}
+
+function filterCK12Courses() {
+    const search = document.getElementById('ck12-search-input').value.toLowerCase().trim();
+    const subject = document.getElementById('ck12-subject-filter').value;
+
+    let filtered = ck12Courses;
+
+    if (search) {
+        filtered = filtered.filter(c =>
+            c.title?.toLowerCase().includes(search) ||
+            c.description?.toLowerCase().includes(search)
+        );
+    }
+
+    if (subject) {
+        filtered = filtered.filter(c =>
+            c.subject?.toLowerCase().includes(subject) ||
+            c.category?.toLowerCase().includes(subject)
+        );
+    }
+
+    ck12FilteredCourses = filtered;
+    renderCK12Courses();
+}
+
+function renderCK12Courses() {
+    const container = document.getElementById('ck12-courses-list');
+    const emptyState = document.getElementById('ck12-courses-empty');
+
+    if (ck12FilteredCourses.length === 0) {
+        emptyState.classList.remove('hidden');
+        container.classList.add('hidden');
+        return;
+    }
+
+    emptyState.classList.add('hidden');
+    container.classList.remove('hidden');
+
+    container.innerHTML = ck12FilteredCourses.map(course => `
+        <div class="flex items-center justify-between p-4 rounded-lg bg-dark-800/30 border border-dark-700/50 hover:border-accent-primary/50 transition-all cursor-pointer" onclick="viewCK12CourseDetail('${escapeHtml(course.id)}')">
+            <div class="flex items-start gap-3 flex-1 min-w-0">
+                <div class="w-10 h-10 rounded-lg bg-accent-success/20 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-accent-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-medium text-dark-100 truncate">${escapeHtml(course.title)}</h4>
+                    <p class="text-sm text-dark-400 mt-1 line-clamp-2">${escapeHtml(course.description || '')}</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        ${course.subject ? `<span class="px-2 py-0.5 text-xs rounded-full bg-accent-info/10 text-accent-info">${escapeHtml(course.subject)}</span>` : ''}
+                        ${course.gradeLevel ? `<span class="px-2 py-0.5 text-xs rounded-full bg-dark-700/50 text-dark-400">${escapeHtml(course.gradeLevel)}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <svg class="w-5 h-5 text-dark-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+    `).join('');
+}
+
+async function viewCK12CourseDetail(courseId) {
+    showToast('CK-12 course details coming soon', 'info');
+    // TODO: Implement detailed view similar to MIT OCW
 }
 
 // ============================================================================
@@ -3955,14 +4719,6 @@ async function initializeAllPlugins() {
         console.error('Failed to initialize plugins:', e);
         alert('Failed to initialize plugins: ' + e.message);
     }
-}
-
-// Utility function to escape HTML
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 // Start the application

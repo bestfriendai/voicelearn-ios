@@ -31,6 +31,11 @@ from .models import (
     ImportProgress,
     ImportResult,
     ImportStatus,
+    # Normalized content structure models (for Generic Plugin UI)
+    ContentTopic,
+    ContentUnit,
+    ContentStructure,
+    NormalizedCourseDetail,
 )
 from .base import CurriculumSourceHandler, LicenseValidationResult, ValidationResult
 from .orchestrator import ImportOrchestrator
@@ -83,6 +88,11 @@ __all__ = [
     "ImportProgress",
     "ImportResult",
     "ImportStatus",
+    # Normalized content structure models (for Generic Plugin UI)
+    "ContentTopic",
+    "ContentUnit",
+    "ContentStructure",
+    "NormalizedCourseDetail",
     # Base Classes
     "CurriculumSourceHandler",
     "LicenseValidationResult",

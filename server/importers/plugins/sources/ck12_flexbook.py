@@ -42,6 +42,9 @@ from ...core.base import (
 )
 from ...core.models import (
     AssignmentInfo,
+    ContentStructure,
+    ContentTopic,
+    ContentUnit,
     CourseCatalogEntry,
     CourseDetail,
     CourseFeature,
@@ -49,6 +52,7 @@ from ...core.models import (
     ExamInfo,
     LectureInfo,
     LicenseInfo,
+    NormalizedCourseDetail,
 )
 from ...core.registry import SourceRegistry
 
@@ -457,6 +461,120 @@ class CK12FlexBookHandler(CurriculumSourceHandler):
             exams=exams,
             estimated_import_time=self._estimate_import_time(len(lessons)),
             estimated_output_size=self._estimate_output_size(len(lessons)),
+            download_url=raw_data.get("download_url") or raw_data.get("url"),
+        )
+
+    async def get_normalized_course_detail(self, course_id: str) -> NormalizedCourseDetail:
+        """
+        Get normalized course detail for generic plugin UI.
+
+        CK-12 uses a nested chapter/lesson structure:
+        - unitLabel: "Chapter"
+        - topicLabel: "Lesson"
+        """
+        # Validate license first
+        license_result = self.validate_license(course_id)
+        if not license_result.can_import:
+            from ...core.base import LicenseRestrictionError
+            raise LicenseRestrictionError(license_result.warnings[0])
+
+        # Get base entry from catalog
+        entry = self._catalog_cache.get(course_id)
+        if not entry:
+            raise ValueError(f"Course not found: {course_id}")
+
+        # Get the raw data for additional details
+        raw_data = self._raw_data_cache.get(course_id)
+        if not raw_data:
+            raise ValueError(f"Course data not found: {course_id}")
+
+        # Build normalized content structure from chapters/lessons
+        units = []
+        chapters = raw_data.get("chapters", [])
+
+        for chapter_num, chapter in enumerate(chapters, 1):
+            topics = []
+            lessons = chapter.get("lessons", [])
+
+            for lesson_num, lesson in enumerate(lessons, 1):
+                topics.append(ContentTopic(
+                    id=f"ch{chapter_num}-lesson-{lesson_num}",
+                    title=lesson.get("title", f"Lesson {lesson_num}"),
+                    number=lesson_num,
+                    has_video=lesson.get("has_video", False),
+                    has_transcript=lesson.get("has_transcript", False),
+                    has_practice=lesson.get("has_practice", True),
+                ))
+
+            units.append(ContentUnit(
+                id=f"chapter-{chapter_num}",
+                title=chapter.get("title", f"Chapter {chapter_num}"),
+                number=chapter_num,
+                topics=topics,
+            ))
+
+        # Determine level label based on grade level
+        level_labels = {
+            "elementary": "Elementary (K-5)",
+            "middle-school": "Middle School (6-8)",
+            "high-school": "High School (9-12)",
+        }
+        level_label = level_labels.get(entry.level, entry.level.replace("-", " ").title())
+
+        # Build content structure with CK-12 terminology
+        content_structure = ContentStructure(
+            unit_label="Chapter",
+            topic_label="Lesson",
+            is_flat=False,  # CK-12 has nested structure
+            units=units,
+        )
+
+        # Count total lessons for estimates
+        total_lessons = sum(len(u.topics) for u in units)
+
+        # Build assignments from practice counts
+        assignments = []
+        if raw_data.get("practice_count", 0) > 0:
+            for i in range(min(raw_data.get("practice_count", 5), 10)):
+                assignments.append(AssignmentInfo(
+                    id=f"practice-{i + 1}",
+                    title=f"Practice Set {i + 1}",
+                    has_solutions=True,
+                ))
+
+        # Build exams from quiz counts
+        exams = []
+        if raw_data.get("quiz_count", 0) > 0:
+            for i in range(min(raw_data.get("quiz_count", 2), 5)):
+                exams.append(ExamInfo(
+                    id=f"quiz-{i + 1}",
+                    title=f"Quiz {i + 1}",
+                    exam_type="quiz",
+                    has_solutions=True,
+                ))
+
+        return NormalizedCourseDetail(
+            id=entry.id,
+            source_id=entry.source_id,
+            title=entry.title,
+            description=entry.description,
+            instructors=entry.instructors,
+            level=entry.level,
+            level_label=level_label,
+            department=entry.department,
+            semester=None,
+            keywords=entry.keywords,
+            thumbnail_url=entry.thumbnail_url,
+            license=entry.license,
+            features=entry.features,
+            content_structure=content_structure,
+            assignments=assignments,
+            exams=exams,
+            syllabus=self._build_syllabus(chapters, raw_data),
+            prerequisites=raw_data.get("prerequisites", []),
+            estimated_import_time=self._estimate_import_time(total_lessons),
+            estimated_output_size=self._estimate_output_size(total_lessons),
+            source_url=raw_data.get("url"),
             download_url=raw_data.get("download_url") or raw_data.get("url"),
         )
 

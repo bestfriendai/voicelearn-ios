@@ -138,7 +138,169 @@ class CourseCatalogEntry:
 
 
 # =============================================================================
-# Course Detail Models
+# Normalized Content Structure Models (for Generic Plugin UI)
+# =============================================================================
+
+@dataclass
+class ContentTopic:
+    """
+    A normalized topic within a content unit.
+
+    This represents the smallest selectable content item (lesson, lecture,
+    section, video, etc.) in a normalized format that works with any plugin.
+    """
+    id: str
+    title: str
+    number: int = 0
+    duration: Optional[str] = None  # e.g., "1:15:00"
+    has_video: bool = False
+    has_transcript: bool = False
+    has_practice: bool = False
+    description: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "number": self.number,
+            "duration": self.duration,
+            "hasVideo": self.has_video,
+            "hasTranscript": self.has_transcript,
+            "hasPractice": self.has_practice,
+            "description": self.description,
+        }
+
+
+@dataclass
+class ContentUnit:
+    """
+    A normalized content unit (chapter, module, unit, etc.).
+
+    Contains a list of topics. For flat structures (like MIT OCW lectures),
+    the plugin can return a single unit containing all lectures as topics.
+    """
+    id: str
+    title: str
+    number: int = 0
+    description: Optional[str] = None
+    topics: List[ContentTopic] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "number": self.number,
+            "description": self.description,
+            "topics": [t.to_dict() for t in self.topics],
+        }
+
+
+@dataclass
+class ContentStructure:
+    """
+    Normalized content structure with source terminology hints.
+
+    This allows the UI to display content generically while preserving
+    source-specific terminology for user familiarity.
+
+    Example:
+        unitLabel="Chapter", topicLabel="Lesson" -> "Units (Chapters)" in UI
+        unitLabel="Lecture", topicLabel="Lecture" -> flat structure (MIT OCW)
+    """
+    # Source terminology hints
+    unit_label: str = "Unit"           # What source calls units (Chapter, Module, etc.)
+    topic_label: str = "Topic"         # What source calls topics (Lesson, Lecture, etc.)
+
+    # Whether structure is flat (no hierarchy) or nested
+    is_flat: bool = False              # True for flat lecture lists like MIT OCW
+
+    # The content hierarchy
+    units: List[ContentUnit] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "unitLabel": self.unit_label,
+            "topicLabel": self.topic_label,
+            "isFlat": self.is_flat,
+            "units": [u.to_dict() for u in self.units],
+        }
+
+
+@dataclass
+class NormalizedCourseDetail:
+    """
+    Fully normalized course detail for generic plugin UI.
+
+    This extends the basic course info with normalized content structure
+    that works with ANY plugin without source-specific UI code.
+    """
+    # Basic info
+    id: str
+    source_id: str
+    title: str
+    description: str
+
+    # Metadata (plugin provides what it has)
+    instructors: List[str] = field(default_factory=list)
+    level: str = "intermediate"        # normalized: introductory, intermediate, advanced
+    level_label: str = ""              # display-friendly, e.g., "Middle School"
+    department: Optional[str] = None
+    semester: Optional[str] = None
+    keywords: List[str] = field(default_factory=list)
+    thumbnail_url: Optional[str] = None
+
+    # License (standard format)
+    license: Optional[LicenseInfo] = None
+
+    # Features (standard keys)
+    features: List[CourseFeature] = field(default_factory=list)
+
+    # NORMALIZED content structure with source terminology
+    content_structure: Optional[ContentStructure] = None
+
+    # Additional materials
+    assignments: List["AssignmentInfo"] = field(default_factory=list)
+    exams: List["ExamInfo"] = field(default_factory=list)
+    syllabus: Optional[str] = None
+    prerequisites: List[str] = field(default_factory=list)
+
+    # Import info
+    estimated_import_time: str = "Unknown"
+    estimated_output_size: str = "Unknown"
+
+    # Source links
+    source_url: Optional[str] = None
+    download_url: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "sourceId": self.source_id,
+            "title": self.title,
+            "description": self.description,
+            "instructors": self.instructors,
+            "level": self.level,
+            "levelLabel": self.level_label or self.level.title(),
+            "department": self.department,
+            "semester": self.semester,
+            "keywords": self.keywords,
+            "thumbnailUrl": self.thumbnail_url,
+            "license": self.license.to_dict() if self.license else None,
+            "features": [f.to_dict() for f in self.features],
+            "contentStructure": self.content_structure.to_dict() if self.content_structure else None,
+            "assignments": [a.to_dict() for a in self.assignments],
+            "exams": [e.to_dict() for e in self.exams],
+            "syllabus": self.syllabus,
+            "prerequisites": self.prerequisites,
+            "estimatedImportTime": self.estimated_import_time,
+            "estimatedOutputSize": self.estimated_output_size,
+            "sourceUrl": self.source_url,
+            "downloadUrl": self.download_url,
+        }
+
+
+# =============================================================================
+# Course Detail Models (Legacy, kept for compatibility)
 # =============================================================================
 
 @dataclass

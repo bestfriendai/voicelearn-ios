@@ -152,21 +152,21 @@
   },
   "2025-12-27": {
     "date": "2025-12-27",
-    "avg_battery_draw_w": 3.4408695652173913,
+    "avg_battery_draw_w": 3.8312500000000003,
     "max_battery_draw_w": 137.45,
-    "min_battery_percent": 78.0,
+    "min_battery_percent": 73.0,
     "battery_drain_percent": 0.0,
     "avg_thermal_level": 0.0,
     "max_thermal_level": 0,
     "thermal_events_count": 0,
     "avg_cpu_temp_c": 0.0,
     "max_cpu_temp_c": 0.0,
-    "avg_cpu_percent": 187.91304347826087,
+    "avg_cpu_percent": 188.4,
     "max_cpu_percent": 1325.5,
     "service_cpu_avg": {
-      "management": 5.108695652173913,
+      "management": 5.066666666666666,
       "ollama": 0.0,
-      "vibevoice": 0.08260869565217391,
+      "vibevoice": 0.07916666666666666,
       "nextjs": 0.01904761904761905,
       "piper": 0.0
     },
@@ -175,10 +175,38 @@
     "active_hours": 0,
     "idle_state_hours": {
       "dormant": 14.996666666666666,
-      "warm": 0.225,
-      "cool": 1.0822222222222222,
+      "warm": 0.3,
+      "cool": 1.3736111111111111,
       "cold": 1.271388888888889
     },
-    "hours_aggregated": 23
+    "hours_aggregated": 24
+  },
+  "2025-12-28": {
+    "date": "2025-12-28",
+    "avg_battery_draw_w": 19.14,
+    "max_battery_draw_w": 82.09,
+    "min_battery_percent": 58.0,
+    "battery_drain_percent": 0.0,
+    "avg_thermal_level": 0.0,
+    "max_thermal_level": 0,
+    "thermal_events_count": 0,
+    "avg_cpu_temp_c": 0.0,
+    "max_cpu_temp_c": 0.0,
+    "avg_cpu_percent": 221.1,
+    "max_cpu_percent": 583.6,
+    "service_cpu_avg": {
+      "management": 4.2,
+      "ollama": 0.0,
+      "vibevoice": 0.0,
+      "piper": 0.0
+    },
+    "total_requests": 0,
+    "total_inferences": 0,
+    "active_hours": 0,
+    "idle_state_hours": {
+      "warm": 0.075,
+      "cool": 0.3411111111111111
+    },
+    "hours_aggregated": 1
   }
 }

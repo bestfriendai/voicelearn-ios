@@ -37,6 +37,9 @@ from ...core.base import (
 )
 from ...core.models import (
     AssignmentInfo,
+    ContentStructure,
+    ContentTopic,
+    ContentUnit,
     CourseCatalogEntry,
     CourseDetail,
     CourseFeature,
@@ -44,6 +47,7 @@ from ...core.models import (
     ExamInfo,
     LectureInfo,
     LicenseInfo,
+    NormalizedCourseDetail,
 )
 from ...core.registry import SourceRegistry
 
@@ -404,6 +408,131 @@ class MITOCWHandler(CurriculumSourceHandler):
             exams=exams,
             estimated_import_time="10-15 minutes",
             estimated_output_size="2-5 MB",
+            download_url=raw_data.get("url"),
+        )
+
+    async def get_normalized_course_detail(self, course_id: str) -> NormalizedCourseDetail:
+        """
+        Get normalized course detail for generic plugin UI.
+
+        MIT OCW uses a flat lecture structure:
+        - unitLabel: "Lecture"
+        - topicLabel: "Lecture"
+        - isFlat: True (single unit containing all lectures)
+        """
+        # Validate license first
+        license_result = self.validate_license(course_id)
+        if not license_result.can_import:
+            raise LicenseRestrictionError(license_result.warnings[0])
+
+        # Get base entry from catalog
+        entry = self._catalog_cache.get(course_id)
+        if not entry:
+            raise ValueError(f"Course not found: {course_id}")
+
+        # Get the raw data for additional details
+        raw_data = self._raw_data_cache.get(course_id)
+        if not raw_data:
+            raise ValueError(f"Course data not found: {course_id}")
+
+        # Course features
+        has_video = "video" in raw_data.get("features", [])
+        has_transcript = "transcript" in raw_data.get("features", [])
+        course_url = raw_data.get("url", "")
+
+        # Try to fetch actual lecture titles from the course pages
+        topics = []
+        if course_url:
+            fetched_lectures = await self._fetch_lecture_titles(course_url)
+            if fetched_lectures:
+                for lec in fetched_lectures:
+                    topics.append(ContentTopic(
+                        id=lec["id"],
+                        title=lec["title"],
+                        number=lec["number"],
+                        has_video=has_video,
+                        has_transcript=has_transcript,
+                        has_practice=False,
+                    ))
+
+        # Fallback to generic titles if fetch failed
+        if not topics:
+            lecture_count = raw_data.get("lecture_count", 0)
+            for i in range(1, lecture_count + 1):
+                topics.append(ContentTopic(
+                    id=f"lecture-{i}",
+                    title=f"Lecture {i}",
+                    number=i,
+                    has_video=has_video,
+                    has_transcript=has_transcript,
+                    has_practice=False,
+                ))
+
+        # Create a single unit containing all lectures (flat structure)
+        units = []
+        if topics:
+            units.append(ContentUnit(
+                id="all-lectures",
+                title="All Lectures",
+                number=1,
+                topics=topics,
+            ))
+
+        # Build content structure with MIT OCW terminology
+        content_structure = ContentStructure(
+            unit_label="Lecture",
+            topic_label="Lecture",
+            is_flat=True,  # MIT OCW has flat lecture list
+            units=units,
+        )
+
+        # Level labels
+        level_labels = {
+            "introductory": "Introductory",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced",
+        }
+        level_label = level_labels.get(entry.level, entry.level.title())
+
+        # Generate assignments/exams (placeholder)
+        assignments = []
+        if "assignments" in raw_data.get("features", []):
+            for i in range(1, 6):  # Assume ~5 assignments
+                assignments.append(AssignmentInfo(
+                    id=f"assignment-{i}",
+                    title=f"Problem Set {i}",
+                    has_solutions=True,
+                ))
+
+        exams = []
+        if "exams" in raw_data.get("features", []):
+            exams = [
+                ExamInfo(id="midterm", title="Midterm Exam", exam_type="midterm", has_solutions=True),
+                ExamInfo(id="final", title="Final Exam", exam_type="final", has_solutions=True),
+            ]
+
+        return NormalizedCourseDetail(
+            id=entry.id,
+            source_id=entry.source_id,
+            title=entry.title,
+            description=entry.description,
+            instructors=entry.instructors,
+            level=entry.level,
+            level_label=level_label,
+            department=entry.department,
+            semester=entry.semester,
+            keywords=entry.keywords,
+            thumbnail_url=None,
+            license=entry.license,
+            features=entry.features,
+            content_structure=content_structure,
+            assignments=assignments,
+            exams=exams,
+            syllabus=f"This course covers {entry.description}",
+            prerequisites=[],
+            estimated_import_time="10-15 minutes",
+            estimated_output_size="2-5 MB",
+            source_url=raw_data.get("url"),
             download_url=raw_data.get("url"),
         )
 

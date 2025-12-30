@@ -8,5 +8,10 @@
     "enabled": true,
     "priority": 100,
     "settings": {}
+  },
+  "merlot": {
+    "enabled": true,
+    "priority": 100,
+    "settings": {}
   }
 }

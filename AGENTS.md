@@ -431,3 +431,31 @@ actor FaithfulMockLLM: LLMService {
 - `createProgress(in:for:timeSpent:quizScores:)` - Creates test progress records
 
 These are NOT mocks. They create real Core Data entities in an in-memory store.
+
+### MANDATORY: Clean Up Test Data
+
+**When testing produces persistent artifacts (curricula, files, database entries), you MUST clean them up before finishing.**
+
+This includes:
+- **Test curricula** created via import API or direct file writes
+- **Test assets** uploaded to the asset system
+- **Test files** written to disk during testing
+- **Import jobs** that created temporary data
+
+**Why this matters:**
+- Test data clutters the curriculum list, requiring manual cleanup
+- Orphaned test files waste disk space
+- Users should never see test artifacts in their interfaces
+
+**Cleanup checklist before finishing any testing session:**
+1. List all curricula and verify only expected content remains
+2. Delete any test curricula you created (use `DELETE /api/curricula/{id}?confirm=true`)
+3. Remove any test files from `curriculum/examples/realistic/`
+4. Verify the management console shows clean state
+
+**Naming convention for test data:**
+- Prefix with `test-` or `claude-test-`
+- Include "DELETE ME" or "TEST" in titles
+- Example IDs: `test-import-validation`, `claude-test-assessment-flow`
+
+This makes orphaned test data easy to identify and clean up if cleanup was missed.

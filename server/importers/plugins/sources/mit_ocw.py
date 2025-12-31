@@ -702,6 +702,107 @@ class MITOCWHandler(CurriculumSourceHandler):
                     except Exception as e:
                         logger.warning(f"Error checking video gallery: {e}")
 
+                # Strategy 3: Check /pages/lecture-notes/ (or calendar, reading) for table-based listing
+                # Many courses like 24.09 list lectures in a table on these pages
+                if not lectures:
+                    try:
+                        # Potential pages that might list lectures
+                        pages_subpaths = ["/pages/lecture-notes/", "/pages/calendar/", "/pages/readings/", "/pages/syllabus/"]
+                        
+                        for subpath in pages_subpaths:
+                            if lectures: break # Stop if found
+                            
+                            page_url = course_url.rstrip("/") + subpath
+                            async with session.get(page_url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                                if resp.status == 200:
+                                    html = await resp.text()
+                                    soup = BeautifulSoup(html, "html.parser")
+                                    
+                                    # Scan ALL rows in the document because of malformed HTML
+                                    # (MIT OCW sometimes has <p> tags inside tables breaking them)
+                                    all_rows = soup.find_all("tr")
+                                    
+                                    ses_idx = -1
+                                    topic_idx = -1
+                                    
+                                    for row in all_rows:
+                                        # Check if this is a header row
+                                        th_cols = row.find_all("th")
+                                        if th_cols:
+                                            # Normalize headers
+                                            raw_headers = [th.get_text(strip=True).upper() for th in th_cols]
+                                            headers = [re.sub(r"[^A-Z#]", "", h) for h in raw_headers]
+                                            
+                                            if any(kw in headers for kw in ["SES#", "LEC#", "SESSION", "LECTURE", "WEEK"]):
+                                                # Reset indices for new table/section
+                                                ses_idx = -1
+                                                topic_idx = -1
+                                                
+                                                for i, h in enumerate(headers):
+                                                    if "TOPIC" in h or "TITLE" in h:
+                                                        topic_idx = i
+                                                    elif any(kw == h for kw in ["SES#", "LEC#", "SESSION", "LECTURE", "WEEK"]):
+                                                        ses_idx = i
+                                                
+                                                # Fallback logic
+                                                if topic_idx == -1 and ses_idx != -1 and len(headers) > ses_idx + 1:
+                                                    topic_idx = ses_idx + 1
+                                                
+                                                if topic_idx != -1:
+                                                    logger.info(f"Found lecture headers in {subpath}: {headers}")
+                                            continue
+
+                                        # Check if this is a data row and we have valid indices
+                                        if topic_idx != -1:
+                                            cols = row.find_all(["td", "th"])
+                                            
+                                            # Validate column count
+                                            # Allow for colspan or loose matching? Strict for now.
+                                            if len(cols) > topic_idx:
+                                                # Extract data
+                                                ses_num_str = ""
+                                                if ses_idx != -1 and len(cols) > ses_idx:
+                                                    ses_num_str = cols[ses_idx].get_text(strip=True)
+                                                
+                                                # Clean up session number
+                                                ses_match = re.search(r"\d+", ses_num_str)
+                                                if ses_match:
+                                                    ses_num = int(ses_match.group(0))
+                                                else:
+                                                    continue
+
+                                                title_text = cols[topic_idx].get_text(strip=True)
+                                                title_text = title_text.strip('"').strip()
+                                                
+                                                # Extract PDF
+                                                pdf_url = ""
+                                                for col in cols:
+                                                    link = col.find("a", href=re.compile(r"\.pdf$"))
+                                                    if link:
+                                                        pdf_url = urljoin(page_url, link["href"])
+                                                        break
+                                                
+                                                if title_text and "exam" not in title_text.lower():
+                                                    lecture_id = f"lecture-{ses_num}"
+                                                    if any(l["id"] == lecture_id for l in lectures):
+                                                        continue
+
+                                                    lectures.append({
+                                                        "id": lecture_id,
+                                                        "number": ses_num,
+                                                        "title": title_text,
+                                                        "url": page_url,
+                                                        "transcript_url": pdf_url if "transcript" in pdf_url.lower() or "notes" in pdf_url.lower() else "",
+                                                        "section": "Lecture Notes"
+                                                    })
+
+                                    if lectures:
+                                        logger.info(f"Extracted {len(lectures)} lectures from {subpath}")
+                                        break
+
+                    except Exception as e:
+                        logger.warning(f"Error checking lecture list pages: {e}")
+
                 # If no structured lectures found, try video-lectures pattern
                 if not lectures:
                     video_pattern = re.compile(r"/video-lectures/lecture-(\d+)")

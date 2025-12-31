@@ -54,3 +54,36 @@ cd server/management && python server.py &
 ```
 
 Always restart after code changes and verify via API calls or log inspection.
+
+## Testing Best Practices
+
+### MANDATORY: Clean Up After Testing
+
+When creating test data (curricula, assets, import jobs, etc.), you MUST clean up after yourself:
+
+1. **Test Curricula**: Delete any test curricula created during testing
+   ```bash
+   curl -X DELETE "http://localhost:8766/api/curricula/{curriculum-id}?confirm=true"
+   ```
+
+2. **Test Assets**: Remove any test visual assets uploaded during testing
+
+3. **Before Finishing**: Always verify the curriculum list only contains intended content
+   ```bash
+   curl -s http://localhost:8766/api/curricula | python3 -c "import sys,json; d=json.load(sys.stdin); [print(c['id'], c['title']) for c in d['curricula']]"
+   ```
+
+### Naming Convention for Test Data
+
+When creating test data that should be easily identified:
+- Prefix with `test-` or `claude-test-`
+- Include "DELETE ME" or "TEST" in titles
+- Example: `test-import-validation`, `claude-test-asset-upload`
+
+This makes it easy to identify and clean up orphaned test data.
+
+### Server State Synchronization
+
+The server loads curriculum data at startup. If files change on disk while the server is running (e.g., file renames, manual deletions), the server's in-memory state becomes stale. Fix by:
+1. Restart the server, OR
+2. Call the reload endpoint: `POST /api/curricula/reload`

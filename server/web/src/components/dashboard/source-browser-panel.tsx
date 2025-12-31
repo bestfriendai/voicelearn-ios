@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryState, parseAsString, parseAsInteger, parseAsStringLiteral } from 'nuqs';
 import {
   Download,
   ExternalLink,
@@ -28,6 +29,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useMainScrollRestoration } from '@/hooks/useScrollRestoration';
 
 // Types matching the actual backend API responses
 interface License {
@@ -90,7 +92,9 @@ interface ImportJob {
   error?: string;
 }
 
-type ViewMode = 'sources' | 'catalog' | 'detail';
+// Valid view modes for URL state
+const VIEW_MODES = ['sources', 'catalog', 'detail'] as const;
+type ViewMode = typeof VIEW_MODES[number];
 
 // Use relative URLs to go through Next.js API proxy routes
 const BACKEND_URL = '';
@@ -102,8 +106,19 @@ const BACKEND_URL = '';
  * Allows browsing courses, viewing details, and importing into UMCF format.
  */
 export function SourceBrowserPanel() {
-  // View state
-  const [viewMode, setViewMode] = useState<ViewMode>('sources');
+  // URL-synced view state using nuqs
+  const [viewMode, setViewMode] = useQueryState(
+    'view',
+    parseAsStringLiteral(VIEW_MODES).withDefault('sources')
+  );
+  const [selectedSourceId, setSelectedSourceId] = useQueryState('source', parseAsString);
+  const [selectedCourseId, setSelectedCourseId] = useQueryState('course', parseAsString);
+  const [currentPage, setCurrentPage] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [searchQuery, setSearchQuery] = useQueryState('q', parseAsString.withDefault(''));
+  const [selectedSubject, setSelectedSubject] = useQueryState('subject', parseAsString.withDefault(''));
+  const [selectedLevel, setSelectedLevel] = useQueryState('level', parseAsString.withDefault(''));
+
+  // Local state (not URL-synced)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,18 +129,14 @@ export function SourceBrowserPanel() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [importJobs, setImportJobs] = useState<ImportJob[]>([]);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [selectedLevel, setSelectedLevel] = useState<string>('');
+  // Filter state (available options from API)
   const [availableFilters, setAvailableFilters] = useState<{
     subjects: string[];
     levels: string[];
     features: string[];
   }>({ subjects: [], levels: [], features: [] });
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  // Pagination totals
   const [totalPages, setTotalPages] = useState(1);
   const [totalCourses, setTotalCourses] = useState(0);
 
@@ -143,7 +154,10 @@ export function SourceBrowserPanel() {
     buildKnowledgeGraph: true,
   });
 
-  // Fetch sources on mount
+  // Scroll restoration
+  useMainScrollRestoration('source-browser-panel');
+
+  // Fetch sources on mount and restore state from URL
   useEffect(() => {
     fetchSources();
     fetchImportJobs();
@@ -152,6 +166,39 @@ export function SourceBrowserPanel() {
     const interval = setInterval(fetchImportJobs, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Restore selected source from URL when sources are loaded
+  useEffect(() => {
+    if (sources.length > 0 && selectedSourceId) {
+      const source = sources.find(s => s.id === selectedSourceId);
+      if (source) {
+        setSelectedSource(source);
+        // If we have a source ID in URL, fetch the catalog
+        if (viewMode === 'catalog' || viewMode === 'detail') {
+          fetchCatalog(
+            source.id,
+            currentPage,
+            searchQuery || undefined,
+            selectedSubject || undefined,
+            selectedLevel || undefined
+          );
+        }
+      }
+    }
+  }, [sources, selectedSourceId]);
+
+  // Restore selected course from URL when courses are loaded
+  useEffect(() => {
+    if (courses.length > 0 && selectedCourseId && selectedSource) {
+      const course = courses.find(c => c.id === selectedCourseId);
+      if (course) {
+        setSelectedCourse(course);
+        if (viewMode === 'detail') {
+          fetchCourseDetail(selectedSource.id, course.id);
+        }
+      }
+    }
+  }, [courses, selectedCourseId, selectedSource, viewMode]);
 
   const fetchSources = async () => {
     setLoading(true);
@@ -249,16 +296,19 @@ export function SourceBrowserPanel() {
 
   const handleSourceSelect = (source: CurriculumSource) => {
     setSelectedSource(source);
+    setSelectedSourceId(source.id);
     setViewMode('catalog');
     setSearchQuery('');
     setSelectedSubject('');
     setSelectedLevel('');
     setCurrentPage(1);
+    setSelectedCourseId(null);
     fetchCatalog(source.id, 1);
   };
 
   const handleCourseSelect = (course: Course) => {
     setSelectedCourse(course);
+    setSelectedCourseId(course.id);
     setViewMode('detail');
     if (selectedSource) {
       fetchCourseDetail(selectedSource.id, course.id);
@@ -330,7 +380,14 @@ export function SourceBrowserPanel() {
       if (data.success) {
         // Go back to sources view to show the import progress
         setViewMode('sources');
+        setSelectedSource(null);
+        setSelectedSourceId(null);
         setSelectedCourse(null);
+        setSelectedCourseId(null);
+        setSearchQuery('');
+        setSelectedSubject('');
+        setSelectedLevel('');
+        setCurrentPage(1);
         fetchImportJobs();
       } else {
         setError(data.error || 'Failed to start import');
@@ -358,10 +415,17 @@ export function SourceBrowserPanel() {
     if (viewMode === 'detail') {
       setViewMode('catalog');
       setSelectedCourse(null);
+      setSelectedCourseId(null);
     } else if (viewMode === 'catalog') {
       setViewMode('sources');
       setSelectedSource(null);
+      setSelectedSourceId(null);
+      setSelectedCourseId(null);
       setCourses([]);
+      setSearchQuery('');
+      setSelectedSubject('');
+      setSelectedLevel('');
+      setCurrentPage(1);
     }
   };
 

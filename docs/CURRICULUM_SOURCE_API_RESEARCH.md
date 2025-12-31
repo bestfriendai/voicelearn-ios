@@ -1463,26 +1463,232 @@ With UnaMentis's non-commercial model, **8 of 10 sources are fully compatible** 
 |------|---------|---------|
 | 2025-12-30 | 1.0.0 | Initial comprehensive research |
 | 2025-12-30 | 1.1.0 | Updated for UnaMentis non-commercial model; NC licenses are not barriers |
+| 2025-12-31 | 1.2.0 | Added K-12 alternative sources and CK-12 partnership deep dive |
+
+---
+
+## K-12 Curriculum: CK-12 Alternative Strategy
+
+Given CK-12's proprietary license and explicit prohibitions on AI/ML use, UnaMentis needs alternative K-12 sources. This section provides both a CK-12 partnership strategy and fully open alternatives.
+
+---
+
+### CK-12 Partnership Deep Dive
+
+#### The Challenge
+
+CK-12's licensing terms explicitly prohibit:
+1. **AI/ML Training:** "You may not use the Curriculum Materials... to build or train artificial intelligence or machine learning algorithms or models"
+2. **Automated Derivative Works:** Cannot "create new content (including derivative works) using automated means"
+3. **Content Aggregation:** If you're "an aggregator of content," you cannot "distribute through your own online or offline services"
+
+These restrictions apply even to non-commercial use. Our open-source status does NOT automatically grant permission.
+
+#### Partnership Approach
+
+**Primary Contacts:**
+| Purpose | Contact |
+|---------|---------|
+| Partnership Inquiry | partners@ck12.org |
+| Legal/Licensing Permission | legal@ck12.org |
+| LTI Technical Setup | support@ck12.org |
+| Phone | 650-353-4619 |
+
+**Key Leadership:**
+- Neeru Khosla (Co-Founder & Executive Director)
+- Miral Shah (Chief Technology & Product Officer)
+- LinkedIn: linkedin.com/company/ck-12-foundation
+
+**What to Emphasize:**
+1. Mission alignment with accessible education
+2. Non-commercial, open-source status
+3. Full attribution commitment
+4. Extending reach to voice-first learners
+5. Willingness to work within their framework
+
+**Precedent:** The NVIDIA partnership ($25M for AI education, 2024-25) shows CK-12 is willing to work with AI-focused organizations under the right circumstances.
+
+#### Recommended Outreach
+
+Email both legal@ck12.org AND partners@ck12.org requesting:
+- Clarification on voice-based content delivery for non-commercial use
+- Special permission for open-source educational application
+- Discussion of potential partnership structure
+
+**Timeline Expectations:** 2-3 months for formal agreement negotiation
+
+---
+
+### K-12 Open Alternatives (Recommended)
+
+Given the complexity of CK-12 partnership, these fully open sources should be primary integration targets:
+
+#### TOP PICK: Open Up Resources + Illustrative Mathematics
+
+**License:** CC BY 4.0 (1st & 2nd editions)
+
+| Coverage | Details |
+|----------|---------|
+| Math K-5 | Illustrative Mathematics curriculum |
+| Math 6-8 | Illustrative Mathematics middle school |
+| Math High School | AGA & Integrated pathways |
+| ELA K-5 | EL Education curriculum |
+| ELA 6-8 | EL Education (2019 Edition) |
+
+**Access:** https://access.openupresources.org/curricula
+- PDF downloads available
+- Standards-aligned (CCSS)
+- Peer-reviewed, high-quality content
+
+**Limitations:**
+- Assessments are NOT under CC (K-12 educator access only)
+- 3rd edition uses CC BY-NC
+
+**Contact:** support@openupresources.org
+
+**Bottom Line:** This is the best K-12 alternative. CC BY 4.0 allows full adaptation for voice AI. Proceed immediately.
+
+---
+
+#### SECOND PICK: EngageNY Archive (New York State)
+
+**License:** CC BY-NC-SA (we qualify as non-commercial)
+
+| Coverage | Details |
+|----------|---------|
+| Math | PreK-12 complete curriculum |
+| ELA | PreK-12 complete curriculum |
+
+**Access:**
+- Internet Archive: archive.org/details/engageny-mathematics
+- Internet Archive: archive.org/details/engageny-ela-archive
+- NYSED Archives: nysed.gov/curriculum-instruction/engageny-mathematics-curriculum-files-archive
+
+**Format:** Word and PDF, ZIP files by module
+
+**Limitations:**
+- Original site discontinued 2022, now archived
+- No ongoing updates
+
+**Bottom Line:** Comprehensive PreK-12 coverage. Bulk downloads available. Proceed immediately.
+
+---
+
+#### THIRD PICK: Utah Middle School Math Project
+
+**License:** CC BY 4.0 (most permissive!)
+
+| Coverage | Details |
+|----------|---------|
+| Math 6-8 | Complete textbooks and workbooks |
+
+**Access:** utahmiddleschoolmath.org
+- Word documents (editable)
+- PDF versions
+- Student workbooks, teacher materials, parent manuals
+
+**Limitations:** Math only, grades 6-8 only
+
+**Bottom Line:** Most permissive license for middle school math. Ideal supplement.
+
+---
+
+#### FOURTH PICK: Core Knowledge Foundation
+
+**License:** CC BY-NC-SA 3.0 (we qualify)
+
+| Coverage | Details |
+|----------|---------|
+| All Subjects K-8 | Language Arts, History, Geography, Visual Arts, Music, Math, Science |
+
+**Access:** coreknowledge.org/download-free-curriculum/
+- PDF format
+- Comprehensive teacher guides
+- Complete Core Knowledge Sequence
+
+**Bottom Line:** Only source with comprehensive cross-subject K-8 coverage.
+
+---
+
+#### Subject-Specific Supplements
+
+| Source | License | Coverage | Access |
+|--------|---------|----------|--------|
+| **PhET Simulations** | CC BY 4.0 | Science/Math K-12 | phet.colorado.edu, GitHub API |
+| **GeoGebra** | CC BY-NC-SA | Math K-12 | geogebra.org |
+| **Project Gutenberg** | Public Domain | Literature/ELA | gutenberg.org |
+| **Curriki** | CC BY | All subjects K-12 | library.curriki.org, API available |
+| **Siyavula** | CC BY | Math/Science 4-12 | siyavula.com/read |
+
+---
+
+### K-12 Implementation Strategy
+
+#### Phase 1: Core Curriculum (Immediate)
+1. **Open Up Resources / Illustrative Mathematics** for Math K-8 (CC BY 4.0)
+2. **EngageNY Archive** for ELA K-8 (CC BY-NC-SA)
+
+#### Phase 2: Subject Enhancement
+3. **Core Knowledge Foundation** for Science, Social Studies, History K-8
+4. **PhET Simulations** for Science enrichment (CC BY 4.0)
+
+#### Phase 3: Extended Content
+5. **Utah Middle School Math** for additional 6-8 math
+6. **Curriki** for supplementary materials across subjects
+
+#### Parallel Track: CK-12 Partnership
+- Initiate partnership discussions with CK-12
+- If successful, integrate as premium addition to open curriculum
+- If unsuccessful, open alternatives provide complete coverage
+
+---
+
+### Sources NOT Recommended for K-12
+
+| Source | License Issue | Problem |
+|--------|---------------|---------|
+| **Khan Academy** | CC BY-NC-SA | No bulk download/API, platform-locked |
+| **PBS LearningMedia** | CC BY-NC-ND | ND restriction prevents adaptation |
+| **iCivics** | Traditional copyright | Not open, no modification rights |
+| **NCERT (India)** | No derivatives | Cannot modify content |
+| **HippoCampus** | Mixed/restricted | Institutional membership required |
 
 ---
 
 ## Key Takeaways
 
-### UnaMentis can immediately integrate with 7 sources:
+### Collegiate/Advanced Sources (7 immediate, 3 require action):
 
-1. **OpenStax** - Public API, CC BY 4.0, proceed now
-2. **BCcampus** - Pressbooks API, CC BY 4.0, proceed now
-3. **MIT OCW** - No API but permissive robots.txt, CC BY-NC-SA, proceed now
-4. **Stanford SEE** - ZIP downloads, CC BY-NC-SA (except LOGIC), proceed now
-5. **OpenLearn** - SPARQL endpoint, CC BY-NC-SA, proceed now
-6. **MERLOT** - Apply for free API key, filter by license, proceed after approval
-7. **OER Commons** - Request API token, filter by license, proceed after approval
+**Proceed Immediately:**
+1. **OpenStax** - Public API, CC BY 4.0
+2. **BCcampus** - Pressbooks API, CC BY 4.0
+3. **MIT OCW** - Sitemap + ZIPs, CC BY-NC-SA
+4. **Stanford SEE** - ZIP downloads, CC BY-NC-SA (except LOGIC)
+5. **OpenLearn** - SPARQL endpoint, CC BY-NC-SA
+6. **MERLOT** - Apply for free API key, filter by license
+7. **OER Commons** - Request API token, filter by license
 
-### UnaMentis needs to clarify/partner with 3 sources:
+**Require Action:**
+8. **NPTEL** - Email NPTEL@iitm.ac.in to clarify licensing
+9. **CK-12** - Must establish formal partnership (see K-12 section)
+10. **Fast.ai** - Link-only approach; cannot republish prose
 
-8. **NPTEL** - Email NPTEL@iitm.ac.in to clarify licensing before proceeding
-9. **CK-12** - Must establish formal partnership; proprietary license prohibits use without agreement
-10. **Fast.ai** - Can use library but cannot republish educational prose; link-only approach
+### K-12 Sources (4 fully open alternatives to CK-12):
+
+**Proceed Immediately:**
+1. **Open Up Resources / Illustrative Mathematics** - CC BY 4.0, Math + ELA K-12, best option
+2. **EngageNY Archive** - CC BY-NC-SA, PreK-12 Math + ELA, bulk downloads
+3. **Utah Middle School Math** - CC BY 4.0, Math 6-8, most permissive
+4. **Core Knowledge Foundation** - CC BY-NC-SA, All subjects K-8
+
+**Supplements:**
+5. **PhET Simulations** - CC BY 4.0, Science/Math K-12
+6. **Curriki** - CC BY, All subjects K-12, API available
+
+**Parallel Track:**
+- Initiate CK-12 partnership discussions (2-3 month timeline)
+- If successful, add as premium supplement
+- If unsuccessful, open alternatives provide complete K-12 coverage
 
 ---
 

@@ -18,10 +18,11 @@
  */
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import { Zap, CheckCircle, Users, FileText, AlertTriangle, AlertCircle } from 'lucide-react';
 import { Header } from './header';
-import { SectionNav, NavTabs, SectionId, TabId } from './nav-tabs';
+import { SectionNav, NavTabs, SectionId, TabId, OpsTabId, ContentTabId } from './nav-tabs';
 import { StatCard } from '@/components/ui/stat-card';
 import { LogsPanel, LogsPanelCompact } from './logs-panel';
 import { ServersPanelCompact, ServersPanel } from './servers-panel';
@@ -38,10 +39,25 @@ import type { DashboardStats } from '@/types';
 import { getStats } from '@/lib/api-client';
 import { formatDuration } from '@/lib/utils';
 import { useWebSocketStatus } from '@/lib/websocket-provider';
+import { useState } from 'react';
+
+// Define valid values for URL state
+const SECTIONS = ['operations', 'content'] as const;
+const OPS_TABS = ['dashboard', 'health', 'metrics', 'logs', 'clients', 'servers', 'models'] as const;
+const CONTENT_TABS = ['curricula', 'sources', 'plugins', 'imports'] as const;
+const ALL_TABS = [...OPS_TABS, ...CONTENT_TABS] as const;
 
 export function Dashboard() {
-  const [activeSection, setActiveSection] = useState<SectionId>('operations');
-  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  // URL-synced state for section and tab using nuqs
+  const [activeSection, setActiveSection] = useQueryState(
+    'section',
+    parseAsStringLiteral(SECTIONS).withDefault('operations')
+  );
+  const [activeTab, setActiveTab] = useQueryState(
+    'tab',
+    parseAsStringLiteral(ALL_TABS).withDefault('dashboard')
+  );
+
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const { connected } = useWebSocketStatus();
 
@@ -69,7 +85,7 @@ export function Dashboard() {
     } else {
       setActiveTab('curricula');
     }
-  }, []);
+  }, [setActiveSection, setActiveTab]);
 
   return (
     <div className="h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden">

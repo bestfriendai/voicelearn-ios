@@ -1,0 +1,397 @@
+{
+  "metadata": {
+    "source": "engageny",
+    "name": "EngageNY Mathematics",
+    "description": "Complete PreK-12 Mathematics curriculum from New York State Education Department. Standards-aligned, comprehensive curriculum developed through NYS Common Core Learning Standards initiative.",
+    "last_updated": "2025-12-31",
+    "total_courses": 16,
+    "subjects": ["Mathematics"],
+    "grade_levels": ["elementary", "middle-school", "high-school"],
+    "education_type": "k12",
+    "license": {
+      "type": "CC-BY-NC-SA-4.0",
+      "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+      "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+    },
+    "archive_source": "https://archive.org/details/engageny-mathematics",
+    "notes": "Original EngageNY site discontinued 2022. Content preserved in Internet Archive."
+  },
+  "courses": [
+    {
+      "id": "prekindergarten-math",
+      "title": "Pre-Kindergarten Mathematics",
+      "description": "Foundation mathematics for pre-kindergarten students. Focuses on counting, shapes, patterns, and early number sense.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["PK"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Prekindergarten%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 5,
+      "lesson_count": 40,
+      "keywords": ["prekindergarten", "math", "counting", "shapes", "patterns", "early math"],
+      "standards": [
+        {"framework": "Common Core", "code": "CC.K", "description": "Counting and Cardinality"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Counting to 5", "lessons": 8},
+        {"number": 2, "title": "Shapes", "lessons": 8},
+        {"number": 3, "title": "Counting to 10", "lessons": 8},
+        {"number": 4, "title": "Number Pairs", "lessons": 8},
+        {"number": 5, "title": "Comparison", "lessons": 8}
+      ]
+    },
+    {
+      "id": "kindergarten-math",
+      "title": "Kindergarten Mathematics",
+      "description": "Complete kindergarten mathematics curriculum covering counting and cardinality, operations, number comparisons, and geometry.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["K"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Kindergarten%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 6,
+      "lesson_count": 120,
+      "keywords": ["kindergarten", "math", "counting", "addition", "subtraction", "geometry"],
+      "standards": [
+        {"framework": "Common Core", "code": "K.CC", "description": "Counting and Cardinality"},
+        {"framework": "Common Core", "code": "K.OA", "description": "Operations and Algebraic Thinking"},
+        {"framework": "Common Core", "code": "K.G", "description": "Geometry"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Numbers to 10", "lessons": 37},
+        {"number": 2, "title": "Two-Dimensional and Three-Dimensional Shapes", "lessons": 10},
+        {"number": 3, "title": "Comparison of Length, Weight, Capacity, and Numbers to 10", "lessons": 32},
+        {"number": 4, "title": "Number Pairs, Addition and Subtraction to 10", "lessons": 41},
+        {"number": 5, "title": "Numbers 10-20 and Counting to 100", "lessons": 24},
+        {"number": 6, "title": "Analyzing, Comparing, and Composing Shapes", "lessons": 6}
+      ]
+    },
+    {
+      "id": "grade1-math",
+      "title": "Grade 1 Mathematics",
+      "description": "First grade mathematics curriculum covering place value, addition and subtraction within 20, measurement, and geometry.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["1"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%201%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 6,
+      "lesson_count": 180,
+      "keywords": ["grade 1", "first grade", "math", "place value", "addition", "subtraction"],
+      "standards": [
+        {"framework": "Common Core", "code": "1.OA", "description": "Operations and Algebraic Thinking"},
+        {"framework": "Common Core", "code": "1.NBT", "description": "Number and Operations in Base Ten"},
+        {"framework": "Common Core", "code": "1.MD", "description": "Measurement and Data"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Sums and Differences to 10", "lessons": 39},
+        {"number": 2, "title": "Introduction to Place Value Through Addition and Subtraction Within 20", "lessons": 29},
+        {"number": 3, "title": "Ordering and Comparing Length Measurements", "lessons": 14},
+        {"number": 4, "title": "Place Value, Comparison, Addition and Subtraction to 40", "lessons": 29},
+        {"number": 5, "title": "Identifying, Composing, and Partitioning Shapes", "lessons": 15},
+        {"number": 6, "title": "Place Value, Comparison, Addition and Subtraction to 100", "lessons": 30}
+      ]
+    },
+    {
+      "id": "grade2-math",
+      "title": "Grade 2 Mathematics",
+      "description": "Second grade mathematics curriculum covering place value to 1000, addition and subtraction within 200, measurement, and foundations of multiplication.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["2"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%202%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 8,
+      "lesson_count": 153,
+      "keywords": ["grade 2", "second grade", "math", "place value", "addition", "subtraction", "measurement"],
+      "standards": [
+        {"framework": "Common Core", "code": "2.OA", "description": "Operations and Algebraic Thinking"},
+        {"framework": "Common Core", "code": "2.NBT", "description": "Number and Operations in Base Ten"},
+        {"framework": "Common Core", "code": "2.MD", "description": "Measurement and Data"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Sums and Differences to 20", "lessons": 8},
+        {"number": 2, "title": "Addition and Subtraction of Length Units", "lessons": 10},
+        {"number": 3, "title": "Place Value, Counting, and Comparison of Numbers to 1,000", "lessons": 21},
+        {"number": 4, "title": "Addition and Subtraction Within 200", "lessons": 31},
+        {"number": 5, "title": "Addition and Subtraction Within 1,000", "lessons": 20},
+        {"number": 6, "title": "Foundations of Multiplication and Division", "lessons": 24},
+        {"number": 7, "title": "Problem Solving with Length, Money, and Data", "lessons": 19},
+        {"number": 8, "title": "Time, Shapes, and Fractions", "lessons": 20}
+      ]
+    },
+    {
+      "id": "grade3-math",
+      "title": "Grade 3 Mathematics",
+      "description": "Third grade mathematics curriculum covering multiplication and division, fractions, area, and problem solving.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["3"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%203%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 7,
+      "lesson_count": 175,
+      "keywords": ["grade 3", "third grade", "math", "multiplication", "division", "fractions", "area"],
+      "standards": [
+        {"framework": "Common Core", "code": "3.OA", "description": "Operations and Algebraic Thinking"},
+        {"framework": "Common Core", "code": "3.NBT", "description": "Number and Operations in Base Ten"},
+        {"framework": "Common Core", "code": "3.NF", "description": "Number and Operations - Fractions"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Properties of Multiplication and Division", "lessons": 21},
+        {"number": 2, "title": "Place Value and Problem Solving with Units of Measure", "lessons": 21},
+        {"number": 3, "title": "Multiplication and Division with Units of 0, 1, 6-9", "lessons": 21},
+        {"number": 4, "title": "Multiplication and Area", "lessons": 19},
+        {"number": 5, "title": "Fractions as Numbers on the Number Line", "lessons": 30},
+        {"number": 6, "title": "Collecting and Displaying Data", "lessons": 13},
+        {"number": 7, "title": "Geometry and Measurement Word Problems", "lessons": 17}
+      ]
+    },
+    {
+      "id": "grade4-math",
+      "title": "Grade 4 Mathematics",
+      "description": "Fourth grade mathematics curriculum covering multi-digit arithmetic, fractions, angles, and geometric measurement.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["4"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%204%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 7,
+      "lesson_count": 180,
+      "keywords": ["grade 4", "fourth grade", "math", "multi-digit", "fractions", "decimals", "angles"],
+      "standards": [
+        {"framework": "Common Core", "code": "4.OA", "description": "Operations and Algebraic Thinking"},
+        {"framework": "Common Core", "code": "4.NBT", "description": "Number and Operations in Base Ten"},
+        {"framework": "Common Core", "code": "4.NF", "description": "Number and Operations - Fractions"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Place Value, Rounding, and Algorithms", "lessons": 19},
+        {"number": 2, "title": "Unit Conversions and Problem Solving", "lessons": 12},
+        {"number": 3, "title": "Multi-Digit Multiplication and Division", "lessons": 38},
+        {"number": 4, "title": "Angle Measure and Plane Figures", "lessons": 16},
+        {"number": 5, "title": "Fraction Equivalence, Ordering, and Operations", "lessons": 41},
+        {"number": 6, "title": "Decimal Fractions", "lessons": 20},
+        {"number": 7, "title": "Exploring Measurement with Multiplication", "lessons": 14}
+      ]
+    },
+    {
+      "id": "grade5-math",
+      "title": "Grade 5 Mathematics",
+      "description": "Fifth grade mathematics curriculum covering operations with fractions, decimals, volume, and coordinate graphing.",
+      "subject": "Mathematics",
+      "level": "elementary",
+      "grades": ["5"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%205%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 6,
+      "lesson_count": 142,
+      "keywords": ["grade 5", "fifth grade", "math", "fractions", "decimals", "volume", "coordinates"],
+      "standards": [
+        {"framework": "Common Core", "code": "5.NBT", "description": "Number and Operations in Base Ten"},
+        {"framework": "Common Core", "code": "5.NF", "description": "Number and Operations - Fractions"},
+        {"framework": "Common Core", "code": "5.MD", "description": "Measurement and Data"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Place Value and Decimal Fractions", "lessons": 18},
+        {"number": 2, "title": "Multi-Digit Whole Number and Decimal Fraction Operations", "lessons": 29},
+        {"number": 3, "title": "Addition and Subtraction of Fractions", "lessons": 16},
+        {"number": 4, "title": "Multiplication and Division of Fractions", "lessons": 34},
+        {"number": 5, "title": "Addition and Multiplication with Volume and Area", "lessons": 21},
+        {"number": 6, "title": "Problem Solving with the Coordinate Plane", "lessons": 33}
+      ]
+    },
+    {
+      "id": "grade6-math",
+      "title": "Grade 6 Mathematics",
+      "description": "Sixth grade mathematics curriculum covering ratios, arithmetic with rational numbers, expressions and equations, and statistics.",
+      "subject": "Mathematics",
+      "level": "middle-school",
+      "grades": ["6"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%206%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 6,
+      "lesson_count": 145,
+      "keywords": ["grade 6", "sixth grade", "math", "ratios", "rational numbers", "expressions", "statistics"],
+      "standards": [
+        {"framework": "Common Core", "code": "6.RP", "description": "Ratios and Proportional Relationships"},
+        {"framework": "Common Core", "code": "6.NS", "description": "The Number System"},
+        {"framework": "Common Core", "code": "6.EE", "description": "Expressions and Equations"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Ratios and Unit Rates", "lessons": 29},
+        {"number": 2, "title": "Arithmetic Operations Including Division of Fractions", "lessons": 19},
+        {"number": 3, "title": "Rational Numbers", "lessons": 19},
+        {"number": 4, "title": "Expressions and Equations", "lessons": 34},
+        {"number": 5, "title": "Area, Surface Area, and Volume Problems", "lessons": 19},
+        {"number": 6, "title": "Statistics", "lessons": 16}
+      ]
+    },
+    {
+      "id": "grade7-math",
+      "title": "Grade 7 Mathematics",
+      "description": "Seventh grade mathematics curriculum covering proportional relationships, rational number operations, expressions and equations, and geometry.",
+      "subject": "Mathematics",
+      "level": "middle-school",
+      "grades": ["7"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%207%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 6,
+      "lesson_count": 139,
+      "keywords": ["grade 7", "seventh grade", "math", "proportions", "rational numbers", "geometry", "probability"],
+      "standards": [
+        {"framework": "Common Core", "code": "7.RP", "description": "Ratios and Proportional Relationships"},
+        {"framework": "Common Core", "code": "7.NS", "description": "The Number System"},
+        {"framework": "Common Core", "code": "7.EE", "description": "Expressions and Equations"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Ratios and Proportional Relationships", "lessons": 22},
+        {"number": 2, "title": "Rational Numbers", "lessons": 23},
+        {"number": 3, "title": "Expressions and Equations", "lessons": 26},
+        {"number": 4, "title": "Percent and Proportional Relationships", "lessons": 18},
+        {"number": 5, "title": "Statistics and Probability", "lessons": 23},
+        {"number": 6, "title": "Geometry", "lessons": 27}
+      ]
+    },
+    {
+      "id": "grade8-math",
+      "title": "Grade 8 Mathematics",
+      "description": "Eighth grade mathematics curriculum covering linear equations, functions, geometry transformations, and introduction to irrational numbers.",
+      "subject": "Mathematics",
+      "level": "middle-school",
+      "grades": ["8"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Grade%208%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 7,
+      "lesson_count": 155,
+      "keywords": ["grade 8", "eighth grade", "math", "linear equations", "functions", "transformations", "pythagorean"],
+      "standards": [
+        {"framework": "Common Core", "code": "8.NS", "description": "The Number System"},
+        {"framework": "Common Core", "code": "8.EE", "description": "Expressions and Equations"},
+        {"framework": "Common Core", "code": "8.F", "description": "Functions"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Integer Exponents and Scientific Notation", "lessons": 13},
+        {"number": 2, "title": "The Concept of Congruence", "lessons": 16},
+        {"number": 3, "title": "Similarity", "lessons": 14},
+        {"number": 4, "title": "Linear Equations", "lessons": 34},
+        {"number": 5, "title": "Examples of Functions from Geometry", "lessons": 11},
+        {"number": 6, "title": "Linear Functions", "lessons": 15},
+        {"number": 7, "title": "Introduction to Irrational Numbers Using Geometry", "lessons": 23}
+      ]
+    },
+    {
+      "id": "algebra1",
+      "title": "Algebra I",
+      "description": "Complete Algebra I curriculum covering linear and exponential relationships, quadratic functions, and descriptive statistics.",
+      "subject": "Mathematics",
+      "level": "high-school",
+      "grades": ["9"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Algebra%20I%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 5,
+      "lesson_count": 146,
+      "keywords": ["algebra 1", "high school", "math", "linear", "quadratic", "exponential", "statistics"],
+      "standards": [
+        {"framework": "Common Core", "code": "HSA-REI", "description": "Reasoning with Equations and Inequalities"},
+        {"framework": "Common Core", "code": "HSF-IF", "description": "Interpreting Functions"},
+        {"framework": "Common Core", "code": "HSS-ID", "description": "Interpreting Categorical and Quantitative Data"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Relationships Between Quantities and Reasoning with Equations and Their Graphs", "lessons": 28},
+        {"number": 2, "title": "Descriptive Statistics", "lessons": 20},
+        {"number": 3, "title": "Linear and Exponential Functions", "lessons": 24},
+        {"number": 4, "title": "Polynomial and Quadratic Expressions, Equations, and Functions", "lessons": 24},
+        {"number": 5, "title": "A Synthesis of Modeling with Equations and Functions", "lessons": 7}
+      ]
+    },
+    {
+      "id": "geometry",
+      "title": "Geometry",
+      "description": "Complete Geometry curriculum covering congruence, similarity, right triangles, circles, and geometric modeling.",
+      "subject": "Mathematics",
+      "level": "high-school",
+      "grades": ["10"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Geometry%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 5,
+      "lesson_count": 131,
+      "keywords": ["geometry", "high school", "math", "congruence", "similarity", "circles", "trigonometry"],
+      "standards": [
+        {"framework": "Common Core", "code": "HSG-CO", "description": "Congruence"},
+        {"framework": "Common Core", "code": "HSG-SRT", "description": "Similarity, Right Triangles, and Trigonometry"},
+        {"framework": "Common Core", "code": "HSG-C", "description": "Circles"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Congruence, Proof, and Constructions", "lessons": 34},
+        {"number": 2, "title": "Similarity, Proof, and Trigonometry", "lessons": 34},
+        {"number": 3, "title": "Extending to Three Dimensions", "lessons": 14},
+        {"number": 4, "title": "Connecting Algebra and Geometry Through Coordinates", "lessons": 15},
+        {"number": 5, "title": "Circles With and Without Coordinates", "lessons": 21}
+      ]
+    },
+    {
+      "id": "algebra2",
+      "title": "Algebra II",
+      "description": "Complete Algebra II curriculum covering polynomial, rational, and radical relationships, trigonometric functions, and probability.",
+      "subject": "Mathematics",
+      "level": "high-school",
+      "grades": ["11"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Algebra%20II%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 5,
+      "lesson_count": 143,
+      "keywords": ["algebra 2", "high school", "math", "polynomial", "trigonometry", "probability", "complex numbers"],
+      "standards": [
+        {"framework": "Common Core", "code": "HSN-CN", "description": "The Complex Number System"},
+        {"framework": "Common Core", "code": "HSA-APR", "description": "Arithmetic with Polynomials and Rational Expressions"},
+        {"framework": "Common Core", "code": "HSF-TF", "description": "Trigonometric Functions"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Polynomial, Rational, and Radical Relationships", "lessons": 40},
+        {"number": 2, "title": "Trigonometric Functions", "lessons": 18},
+        {"number": 3, "title": "Exponential and Logarithmic Functions", "lessons": 35},
+        {"number": 4, "title": "Inferences and Conclusions from Data", "lessons": 29},
+        {"number": 5, "title": "Modeling with Equations and Inequalities", "lessons": 7}
+      ]
+    },
+    {
+      "id": "precalculus",
+      "title": "Precalculus and Advanced Topics",
+      "description": "Precalculus curriculum covering complex number systems, vectors, matrices, and advanced function analysis.",
+      "subject": "Mathematics",
+      "level": "high-school",
+      "grades": ["12"],
+      "authors": ["New York State Education Department", "EngageNY"],
+      "archive_url": "https://archive.org/download/engageny-mathematics/Precalculus%20Module%201.zip",
+      "features": ["lessons", "practice"],
+      "module_count": 5,
+      "lesson_count": 85,
+      "keywords": ["precalculus", "high school", "math", "complex numbers", "vectors", "matrices", "limits"],
+      "standards": [
+        {"framework": "Common Core", "code": "HSN-CN", "description": "The Complex Number System"},
+        {"framework": "Common Core", "code": "HSN-VM", "description": "Vector and Matrix Quantities"},
+        {"framework": "Common Core", "code": "HSF-TF", "description": "Trigonometric Functions"}
+      ],
+      "modules": [
+        {"number": 1, "title": "Complex Numbers and Transformations", "lessons": 21},
+        {"number": 2, "title": "Vectors and Matrices", "lessons": 29},
+        {"number": 3, "title": "Rational and Exponential Functions", "lessons": 17},
+        {"number": 4, "title": "Trigonometry", "lessons": 18},
+        {"number": 5, "title": "Probability and Statistics", "lessons": 0}
+      ]
+    }
+  ]
+}

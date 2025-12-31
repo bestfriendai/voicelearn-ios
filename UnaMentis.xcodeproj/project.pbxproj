@@ -114,6 +114,7 @@
 		F5B96F9B50C19678571221DA /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AD25072A06649A8319CA61 /* ServerSettingsView.swift */; };
 		F6515847BF5C9C7953D34854 /* LLMTaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9AD07E27AF281275DC11BE0 /* LLMTaskType.swift */; };
 		F98DD78B3D71992AFF824066 /* HelpComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */; };
+		906DB3A650504D8092ABD48A /* SessionControlComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AC7209455743729D32DEE2 /* SessionControlComponents.swift */; };
 		FAD3F8A6F3DD20E8B474CF37 /* GLMASRIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED7DFE0AA0EFDFDA0E2997B /* GLMASRIntegrationTests.swift */; };
 		FFF26AE98F6DDE371CA0B169 /* VADService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F889719749AE4061E8AD19F /* VADService.swift */; };
 /* End PBXBuildFile section */
@@ -169,6 +170,7 @@
 		4E5DFDB8CAB387BD3FABE2DB /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
 		5F889719749AE4061E8AD19F /* VADService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VADService.swift; sourceTree = "<group>"; };
 		6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpComponents.swift; sourceTree = "<group>"; };
+		73AC7209455743729D32DEE2 /* SessionControlComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlComponents.swift; sourceTree = "<group>"; };
 		60AD25072A06649A8319CA61 /* ServerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsView.swift; sourceTree = "<group>"; };
 		6762AB91B87A534E283F0CD0 /* CurriculumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumModels.swift; sourceTree = "<group>"; };
 		6819C6680DDB8F7A6C3DD0C4 /* LLMEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMEndpoint.swift; sourceTree = "<group>"; };
@@ -638,6 +640,7 @@
 			isa = PBXGroup;
 			children = (
 				6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */,
+				73AC7209455743729D32DEE2 /* SessionControlComponents.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -823,6 +826,7 @@
 				6620DE1B619B9F29F9CFEE0B /* GLMASROnDeviceSTTService.swift in Sources */,
 				979AE8F5878DBD378FADD22F /* GLMASRSTTService.swift in Sources */,
 				F98DD78B3D71992AFF824066 /* HelpComponents.swift in Sources */,
+				906DB3A650504D8092ABD48A /* SessionControlComponents.swift in Sources */,
 				A0569F0FAEBFCCBEA2B1A1AA /* HelpView.swift in Sources */,
 				4D5B79F40271572EDF52AF45 /* HistoryView.swift in Sources */,
 				606486FC4527634F60886677 /* LLMEndpoint.swift in Sources */,

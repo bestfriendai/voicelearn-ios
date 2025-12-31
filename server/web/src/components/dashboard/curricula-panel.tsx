@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryState, parseAsString, parseAsBoolean } from 'nuqs';
 import { BookOpen, Search, Archive, Trash2, RefreshCw, Eye, Plus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +9,7 @@ import { CurriculumDetailPanel } from './curriculum-detail-panel';
 import type { CurriculumSummary, CurriculaResponse } from '@/types';
 import { CurriculumStudio } from '@/components/curriculum/CurriculumEditor';
 import { Curriculum } from '@/types/curriculum';
+import { useMainScrollRestoration } from '@/hooks/useScrollRestoration';
 
 // API functions for curricula
 async function getCurricula(params?: {
@@ -53,10 +55,25 @@ export function CurriculaPanel() {
   const [curricula, setCurricula] = useState<CurriculumSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showArchived, setShowArchived] = useState(false);
-  const [selectedCurriculumId, setSelectedCurriculumId] = useState<string | null>(null);
+
+  // URL-synced state using nuqs for persistence across refreshes
+  const [searchQuery, setSearchQuery] = useQueryState(
+    'search',
+    parseAsString.withDefault('')
+  );
+  const [showArchived, setShowArchived] = useQueryState(
+    'archived',
+    parseAsBoolean.withDefault(false)
+  );
+  const [selectedCurriculumId, setSelectedCurriculumId] = useQueryState(
+    'curriculum',
+    parseAsString
+  );
+
   const [isCreating, setIsCreating] = useState(false);
+
+  // Scroll restoration for the curricula panel (saves/restores main scroll position)
+  useMainScrollRestoration('curricula-panel');
 
   const fetchCurricula = useCallback(async () => {
     setLoading(true);

@@ -69,7 +69,7 @@ export const StudioTour: React.FC<StudioTourProps> = ({
     const [currentStep, setCurrentStep] = useState(0);
     const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-    const rafRef = useRef<number>();
+    const rafRef = useRef<number | undefined>(undefined);
 
     const step = steps[currentStep];
 

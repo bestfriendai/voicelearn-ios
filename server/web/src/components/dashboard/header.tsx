@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Activity, FileText, Users } from 'lucide-react';
+import { FileText, Users } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { isUsingMockData } from '@/lib/api-client';
 
@@ -32,15 +33,17 @@ export function Header({ stats, connected = false }: HeaderProps) {
         <div className="flex items-center justify-between gap-2">
           {/* Logo and Title */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20 flex-shrink-0">
-              <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-lg font-bold text-slate-100 truncate">
-                UnaMentis Server
-              </h1>
-              <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider hidden sm:block">
-                System Management Console
+            <Image
+              src="/logo-expanded.png"
+              alt="UnaMentis"
+              width={200}
+              height={69}
+              className="h-8 sm:h-10 w-auto"
+              priority
+            />
+            <div className="min-w-0 hidden sm:block">
+              <p className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-wider">
+                Server Console
               </p>
             </div>
           </div>

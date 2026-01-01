@@ -6,7 +6,7 @@ UnaMentis is an AI-powered voice tutoring platform that enables extended (60-90+
 
 **Vision:** A personalized AI tutor that works with you over long stretches of time, understands your learning progress and style, and evolves into a true personal tutor.
 
-**Development Model:** 100% AI-assisted development (Claude Code, Cursor, Windsurf). The entire app (Phases 1-5 of a 12-week roadmap) was implemented in approximately 5 hours, demonstrating ~200x speedup over traditional development.
+**Development Model:** 100% AI-assisted development (Claude CodeC mostly). 
 
 ---
 

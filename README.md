@@ -1,4 +1,6 @@
-# UnaMentis iOS
+<p align="center">
+  <img src="images/UnaMentis_expanded_color.png" alt="UnaMentis" width="500">
+</p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

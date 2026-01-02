@@ -33,6 +33,7 @@
 		3A6E9B0DBB0AF4F839C09FA7 /* STTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CEE1862B662019B07B4EAB /* STTService.swift */; };
 		3C815907AB7777C3AEB9CBCB /* MockLLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95969F48DA15F89D70603334 /* MockLLMService.swift */; };
 		3EE6A10EB470F1654EA8EE1C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 01C496581684518021B58948 /* LaunchScreen.storyboard */; };
+		A581B8AAA52642EE931EFFE4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB3675BA236E4F47A65BFBDA /* Assets.xcassets */; };
 		40617E027E2B006827B08E81 /* DeepgramTTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B615593CB5F40AE18991D0 /* DeepgramTTSService.swift */; };
 		445DE38CFA5CBA6AEDF7CC2C /* CurriculumModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6762AB91B87A534E283F0CD0 /* CurriculumModels.swift */; };
 		469094F4D5F4797BA502E893 /* Topic+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41404B99C2D28DB798E458D0 /* Topic+CoreDataClass.swift */; };
@@ -114,6 +115,7 @@
 		F5B96F9B50C19678571221DA /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AD25072A06649A8319CA61 /* ServerSettingsView.swift */; };
 		F6515847BF5C9C7953D34854 /* LLMTaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9AD07E27AF281275DC11BE0 /* LLMTaskType.swift */; };
 		F98DD78B3D71992AFF824066 /* HelpComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */; };
+		4A8A1B18B8924AB280246CAF /* BrandLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E10A9A03F8E4952B7336FB9 /* BrandLogo.swift */; };
 		906DB3A650504D8092ABD48A /* SessionControlComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AC7209455743729D32DEE2 /* SessionControlComponents.swift */; };
 		FAD3F8A6F3DD20E8B474CF37 /* GLMASRIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED7DFE0AA0EFDFDA0E2997B /* GLMASRIntegrationTests.swift */; };
 		FFF26AE98F6DDE371CA0B169 /* VADService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F889719749AE4061E8AD19F /* VADService.swift */; };
@@ -133,6 +135,7 @@
 		0036EFE850AA592D96BD5AAE /* TopicEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicEntity.swift; sourceTree = "<group>"; };
 		0122D12D71D21E39864BD351 /* RemoteLogHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLogHandler.swift; sourceTree = "<group>"; };
 		01C496581684518021B58948 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DB3675BA236E4F47A65BFBDA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		037AC52C72070C79DF5CCA3B /* VisualAsset+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VisualAsset+CoreDataClass.swift"; sourceTree = "<group>"; };
 		06BE3D2A121D2753F7AD378F /* UnaMentis.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = UnaMentis.xcdatamodel; sourceTree = "<group>"; };
 		07CF7D30DE2EBE3285D2B6D6 /* AnthropicLLMServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicLLMServiceTests.swift; sourceTree = "<group>"; };
@@ -170,6 +173,7 @@
 		4E5DFDB8CAB387BD3FABE2DB /* SessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionView.swift; sourceTree = "<group>"; };
 		5F889719749AE4061E8AD19F /* VADService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VADService.swift; sourceTree = "<group>"; };
 		6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpComponents.swift; sourceTree = "<group>"; };
+		8E10A9A03F8E4952B7336FB9 /* BrandLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandLogo.swift; sourceTree = "<group>"; };
 		73AC7209455743729D32DEE2 /* SessionControlComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionControlComponents.swift; sourceTree = "<group>"; };
 		60AD25072A06649A8319CA61 /* ServerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsView.swift; sourceTree = "<group>"; };
 		6762AB91B87A534E283F0CD0 /* CurriculumModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumModels.swift; sourceTree = "<group>"; };
@@ -505,6 +509,7 @@
 				C106D83D776CAC24BE29F29E /* CLAUDE.md */,
 				BD201D1F3BB062E53F4A882A /* Info.plist */,
 				01C496581684518021B58948 /* LaunchScreen.storyboard */,
+				DB3675BA236E4F47A65BFBDA /* Assets.xcassets */,
 				69BCDC85F09A4EC5F3AFF8C8 /* Localizable.strings */,
 				C8CD06EDCAA31E7B098CFE99 /* UnaMentis.entitlements */,
 				C9E6C480A39CD30072D919FF /* UnaMentis.xcdatamodeld */,
@@ -640,6 +645,7 @@
 			isa = PBXGroup;
 			children = (
 				6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */,
+				8E10A9A03F8E4952B7336FB9 /* BrandLogo.swift */,
 				73AC7209455743729D32DEE2 /* SessionControlComponents.swift */,
 			);
 			path = Components;
@@ -786,6 +792,7 @@
 			files = (
 				9FF33043A3535D20BB665608 /* CLAUDE.md in Resources */,
 				3EE6A10EB470F1654EA8EE1C /* LaunchScreen.storyboard in Resources */,
+				A581B8AAA52642EE931EFFE4 /* Assets.xcassets in Resources */,
 				4B12FB0AF2279C8F7769DCC8 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -826,6 +833,7 @@
 				6620DE1B619B9F29F9CFEE0B /* GLMASROnDeviceSTTService.swift in Sources */,
 				979AE8F5878DBD378FADD22F /* GLMASRSTTService.swift in Sources */,
 				F98DD78B3D71992AFF824066 /* HelpComponents.swift in Sources */,
+				4A8A1B18B8924AB280246CAF /* BrandLogo.swift in Sources */,
 				906DB3A650504D8092ABD48A /* SessionControlComponents.swift in Sources */,
 				A0569F0FAEBFCCBEA2B1A1AA /* HelpView.swift in Sources */,
 				4D5B79F40271572EDF52AF45 /* HistoryView.swift in Sources */,

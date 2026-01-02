@@ -46,6 +46,32 @@ xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
 ./scripts/health-check.sh
 ```
 
+## MANDATORY: Log Server Must Always Be Running
+
+**The log server MUST be running whenever the iOS app or any server is running.** This is non-negotiable.
+
+```bash
+# Start log server FIRST, before anything else
+python3 scripts/log_server.py &
+
+# Verify it's running
+curl -s http://localhost:8765/health  # Returns "OK"
+```
+
+**Access logs:**
+- Web interface: http://localhost:8765/
+- JSON API: `curl -s http://localhost:8765/logs`
+- Clear logs: `curl -s -X POST http://localhost:8765/clear`
+
+**When debugging issues:**
+1. Ensure log server is running
+2. Clear logs: `curl -s -X POST http://localhost:8765/clear`
+3. Reproduce the issue
+4. Fetch logs: `curl -s http://localhost:8765/logs | python3 -m json.tool`
+5. The last log message before a freeze identifies the blocking point
+
+Without the log server, debugging is guesswork. Always start it first.
+
 ## MANDATORY: Definition of Done
 
 **NO IMPLEMENTATION IS COMPLETE UNTIL TESTS PASS.** This is the single most important rule.

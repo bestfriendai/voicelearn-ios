@@ -173,15 +173,50 @@ If you tell the user "implementation is complete" when tests are failing, you ha
 - **Localizable strings for all user-facing text** (per iOS Style Guide)
 - **iPad adaptive layouts using size class detection** (per iOS Style Guide)
 
+### MANDATORY: Log Server Must Always Be Running
+
+**The remote log server MUST be running whenever:**
+- The iOS app is running (simulator or device)
+- Any server component is running (Management Console, Operations Console)
+- You are testing, debugging, or developing any part of the system
+
+**This is non-negotiable.** The log server is our primary debugging tool. Without it, diagnosing issues is guesswork.
+
+**Start the log server FIRST, before anything else:**
+```bash
+python3 scripts/log_server.py &
+```
+
+**Verify it's running:**
+```bash
+curl -s http://localhost:8765/health  # Should return "OK"
+```
+
+**Access logs:**
+- Web interface: http://localhost:8765/
+- JSON API: `curl -s http://localhost:8765/logs`
+- Clear logs: `curl -s -X POST http://localhost:8765/clear`
+
+**When debugging issues:**
+1. Check log server is running first
+2. Clear logs before reproducing the issue
+3. Reproduce the issue
+4. Fetch and analyze logs immediately
+5. The last log message before a freeze/crash identifies the blocking point
+
+**For device testing:** Set the log server IP in app Settings > Debug to your Mac's IP address.
+
 ### Server Work Completion Requirements
 
 **When modifying server code (Management Console, Operations Console, or any Python/Node backend), you MUST:**
 
-1. **Restart the affected server** after making code changes
-2. **Verify the changes are working** by testing the modified functionality
-3. **Check server logs** to confirm the new code is running (look for expected log output)
+1. **Ensure log server is running** (see above)
+2. **Restart the affected server** after making code changes
+3. **Verify the changes are working** by testing the modified functionality
+4. **Check server logs** to confirm the new code is running (look for expected log output)
 
 This is non-negotiable. Server work is NOT complete until:
+- The log server is running and capturing logs
 - The server has been restarted with your changes
 - You have verified the changes work as expected
 - You have confirmed via logs or API calls that your code is active

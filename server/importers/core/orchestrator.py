@@ -379,13 +379,14 @@ class ImportOrchestrator:
         progress.update_stage("enrich", "running")
         self._notify_progress(progress)
 
-        # Enrichment substages
+        # Enrichment substages (now including image acquisition)
         enrichment_stages = [
             ("enrich_analysis", "Content Analysis", config.generate_objectives),
             ("enrich_structure", "Structure Inference", True),
             ("enrich_segment", "Content Segmentation", config.create_checkpoints),
             ("enrich_objectives", "Learning Objectives", config.generate_objectives),
             ("enrich_assessments", "Assessment Enhancement", True),
+            ("enrich_images", "Image Acquisition", True),  # New stage
             ("enrich_tutoring", "Tutoring Enhancement", config.generate_spoken_text),
             ("enrich_kg", "Knowledge Graph", config.build_knowledge_graph),
         ]
@@ -403,8 +404,12 @@ class ImportOrchestrator:
             progress.update_stage(stage_id, "running")
             self._notify_progress(progress)
 
-            # Simulate enrichment (in production, call actual enrichment pipeline)
-            await asyncio.sleep(0.5)
+            # Run image acquisition stage
+            if stage_id == "enrich_images":
+                await self._run_image_acquisition(progress, config)
+            else:
+                # Simulate other enrichment stages (in production, call actual enrichment pipeline)
+                await asyncio.sleep(0.5)
 
             progress.update_stage(stage_id, "complete", 100, f"{stage_name} complete")
             progress.add_log("info", f"Completed: {stage_name}")
@@ -414,6 +419,131 @@ class ImportOrchestrator:
         progress.update_stage("enrich", "complete", 100, "Enrichment complete")
         progress.overall_progress = 80.0
         self._notify_progress(progress)
+
+    async def _run_image_acquisition(self, progress: ImportProgress, config: ImportConfig):  # noqa: ARG002
+        """Acquire and validate images for the curriculum."""
+        try:
+            from ..enrichment.image_acquisition import (
+                ImageAcquisitionService,
+                ImageAssetInfo,
+                ImageSourceType,
+            )
+
+            extracted_content = getattr(progress, "_extracted_content", {})
+            content_path = getattr(progress, "_content_path", None)
+
+            if not content_path:
+                progress.add_log("warning", "No content path for image acquisition")
+                return
+
+            output_dir = Path(content_path)
+            service = ImageAcquisitionService(cache_dir=output_dir / "images")
+
+            try:
+                # Collect image assets from extracted content
+                # Look for media collections in the content structure
+                assets = []
+                lectures = extracted_content.get("lectures", [])
+
+                for lecture in lectures:
+                    media = lecture.get("media", {})
+                    for embedded in media.get("embedded", []):
+                        if embedded.get("type") in ("image", "diagram", "chart", "slideImage"):
+                            assets.append(ImageAssetInfo(
+                                id=embedded.get("id", f"img-{len(assets)}"),
+                                url=embedded.get("url"),
+                                local_path=embedded.get("localPath"),
+                                title=embedded.get("title"),
+                                alt=embedded.get("alt"),
+                                caption=embedded.get("caption"),
+                                audio_description=embedded.get("audioDescription"),
+                                asset_type=embedded.get("type", "image"),
+                                width=embedded.get("dimensions", {}).get("width", 0),
+                                height=embedded.get("dimensions", {}).get("height", 0),
+                            ))
+
+                if not assets:
+                    progress.add_log("info", "No image assets to acquire")
+                    return
+
+                # Acquire images
+                results = {}
+                acquired = 0
+                failed = 0
+                replaced = 0
+
+                for asset in assets:
+                    result = await service.acquire_image(asset)
+                    results[asset.id] = result
+
+                    if result.success:
+                        acquired += 1
+                        if result.source_type == ImageSourceType.WIKIMEDIA_SEARCH:
+                            replaced += 1
+                            progress.add_log(
+                                "info",
+                                f"Found replacement for {asset.id} on Wikimedia"
+                            )
+                        elif result.source_type == ImageSourceType.GENERATED:
+                            replaced += 1
+                            progress.add_log(
+                                "info",
+                                f"Generated placeholder for {asset.id}"
+                            )
+                    else:
+                        failed += 1
+                        progress.add_log(
+                            "warning",
+                            f"Failed to acquire {asset.id}: {result.error}"
+                        )
+
+                # Store results for generate stage
+                progress._acquired_images = results
+
+                # Save acquired images
+                images_dir = output_dir / "images"
+                images_dir.mkdir(parents=True, exist_ok=True)
+
+                asset_data = {}
+                for asset_id, result in results.items():
+                    if result.success and result.data:
+                        ext_map = {
+                            "image/jpeg": ".jpg",
+                            "image/png": ".png",
+                            "image/gif": ".gif",
+                            "image/webp": ".webp",
+                            "image/svg+xml": ".svg",
+                        }
+                        ext = ext_map.get(result.mime_type, ".jpg")
+
+                        file_path = images_dir / f"{asset_id}{ext}"
+                        file_path.write_bytes(result.data)
+
+                        import base64
+                        asset_data[asset_id] = {
+                            "data": base64.b64encode(result.data).decode('utf-8'),
+                            "mimeType": result.mime_type,
+                            "size": len(result.data),
+                            "source": result.source_type.value,
+                            "newUrl": result.new_url,
+                            "attribution": result.attribution,
+                        }
+
+                # Store for later bundling with UMCF
+                progress._asset_data = asset_data
+
+                progress.add_log(
+                    "info",
+                    f"Image acquisition: {acquired} acquired, {replaced} replaced, {failed} failed"
+                )
+
+            finally:
+                await service.close()
+
+        except ImportError as e:
+            progress.add_log("warning", f"Image acquisition not available: {e}")
+        except Exception as e:
+            progress.add_log("error", f"Image acquisition failed: {e}")
 
     async def _run_generate_stage(self, progress: ImportProgress):
         """Generate UMCF output."""

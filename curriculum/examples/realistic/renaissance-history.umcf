@@ -115,7 +115,7 @@
       {
         "id": "term-renaissance",
         "term": "Renaissance",
-        "pronunciation": "/ˈrenəˌsäns/",
+        "pronunciation": "/\u02c8ren\u0259\u02ccs\u00e4ns/",
         "definition": "A period of cultural, artistic, and intellectual revival in Europe from the 14th to 17th century, marking the transition from medieval to modern times.",
         "spokenDefinition": "The Renaissance was an amazing time in European history, roughly from the 1300s to the 1600s, when art, science, and learning exploded after the darker medieval period. The word Renaissance literally means 'rebirth' in French, because it felt like civilization was being reborn.",
         "simpleDefinition": "A time in Europe when art, science, and learning became super important again after the Middle Ages. It means 'rebirth.'",
@@ -129,7 +129,7 @@
       {
         "id": "term-humanism",
         "term": "humanism",
-        "pronunciation": "/ˈhyo͞oməˌnizəm/",
+        "pronunciation": "/\u02c8hyo\u035eom\u0259\u02ccniz\u0259m/",
         "definition": "A Renaissance philosophy that emphasized human potential, achievements, and the study of classical Greek and Roman texts.",
         "spokenDefinition": "Humanism was a big idea during the Renaissance. Instead of focusing only on religious topics, humanists said, 'Hey, humans are pretty amazing! Let's study what people in ancient Greece and Rome accomplished and see what we can learn.' They believed in human potential and individual achievement.",
         "simpleDefinition": "A way of thinking that says people are capable of great things and we should study what ancient Greeks and Romans did.",
@@ -142,7 +142,7 @@
       {
         "id": "term-patron",
         "term": "patron",
-        "pronunciation": "/ˈpātrən/",
+        "pronunciation": "/\u02c8p\u0101tr\u0259n/",
         "definition": "A wealthy person who financially supports artists, writers, or other creative people.",
         "spokenDefinition": "A patron was a rich person who paid artists to create their works. During the Renaissance, wealthy families like the Medici in Florence were famous patrons. Without patrons, many great artists couldn't have afforded to spend their time painting or sculpting.",
         "simpleDefinition": "A rich person who pays artists to create art.",
@@ -155,7 +155,7 @@
       {
         "id": "term-perspective",
         "term": "perspective",
-        "pronunciation": "/pərˈspektiv/",
+        "pronunciation": "/p\u0259r\u02c8spektiv/",
         "definition": "An artistic technique that creates the illusion of depth and three-dimensional space on a flat surface.",
         "spokenDefinition": "Perspective is a technique that makes flat paintings look like they have depth, like you could walk right into them. Renaissance artists figured out the math behind how things look smaller when they're far away, and they used it to create incredibly realistic scenes. Before this, medieval art looked pretty flat.",
         "simpleDefinition": "A way of drawing that makes flat pictures look 3D, with things getting smaller in the distance.",
@@ -168,7 +168,7 @@
       {
         "id": "term-printing-press",
         "term": "printing press",
-        "pronunciation": "/ˈprintiNG pres/",
+        "pronunciation": "/\u02c8printiNG pres/",
         "definition": "A mechanical device invented by Johannes Gutenberg around 1440 that could produce multiple copies of text quickly.",
         "spokenDefinition": "The printing press was a machine that changed the world. Before Gutenberg invented it around 1440, every book had to be copied by hand, which was incredibly slow and expensive. The printing press could make many copies of a book quickly, which meant more people could afford books and learn to read.",
         "simpleDefinition": "A machine that could make many copies of a book quickly instead of writing each one by hand.",
@@ -181,7 +181,7 @@
       {
         "id": "term-reformation",
         "term": "Reformation",
-        "pronunciation": "/ˌrefərˈmāSH(ə)n/",
+        "pronunciation": "/\u02ccref\u0259r\u02c8m\u0101SH(\u0259)n/",
         "definition": "A 16th-century religious movement that led to the split of Western Christianity into Catholic and Protestant churches.",
         "spokenDefinition": "The Reformation was a religious revolution that happened during the Renaissance. People like Martin Luther criticized the Catholic Church and started new Protestant churches. This happened partly because the printing press helped spread new ideas quickly.",
         "simpleDefinition": "A time when people challenged the Catholic Church and created new Christian churches.",
@@ -194,7 +194,7 @@
       {
         "id": "term-classical",
         "term": "classical",
-        "pronunciation": "/ˈklasək(ə)l/",
+        "pronunciation": "/\u02c8klas\u0259k(\u0259)l/",
         "definition": "Relating to ancient Greek and Roman civilization, art, and learning.",
         "spokenDefinition": "When historians say 'classical,' they mean ancient Greece and Rome. During the Renaissance, people became obsessed with studying classical texts, architecture, and art. They thought the ancients had figured out a lot of important things that had been forgotten during the Middle Ages.",
         "simpleDefinition": "Related to ancient Greece and Rome.",
@@ -207,7 +207,7 @@
       {
         "id": "term-fresco",
         "term": "fresco",
-        "pronunciation": "/ˈfreskō/",
+        "pronunciation": "/\u02c8fresk\u014d/",
         "definition": "A painting technique where pigments are applied to wet plaster on a wall or ceiling.",
         "spokenDefinition": "A fresco is a type of painting done on wet plaster. The artist has to work fast before the plaster dries! Michelangelo painted the Sistine Chapel ceiling using this technique. It was incredibly difficult because he had to paint while lying on scaffolding, looking up.",
         "simpleDefinition": "A painting made on wet plaster on a wall or ceiling.",
@@ -220,7 +220,7 @@
       {
         "id": "term-city-state",
         "term": "city-state",
-        "pronunciation": "/ˈsidē stāt/",
+        "pronunciation": "/\u02c8sid\u0113 st\u0101t/",
         "definition": "An independent city and its surrounding territory that functions as its own nation.",
         "spokenDefinition": "A city-state is a city that runs itself like its own country. During the Renaissance, Italy wasn't one unified country like it is today. Instead, it was made up of powerful city-states like Florence, Venice, and Milan. These city-states competed with each other, which actually helped art and culture flourish.",
         "simpleDefinition": "A city that acts like its own country, with its own government.",
@@ -233,7 +233,7 @@
       {
         "id": "term-scientific-method",
         "term": "scientific method",
-        "pronunciation": "/ˌsīənˈtifik ˈmeTHəd/",
+        "pronunciation": "/\u02ccs\u012b\u0259n\u02c8tifik \u02c8meTH\u0259d/",
         "definition": "A systematic approach to learning about the world through observation, hypothesis, experimentation, and analysis.",
         "spokenDefinition": "The scientific method is a way of figuring out how things work. Instead of just accepting what old books said, Renaissance scientists like Galileo actually tested their ideas with experiments. They observed, made guesses about what might be true, tested those guesses, and then revised their ideas based on the results.",
         "simpleDefinition": "A step-by-step way of learning about the world through experiments and observations.",
@@ -668,7 +668,7 @@
               {
                 "id": "img-feudal-pyramid",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Feudal_pyramid.svg/800px-Feudal_pyramid.svg.png",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/F%C3%B8ydalsystem.jpg/857px-F%C3%B8ydalsystem.jpg",
                 "title": "The Feudal System Pyramid",
                 "alt": "Diagram showing the hierarchical structure of medieval feudal society, with the king at top, followed by nobles, knights, and peasants at the base",
                 "caption": "The feudal pyramid: King at top, peasants at the bottom making up 90% of the population",
@@ -682,12 +682,13 @@
                   "endSegment": 4,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "A pyramid diagram showing medieval social hierarchy. At the tiny peak sits the king. Below him, a small layer of nobles and lords. Below them, knights in armor. The massive base of the pyramid represents peasants and serfs, making up about ninety percent of the population."
+                "audioDescription": "A pyramid diagram showing medieval social hierarchy. At the tiny peak sits the king. Below him, a small layer of nobles and lords. Below them, knights in armor. The massive base of the pyramid represents peasants and serfs, making up about ninety percent of the population.",
+                "attribution": "Image from Wikimedia Commons by Petter Ulleland (CC BY-SA 4.0)"
               },
               {
                 "id": "img-medieval-manuscript",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Monk_at_work_in_a_scriptorium.jpg/800px-Monk_at_work_in_a_scriptorium.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NZWRpZXZhbCBNb25rIGluIFNjcmlwdG9yaXVtPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "Medieval Monk in Scriptorium",
                 "alt": "Illustration of a medieval monk copying manuscripts by hand in a monastery scriptorium",
                 "caption": "A monk copying books by hand in a scriptorium - each book could take months or years to complete",
@@ -701,12 +702,14 @@
                   "endSegment": 7,
                   "displayMode": "inline"
                 },
-                "audioDescription": "An illustration showing a medieval monk hunched over a desk in a monastery scriptorium, carefully copying text by hand onto parchment. The room has a small window for light, and the monk uses a quill pen and inkwell."
+                "audioDescription": "An illustration showing a medieval monk hunched over a desk in a monastery scriptorium, carefully copying text by hand onto parchment. The room has a small window for light, and the monk uses a quill pen and inkwell.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-plague-doctor",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Paul_F%C3%BCrst%2C_Der_Doctor_Schnabel_von_Rom_%28Coloured_version%29.png/520px-Paul_F%C3%BCrst%2C_Der_Doctor_Schnabel_von_Rom_%28Coloured_version%29.png",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Craig_the_Plague_Doctor_%2818869539725%29.jpg/960px-Craig_the_Plague_Doctor_%2818869539725%29.jpg",
                 "title": "The Plague Doctor",
                 "alt": "17th century engraving of a plague doctor wearing the characteristic beaked mask and long coat",
                 "caption": "Doctor Schnabel of Rome - the iconic plague doctor with his beaked mask filled with herbs",
@@ -720,7 +723,8 @@
                   "endSegment": 11,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "A haunting engraving of a plague doctor from Rome, wearing a long dark coat, a wide-brimmed hat, and the distinctive bird-like mask with a long beak. The beak was filled with aromatic herbs that doctors believed would protect them from disease."
+                "audioDescription": "A haunting engraving of a plague doctor from Rome, wearing a long dark coat, a wide-brimmed hat, and the distinctive bird-like mask with a long beak. The beak was filled with aromatic herbs that doctors believed would protect them from disease.",
+                "attribution": "Image from Wikimedia Commons by David Prasad from Fresno, CA., United States (CC BY-SA 2.0)"
               },
               {
                 "id": "img-black-death-spread",
@@ -746,7 +750,7 @@
               {
                 "id": "ref-medieval-europe-map",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Europe_1000.jpg/1200px-Europe_1000.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NYXAgb2YgTWVkaWV2YWwgRXVyb3BlIGFyb3VuZCAxMDAwIEFEPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "Map of Medieval Europe around 1000 AD",
                 "description": "Detailed political map showing the kingdoms, duchies, and empires of medieval Europe",
                 "keywords": [
@@ -755,12 +759,14 @@
                   "europe",
                   "kingdoms",
                   "geography"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "ref-medieval-cathedral",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Notre-Dame_de_Paris_2013-07-24.jpg/800px-Notre-Dame_de_Paris_2013-07-24.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Paris%2C_Notre_Dame_--_2014_--_1458-65.jpg/960px-Paris%2C_Notre_Dame_--_2014_--_1458-65.jpg",
                 "title": "Notre-Dame Cathedral, Paris",
                 "description": "Example of Gothic cathedral architecture from the medieval period",
                 "keywords": [
@@ -769,7 +775,8 @@
                   "architecture",
                   "church",
                   "medieval building"
-                ]
+                ],
+                "attribution": "Image from Wikimedia Commons by Dietmar Rabich (CC BY-SA 4.0)"
               }
             ]
           }
@@ -796,121 +803,121 @@
           "transcript": {
             "pronunciationGuide": {
               "Medici": {
-                "ipa": "/ˈmɛdɪtʃi/",
+                "ipa": "/\u02c8m\u025bd\u026at\u0283i/",
                 "respelling": "MED-ih-chee",
                 "language": "it",
                 "notes": "Italian banking family, not 'meh-DEE-chee'"
               },
               "Cosimo de' Medici": {
-                "ipa": "/ˈkɔːzɪmoʊ deɪ ˈmɛdɪtʃi/",
+                "ipa": "/\u02c8k\u0254\u02d0z\u026amo\u028a de\u026a \u02c8m\u025bd\u026at\u0283i/",
                 "respelling": "KAW-zee-moh day MED-ih-chee",
                 "language": "it"
               },
               "Lorenzo de' Medici": {
-                "ipa": "/loʊˈrɛntsoʊ deɪ ˈmɛdɪtʃi/",
+                "ipa": "/lo\u028a\u02c8r\u025bntso\u028a de\u026a \u02c8m\u025bd\u026at\u0283i/",
                 "respelling": "loh-REN-tsoh day MED-ih-chee",
                 "language": "it"
               },
               "Florence": {
-                "ipa": "/ˈflɒrəns/",
+                "ipa": "/\u02c8fl\u0252r\u0259ns/",
                 "respelling": "FLOR-ence",
                 "language": "en",
                 "notes": "English name for Firenze"
               },
               "Venice": {
-                "ipa": "/ˈvɛnɪs/",
+                "ipa": "/\u02c8v\u025bn\u026as/",
                 "respelling": "VEN-iss",
                 "language": "en",
                 "notes": "English name for Venezia"
               },
               "Milan": {
-                "ipa": "/mɪˈlæn/",
+                "ipa": "/m\u026a\u02c8l\u00e6n/",
                 "respelling": "mih-LAN",
                 "language": "en",
                 "notes": "English name for Milano"
               },
               "Filippo Brunelleschi": {
-                "ipa": "/fɪˈliːpoʊ ˌbruːnɛˈlɛski/",
+                "ipa": "/f\u026a\u02c8li\u02d0po\u028a \u02ccbru\u02d0n\u025b\u02c8l\u025bski/",
                 "respelling": "fih-LEE-poh broo-neh-LES-kee",
                 "language": "it"
               },
               "Leonardo da Vinci": {
-                "ipa": "/ˌleɪɔˈnɑːrdoʊ dɑː ˈvɪntʃi/",
+                "ipa": "/\u02ccle\u026a\u0254\u02c8n\u0251\u02d0rdo\u028a d\u0251\u02d0 \u02c8v\u026ant\u0283i/",
                 "respelling": "lay-oh-NAR-doh dah VIN-chee",
                 "language": "it"
               },
               "Michelangelo": {
-                "ipa": "/ˌmaɪkəlˈændʒəloʊ/",
+                "ipa": "/\u02ccma\u026ak\u0259l\u02c8\u00e6nd\u0292\u0259lo\u028a/",
                 "respelling": "my-kul-AN-juh-loh",
                 "language": "it",
                 "notes": "Anglicized pronunciation commonly used"
               },
               "Constantinople": {
-                "ipa": "/ˌkɒnstæntɪˈnoʊpəl/",
+                "ipa": "/\u02cck\u0252nst\u00e6nt\u026a\u02c8no\u028ap\u0259l/",
                 "respelling": "kon-stan-tih-NOH-pul",
                 "language": "en"
               },
               "Byzantine": {
-                "ipa": "/ˈbɪzəntiːn/",
+                "ipa": "/\u02c8b\u026az\u0259nti\u02d0n/",
                 "respelling": "BIZ-un-teen",
                 "language": "en"
               },
               "Ottoman": {
-                "ipa": "/ˈɒtəmən/",
+                "ipa": "/\u02c8\u0252t\u0259m\u0259n/",
                 "respelling": "OT-uh-mun",
                 "language": "en"
               },
               "Plato": {
-                "ipa": "/ˈpleɪtoʊ/",
+                "ipa": "/\u02c8ple\u026ato\u028a/",
                 "respelling": "PLAY-toh",
                 "language": "en"
               },
               "Aristotle": {
-                "ipa": "/ˈærɪstɒtəl/",
+                "ipa": "/\u02c8\u00e6r\u026ast\u0252t\u0259l/",
                 "respelling": "AIR-ih-stot-ul",
                 "language": "en"
               },
               "florin": {
-                "ipa": "/ˈflɒrɪn/",
+                "ipa": "/\u02c8fl\u0252r\u026an/",
                 "respelling": "FLOR-in",
                 "language": "en",
                 "notes": "Florentine gold coin"
               },
               "studia humanitatis": {
-                "ipa": "/ˈstuːdiə hjuːˈmænɪtɑːtɪs/",
+                "ipa": "/\u02c8stu\u02d0di\u0259 hju\u02d0\u02c8m\u00e6n\u026at\u0251\u02d0t\u026as/",
                 "respelling": "STOO-dee-uh hyoo-man-ih-TAH-tis",
                 "language": "la",
                 "notes": "Latin phrase meaning 'study of humanity'"
               },
               "Platonic Academy": {
-                "ipa": "/pləˈtɒnɪk əˈkædəmi/",
+                "ipa": "/pl\u0259\u02c8t\u0252n\u026ak \u0259\u02c8k\u00e6d\u0259mi/",
                 "respelling": "pluh-TON-ik uh-KAD-uh-mee",
                 "language": "en"
               },
               "Arno": {
-                "ipa": "/ˈɑːrnoʊ/",
+                "ipa": "/\u02c8\u0251\u02d0rno\u028a/",
                 "respelling": "AR-noh",
                 "language": "it",
                 "notes": "River running through Florence"
               },
               "Pope Julius": {
-                "ipa": "/poʊp ˈdʒuːliəs/",
+                "ipa": "/po\u028ap \u02c8d\u0292u\u02d0li\u0259s/",
                 "respelling": "pope JOO-lee-us",
                 "language": "en"
               },
               "Raphael": {
-                "ipa": "/ˈræfeɪəl/",
+                "ipa": "/\u02c8r\u00e6fe\u026a\u0259l/",
                 "respelling": "RAF-ay-ul",
                 "language": "en",
                 "notes": "Anglicized; Italian is Raffaello"
               },
               "Sistine Chapel": {
-                "ipa": "/ˈsɪstiːn ˈtʃæpəl/",
+                "ipa": "/\u02c8s\u026asti\u02d0n \u02c8t\u0283\u00e6p\u0259l/",
                 "respelling": "SIS-teen CHAP-ul",
                 "language": "en"
               },
               "Vatican": {
-                "ipa": "/ˈvætɪkən/",
+                "ipa": "/\u02c8v\u00e6t\u026ak\u0259n/",
                 "respelling": "VAT-ih-kun",
                 "language": "en"
               }
@@ -1362,7 +1369,7 @@
               {
                 "id": "img-italian-city-states",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Italy_1494_v2.png/800px-Italy_1494_v2.png",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/6/62/Saint_Christopher_and_the_Infant_Christ_MET_Ghirlandaio_giornate.jpg",
                 "title": "Italian City-States in 1494",
                 "alt": "Map of the Italian peninsula showing the major city-states during the Renaissance including Florence, Venice, Milan, and the Papal States",
                 "caption": "The Italian Peninsula divided among powerful city-states - the birthplace of the Renaissance",
@@ -1376,12 +1383,13 @@
                   "endSegment": 3,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "A colorful map of the Italian peninsula in 1494 showing the major Renaissance city-states. Florence is shown in central Italy, Venice controls the northeast, Milan dominates the north, and the Papal States stretch across the center. Naples controls the south."
+                "audioDescription": "A colorful map of the Italian peninsula in 1494 showing the major Renaissance city-states. Florence is shown in central Italy, Venice controls the northeast, Milan dominates the north, and the Papal States stretch across the center. Naples controls the south.",
+                "attribution": "Image from Wikimedia Commons by Domenico Ghirlandaio (CC0)"
               },
               {
                 "id": "img-florence-duomo",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Florence_duomo_fc01.jpg/1200px-Florence_duomo_fc01.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Florence_Cathedral_-_Duomo_-_Cathedral_of_Santa_Maria_del_Fiore_%2851351491273%29.jpg/960px-Florence_Cathedral_-_Duomo_-_Cathedral_of_Santa_Maria_del_Fiore_%2851351491273%29.jpg",
                 "title": "Florence Cathedral (Duomo)",
                 "alt": "The Florence Cathedral with Brunelleschi's famous dome rising above the city",
                 "caption": "Brunelleschi's dome on the Florence Cathedral - an engineering marvel of the Renaissance",
@@ -1395,12 +1403,13 @@
                   "endSegment": 10,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "The magnificent Florence Cathedral, known as the Duomo, with its iconic terracotta-colored dome designed by Filippo Brunelleschi. The dome dominates the city skyline and was the largest dome built since ancient Rome."
+                "audioDescription": "The magnificent Florence Cathedral, known as the Duomo, with its iconic terracotta-colored dome designed by Filippo Brunelleschi. The dome dominates the city skyline and was the largest dome built since ancient Rome.",
+                "attribution": "Image from Wikimedia Commons by Nan Palmero from San Antonio, TX, USA (CC BY 2.0)"
               },
               {
                 "id": "img-medici-lorenzo",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Lorenzo_de%27_Medici-ritratto.jpg/460px-Lorenzo_de%27_Medici-ritratto.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Where_ghosts_walk_-_the_haunts_of_familiar_characters_in_history_and_literature_%281898%29_%2814779935171%29.jpg/960px-Where_ghosts_walk_-_the_haunts_of_familiar_characters_in_history_and_literature_%281898%29_%2814779935171%29.jpg",
                 "title": "Lorenzo de' Medici (Lorenzo the Magnificent)",
                 "alt": "Portrait of Lorenzo de' Medici, the powerful Florentine ruler and art patron",
                 "caption": "Lorenzo the Magnificent - ruler of Florence and one of the greatest art patrons in history",
@@ -1414,12 +1423,13 @@
                   "endSegment": 8,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A Renaissance portrait of Lorenzo de' Medici, known as Lorenzo the Magnificent. He has a strong, distinctive face with a prominent nose. Lorenzo was the de facto ruler of Florence and used his banking fortune to support artists like Michelangelo, Botticelli, and Leonardo da Vinci."
+                "audioDescription": "A Renaissance portrait of Lorenzo de' Medici, known as Lorenzo the Magnificent. He has a strong, distinctive face with a prominent nose. Lorenzo was the de facto ruler of Florence and used his banking fortune to support artists like Michelangelo, Botticelli, and Leonardo da Vinci.",
+                "attribution": "Image from Wikimedia Commons by \nInternet Archive Book Images (No restrictions)"
               },
               {
                 "id": "img-venice-grand-canal",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Canaletto%2C_Entrance_to_the_Grand_Canal_from_the_Piazzetta.jpg/1200px-Canaletto%2C_Entrance_to_the_Grand_Canal_from_the_Piazzetta.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/L%27entr%C3%A9e_du_grand_canal_de_Canaletto_%28Grand_Palais%2C_Paris%29_%2844192095965%29.jpg/960px-L%27entr%C3%A9e_du_grand_canal_de_Canaletto_%28Grand_Palais%2C_Paris%29_%2844192095965%29.jpg",
                 "title": "Venice: Entrance to the Grand Canal",
                 "alt": "Painting by Canaletto showing the entrance to Venice's Grand Canal with gondolas and grand architecture",
                 "caption": "Venice's Grand Canal - the wealthy trading republic that rivaled Florence",
@@ -1433,14 +1443,15 @@
                   "endSegment": 5,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A painting by Canaletto depicting the entrance to Venice's famous Grand Canal. Gondolas float on sparkling water, surrounded by magnificent palaces and the iconic architecture of the Venetian Republic, one of the wealthiest trading powers of the Renaissance."
+                "audioDescription": "A painting by Canaletto depicting the entrance to Venice's famous Grand Canal. Gondolas float on sparkling water, surrounded by magnificent palaces and the iconic architecture of the Venetian Republic, one of the wealthiest trading powers of the Renaissance.",
+                "attribution": "Image from Wikimedia Commons by Canaletto (CC BY 2.0)"
               }
             ],
             "reference": [
               {
                 "id": "ref-medici-bank",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Medici_family_tree.png/800px-Medici_family_tree.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0UzRjJGRCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NZWRpY2kgRmFtaWx5IFRyZWU8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMxOTc2RDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIG9wYWNpdHk9IjAuNyI+UGxhY2Vob2xkZXIgLSBvcmlnaW5hbCBpbWFnZSB1bmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+",
                 "title": "Medici Family Tree",
                 "description": "Genealogical chart showing the Medici family's banking empire and political connections",
                 "keywords": [
@@ -1449,12 +1460,14 @@
                   "banking",
                   "florence",
                   "dynasty"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "ref-constantinople-fall",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Siege_of_Constantinople_by_the_Turks_%281453%29.jpg/1200px-Siege_of_Constantinople_by_the_Turks_%281453%29.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Theofilos_Palaiologos.jpg/960px-Theofilos_Palaiologos.jpg",
                 "title": "Fall of Constantinople (1453)",
                 "description": "Painting depicting the Ottoman siege of Constantinople in 1453, which drove Greek scholars to Italy",
                 "keywords": [
@@ -1464,7 +1477,8 @@
                   "1453",
                   "scholars",
                   "greek"
-                ]
+                ],
+                "attribution": "Image from Wikimedia Commons by Theophilos Hatzimihail (Public domain)"
               }
             ]
           }
@@ -1491,50 +1505,50 @@
           "transcript": {
             "pronunciationGuide": {
               "Filippo Brunelleschi": {
-                "ipa": "/fɪˈliːpoʊ ˌbruːnɛˈlɛski/",
+                "ipa": "/f\u026a\u02c8li\u02d0po\u028a \u02ccbru\u02d0n\u025b\u02c8l\u025bski/",
                 "respelling": "fih-LEE-poh broo-neh-LES-kee",
                 "language": "it"
               },
               "Leonardo da Vinci": {
-                "ipa": "/ˌleɪɔˈnɑːrdoʊ dɑː ˈvɪntʃi/",
+                "ipa": "/\u02ccle\u026a\u0254\u02c8n\u0251\u02d0rdo\u028a d\u0251\u02d0 \u02c8v\u026ant\u0283i/",
                 "respelling": "lay-oh-NAR-doh dah VIN-chee",
                 "language": "it"
               },
               "Michelangelo": {
-                "ipa": "/ˌmaɪkəlˈændʒəloʊ/",
+                "ipa": "/\u02ccma\u026ak\u0259l\u02c8\u00e6nd\u0292\u0259lo\u028a/",
                 "respelling": "my-kul-AN-juh-loh",
                 "language": "it",
                 "notes": "Anglicized pronunciation commonly used"
               },
               "Mona Lisa": {
-                "ipa": "/ˈmoʊnə ˈliːzə/",
+                "ipa": "/\u02c8mo\u028an\u0259 \u02c8li\u02d0z\u0259/",
                 "respelling": "MOH-nuh LEE-zuh",
                 "language": "en",
                 "notes": "Anglicized; Italian is 'La Gioconda'"
               },
               "sfumato": {
-                "ipa": "/sfuːˈmɑːtoʊ/",
+                "ipa": "/sfu\u02d0\u02c8m\u0251\u02d0to\u028a/",
                 "respelling": "sfoo-MAH-toh",
                 "language": "it",
                 "notes": "Italian art technique meaning 'smoky'"
               },
               "Sistine Chapel": {
-                "ipa": "/ˈsɪstiːn ˈtʃæpəl/",
+                "ipa": "/\u02c8s\u026asti\u02d0n \u02c8t\u0283\u00e6p\u0259l/",
                 "respelling": "SIS-teen CHAP-ul",
                 "language": "en"
               },
               "David": {
-                "ipa": "/ˈdeɪvɪd/",
+                "ipa": "/\u02c8de\u026av\u026ad/",
                 "respelling": "DAY-vid",
                 "language": "en"
               },
               "Botticelli": {
-                "ipa": "/ˌbɒtɪˈtʃɛli/",
+                "ipa": "/\u02ccb\u0252t\u026a\u02c8t\u0283\u025bli/",
                 "respelling": "bot-ih-CHEL-ee",
                 "language": "it"
               },
               "fresco": {
-                "ipa": "/ˈfrɛskoʊ/",
+                "ipa": "/\u02c8fr\u025bsko\u028a/",
                 "respelling": "FRES-koh",
                 "language": "it"
               }
@@ -1740,7 +1754,7 @@
               {
                 "id": "img-last-supper",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/%C3%9Altima_Cena_-_Da_Vinci_5.jpg/1200px-%C3%9Altima_Cena_-_Da_Vinci_5.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Last_Supper_Mural_Thomas_Mount_Chennai_Aug22_A7C_02287.jpg/960px-Last_Supper_Mural_Thomas_Mount_Chennai_Aug22_A7C_02287.jpg",
                 "title": "The Last Supper by Leonardo da Vinci",
                 "alt": "Leonardo da Vinci's famous mural depicting Jesus and his twelve apostles at their final meal together",
                 "caption": "The Last Supper - demonstrating linear perspective with all lines pointing to Jesus",
@@ -1755,12 +1769,13 @@
                   "displayMode": "highlight"
                 },
                 "audioDescription": "Leonardo da Vinci's monumental painting of The Last Supper. Jesus sits in the center with his twelve apostles on either side, reacting to his announcement that one will betray him. The room's architecture creates perfect linear perspective, with all lines converging on Jesus's head.",
-                "localPath": "curriculum/assets/e5f6a7b8-c9d0-1234-ef56-789012345678/topic-renaissance-art/img-last-supper.jpg"
+                "localPath": "curriculum/assets/e5f6a7b8-c9d0-1234-ef56-789012345678/topic-renaissance-art/img-last-supper.jpg",
+                "attribution": "Image from Wikimedia Commons by \n\n\nThis Photo was taken by Timothy A. Gonsalves.  Feel free to use my photos, but please mention me as the author.  I would much appreciate if you send me an email tagooty@gmail.com or write on my talk page, for my information.  Please contact me before commercial use.\n\n\n\nPlease do not upload an edited image here without consulting me.  I would like to make corrections only at my own source to ensure that the changes improve the image and are preserved.Otherwise you may upload an edited image with a new name. Please use one of the templates derivative or extract.\n (CC BY-SA 4.0)"
               },
               {
                 "id": "img-david-michelangelo",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/%27David%27_by_Michelangelo_JBU0001.JPG/460px-%27David%27_by_Michelangelo_JBU0001.JPG",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Michelangelo_David_crop.jpg/960px-Michelangelo_David_crop.jpg",
                 "title": "David by Michelangelo",
                 "alt": "Michelangelo's marble sculpture of David, the Biblical hero who defeated Goliath",
                 "caption": "Michelangelo's David - 17 feet of marble perfection carved by a 26-year-old genius",
@@ -1774,12 +1789,13 @@
                   "endSegment": 12,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "Michelangelo's towering marble sculpture of David stands 17 feet tall. The young hero is captured in the moment before his battle with Goliath, his muscles tensed, his gaze focused. Every vein, tendon, and muscle is carved with anatomical perfection."
+                "audioDescription": "Michelangelo's towering marble sculpture of David stands 17 feet tall. The young hero is captured in the moment before his battle with Goliath, his muscles tensed, his gaze focused. Every vein, tendon, and muscle is carved with anatomical perfection.",
+                "attribution": "Image from Wikimedia Commons by George M. Groutas (CC BY 2.0)"
               },
               {
                 "id": "img-sistine-chapel",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Creación_de_Adán_%28Miguel_Ángel%29.jpg/1200px-Creación_de_Adán_%28Miguel_Ángel%29.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Italy-3218_-_Creation_%285387304891%29.jpg/960px-Italy-3218_-_Creation_%285387304891%29.jpg",
                 "title": "Creation of Adam - Sistine Chapel",
                 "alt": "The famous Creation of Adam fresco by Michelangelo showing God reaching out to touch Adam's finger",
                 "caption": "The Creation of Adam from the Sistine Chapel ceiling - perhaps the most famous image in Western art",
@@ -1793,12 +1809,13 @@
                   "endSegment": 14,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "The iconic Creation of Adam from Michelangelo's Sistine Chapel ceiling. On the right, God reaches out from heaven, surrounded by angels. On the left, Adam reclines on Earth, his finger extended. Their fingers nearly touch in one of art's most powerful moments."
+                "audioDescription": "The iconic Creation of Adam from Michelangelo's Sistine Chapel ceiling. On the right, God reaches out from heaven, surrounded by angels. On the left, Adam reclines on Earth, his finger extended. Their fingers nearly touch in one of art's most powerful moments.",
+                "attribution": "Image from Wikimedia Commons by Michelangelo (Public domain)"
               },
               {
                 "id": "img-perspective-diagram",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/One-point_perspective.svg/800px-One-point_perspective.svg.png",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Brunelleschi%27s_perspective_experiment.jpg",
                 "title": "Linear Perspective Diagram",
                 "alt": "Diagram showing how one-point linear perspective works, with lines converging to a single vanishing point",
                 "caption": "Linear perspective - the mathematical technique that made Renaissance paintings look three-dimensional",
@@ -1812,12 +1829,13 @@
                   "endSegment": 4,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A technical diagram showing linear perspective. Parallel lines in the scene all converge to a single vanishing point on the horizon. This mathematical technique, perfected during the Renaissance, creates the illusion of three-dimensional depth on a flat surface."
+                "audioDescription": "A technical diagram showing linear perspective. Parallel lines in the scene all converge to a single vanishing point on the horizon. This mathematical technique, perfected during the Renaissance, creates the illusion of three-dimensional depth on a flat surface.",
+                "attribution": "Image from Wikimedia Commons by Amphicoelias (CC BY-SA 3.0)"
               },
               {
                 "id": "img-medieval-vs-renaissance",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Medieval_and_Renaissance_Art_Comparison.svg/1000px-Medieval_and_Renaissance_Art_Comparison.svg.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDEwMDAgNTAwIj4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI1MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iOTgwIiBoZWlnaHQ9IjQ4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI1MDAiIHk9IjIyMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjUwMCIgeT0iMjgwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NZWRpZXZhbCB2cyBSZW5haXNzYW5jZSBBcnQgQ29tcGFyaXNvbjwvdGV4dD4KICA8dGV4dCB4PSI1MDAiIHk9IjMxMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Medieval vs Renaissance Art Comparison",
                 "alt": "Side-by-side comparison showing the flat style of medieval art versus the realistic depth of Renaissance art",
                 "caption": "The dramatic difference: flat medieval art versus realistic Renaissance techniques",
@@ -1831,7 +1849,9 @@
                   "endSegment": 2,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "A side-by-side comparison of medieval and Renaissance art styles. The medieval example shows flat, stylized figures with gold backgrounds and no sense of depth. The Renaissance example shows realistic human forms with proper proportions, natural lighting, and convincing three-dimensional space."
+                "audioDescription": "A side-by-side comparison of medieval and Renaissance art styles. The medieval example shows flat, stylized figures with gold backgrounds and no sense of depth. The Renaissance example shows realistic human forms with proper proportions, natural lighting, and convincing three-dimensional space.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ],
             "reference": [
@@ -1869,7 +1889,7 @@
               {
                 "id": "ref-vitruvian-man",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/960px-Da_Vinci_Vitruve_Luc_Viatour.jpg",
                 "title": "Vitruvian Man by Leonardo da Vinci",
                 "description": "Leonardo's famous drawing showing ideal human proportions inscribed in a circle and square",
                 "keywords": [
@@ -1878,7 +1898,8 @@
                   "anatomy",
                   "leonardo",
                   "human body"
-                ]
+                ],
+                "attribution": "Image from Wikimedia Commons by Leonardo da Vinci (Public domain)"
               }
             ]
           }
@@ -1905,34 +1926,34 @@
           "transcript": {
             "pronunciationGuide": {
               "Nicolaus Copernicus": {
-                "ipa": "/ˌnɪkəˈleɪəs koʊˈpɜːrnɪkəs/",
+                "ipa": "/\u02ccn\u026ak\u0259\u02c8le\u026a\u0259s ko\u028a\u02c8p\u025c\u02d0rn\u026ak\u0259s/",
                 "respelling": "nik-oh-LAY-us koh-PUR-nih-kus",
                 "language": "la",
-                "notes": "Latinized name; Polish is Mikołaj Kopernik"
+                "notes": "Latinized name; Polish is Miko\u0142aj Kopernik"
               },
               "Copernicus": {
-                "ipa": "/koʊˈpɜːrnɪkəs/",
+                "ipa": "/ko\u028a\u02c8p\u025c\u02d0rn\u026ak\u0259s/",
                 "respelling": "koh-PUR-nih-kus",
                 "language": "la"
               },
               "Galileo Galilei": {
-                "ipa": "/ˌɡælɪˈleɪoʊ ˌɡælɪˈleɪi/",
+                "ipa": "/\u02cc\u0261\u00e6l\u026a\u02c8le\u026ao\u028a \u02cc\u0261\u00e6l\u026a\u02c8le\u026ai/",
                 "respelling": "gal-ih-LAY-oh gal-ih-LAY-ee",
                 "language": "it"
               },
               "Galileo": {
-                "ipa": "/ˌɡælɪˈleɪoʊ/",
+                "ipa": "/\u02cc\u0261\u00e6l\u026a\u02c8le\u026ao\u028a/",
                 "respelling": "gal-ih-LAY-oh",
                 "language": "it"
               },
               "Ptolemy": {
-                "ipa": "/ˈtɒləmi/",
+                "ipa": "/\u02c8t\u0252l\u0259mi/",
                 "respelling": "TOL-uh-mee",
                 "language": "en",
                 "notes": "Anglicized from Greek Ptolemaios"
               },
               "heliocentric": {
-                "ipa": "/ˌhiːliəˈsɛntrɪk/",
+                "ipa": "/\u02cchi\u02d0li\u0259\u02c8s\u025bntr\u026ak/",
                 "respelling": "hee-lee-oh-SEN-trik",
                 "language": "en",
                 "notes": "From Greek 'helios' meaning sun"
@@ -2078,7 +2099,7 @@
               {
                 "id": "img-leonardo-flying",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Leonardo_da_Vinci_-_Codice_sul_volo_degli_uccelli_-_ca._1505.jpg/800px-Leonardo_da_Vinci_-_Codice_sul_volo_degli_uccelli_-_ca._1505.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5MZW9uYXJkbydzIEZseWluZyBNYWNoaW5lIERlc2lnbnM8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNGNTdDMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIG9wYWNpdHk9IjAuNyI+UGxhY2Vob2xkZXIgLSBvcmlnaW5hbCBpbWFnZSB1bmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+",
                 "title": "Leonardo's Flying Machine Designs",
                 "alt": "Pages from Leonardo da Vinci's notebooks showing his designs for flying machines",
                 "caption": "Leonardo's flying machine sketches - science and art combined in one genius",
@@ -2092,12 +2113,14 @@
                   "endSegment": 5,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "Pages from Leonardo da Vinci's famous notebooks showing his designs for flying machines. The pages are covered with detailed sketches of wings, mechanisms, and notes written in his characteristic mirror script. He studied bird flight to create these remarkably advanced concepts."
+                "audioDescription": "Pages from Leonardo da Vinci's famous notebooks showing his designs for flying machines. The pages are covered with detailed sketches of wings, mechanisms, and notes written in his characteristic mirror script. He studied bird flight to create these remarkably advanced concepts.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-leonardo-anatomy",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Leonardo_da_vinci%2C_Studies_of_the_Arm_showing_the_Movements_made_by_the_Biceps.jpg/460px-Leonardo_da_vinci%2C_Studies_of_the_Arm_showing_the_Movements_made_by_the_Biceps.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NjAiIGhlaWdodD0iNjYwIiB2aWV3Qm94PSIwIDAgNDYwIDY2MCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjQ2MCIgaGVpZ2h0PSI2NjAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNDQwIiBoZWlnaHQ9IjY0MCIgcng9IjgiLz4KICA8dGV4dCB4PSIyMzAiIHk9IjMwMCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjIzMCIgeT0iMzYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5MZW9uYXJkbydzIEFuYXRvbWljYWwgU3R1ZGllczwvdGV4dD4KICA8dGV4dCB4PSIyMzAiIHk9IjM5MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Leonardo's Anatomical Studies",
                 "alt": "Leonardo da Vinci's detailed anatomical drawings of the human arm and muscles",
                 "caption": "Leonardo's anatomical drawings - he dissected over 30 human bodies to understand how we work",
@@ -2111,12 +2134,14 @@
                   "endSegment": 7,
                   "displayMode": "inline"
                 },
-                "audioDescription": "Leonardo da Vinci's extraordinarily detailed anatomical drawings of the human arm. Multiple views show the bones, muscles, and tendons, with notes explaining how they work together. Leonardo dissected over thirty human bodies to create these scientifically accurate studies."
+                "audioDescription": "Leonardo da Vinci's extraordinarily detailed anatomical drawings of the human arm. Multiple views show the bones, muscles, and tendons, with notes explaining how they work together. Leonardo dissected over thirty human bodies to create these scientifically accurate studies.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-copernicus-heliocentric",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Heliocentric.jpg/800px-Heliocentric.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiB2aWV3Qm94PSIwIDAgODAwIDgwMCI+CiAgPHJlY3QgZmlsbD0iI0UzRjJGRCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI4MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9Ijc4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjM3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNDMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5Db3Blcm5pY3VzJ3MgSGVsaW9jZW50cmljIE1vZGVsPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNDYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "Copernicus's Heliocentric Model",
                 "alt": "Diagram from Copernicus showing the Sun at the center with planets orbiting around it",
                 "caption": "Copernicus's revolutionary idea: The Sun, not Earth, is at the center of our solar system",
@@ -2130,12 +2155,14 @@
                   "endSegment": 10,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "A historical diagram showing Copernicus's heliocentric model of the solar system. The Sun sits at the center, with Earth and other planets orbiting around it. This was revolutionary because for centuries, people believed Earth was the center of the universe."
+                "audioDescription": "A historical diagram showing Copernicus's heliocentric model of the solar system. The Sun sits at the center, with Earth and other planets orbiting around it. This was revolutionary because for centuries, people believed Earth was the center of the universe.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-galileo-telescope",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Galileo.arp.300pix.jpg/330px-Galileo.arp.300pix.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMzAiIGhlaWdodD0iNDI1IiB2aWV3Qm94PSIwIDAgMzMwIDQyNSI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjMzMCIgaGVpZ2h0PSI0MjUiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjQwNSIgcng9IjgiLz4KICA8dGV4dCB4PSIxNjUiIHk9IjE4MiIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjE2NSIgeT0iMjQyIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5Qb3J0cmFpdCBvZiBHYWxpbGVvIEdhbGlsZWk8L3RleHQ+CiAgPHRleHQgeD0iMTY1IiB5PSIyNzIiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNGNTdDMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIG9wYWNpdHk9IjAuNyI+UGxhY2Vob2xkZXIgLSBvcmlnaW5hbCBpbWFnZSB1bmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+",
                 "title": "Portrait of Galileo Galilei",
                 "alt": "Portrait of the scientist Galileo Galilei, who improved the telescope and made astronomical discoveries",
                 "caption": "Galileo Galilei - he turned the telescope to the sky and changed our understanding of the universe",
@@ -2149,7 +2176,9 @@
                   "endSegment": 12,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A portrait of Galileo Galilei, the famous Italian scientist. He has a full beard and wears the clothing of a Renaissance scholar. Galileo improved the telescope and used it to discover the moons of Jupiter and the phases of Venus, proving Copernicus was right."
+                "audioDescription": "A portrait of Galileo Galilei, the famous Italian scientist. He has a full beard and wears the clothing of a Renaissance scholar. Galileo improved the telescope and used it to discover the moons of Jupiter and the phases of Venus, proving Copernicus was right.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ],
             "reference": [
@@ -2170,7 +2199,7 @@
               {
                 "id": "ref-vesalius-anatomy",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Vesalius_Fabrica_fronticepiece.jpg/800px-Vesalius_Fabrica_fronticepiece.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Vesalius_Portrait_pg_xii_-_c.png",
                 "title": "Vesalius's De Humani Corporis Fabrica",
                 "description": "Frontispiece of the revolutionary anatomy textbook that transformed medical knowledge",
                 "keywords": [
@@ -2179,7 +2208,8 @@
                   "medicine",
                   "dissection",
                   "science"
-                ]
+                ],
+                "attribution": "Image from Wikimedia Commons by Attributed to Jan van Calcar (Public domain)"
               }
             ]
           }
@@ -2206,29 +2236,29 @@
           "transcript": {
             "pronunciationGuide": {
               "Johannes Gutenberg": {
-                "ipa": "/joʊˈhɑːnɪs ˈɡuːtənbɜːrɡ/",
+                "ipa": "/jo\u028a\u02c8h\u0251\u02d0n\u026as \u02c8\u0261u\u02d0t\u0259nb\u025c\u02d0r\u0261/",
                 "respelling": "yoh-HAH-nis GOO-ten-berg",
                 "language": "de"
               },
               "Gutenberg": {
-                "ipa": "/ˈɡuːtənbɜːrɡ/",
+                "ipa": "/\u02c8\u0261u\u02d0t\u0259nb\u025c\u02d0r\u0261/",
                 "respelling": "GOO-ten-berg",
                 "language": "de"
               },
               "Mainz": {
-                "ipa": "/maɪnts/",
+                "ipa": "/ma\u026ants/",
                 "respelling": "MYNTS",
                 "language": "de",
                 "notes": "German city where printing press was invented"
               },
               "Martin Luther": {
-                "ipa": "/ˈmɑːrtɪn ˈluːθər/",
+                "ipa": "/\u02c8m\u0251\u02d0rt\u026an \u02c8lu\u02d0\u03b8\u0259r/",
                 "respelling": "MAR-tin LOO-ther",
                 "language": "en",
                 "notes": "Anglicized; German is LOO-ter"
               },
               "Wittenberg": {
-                "ipa": "/ˈvɪtənbɜːrɡ/",
+                "ipa": "/\u02c8v\u026at\u0259nb\u025c\u02d0r\u0261/",
                 "respelling": "VIT-en-berg",
                 "language": "de"
               }
@@ -2384,7 +2414,7 @@
               {
                 "id": "img-gutenberg-press",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Printer_in_1568-ce.png/800px-Printer_in_1568-ce.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5UaGUgUHJpbnRpbmcgUHJlc3MgaW4gT3BlcmF0aW9uPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "The Printing Press in Operation",
                 "alt": "Historical illustration showing printers operating a Gutenberg-style printing press",
                 "caption": "A Renaissance printing press in action - the machine that changed the world",
@@ -2398,12 +2428,14 @@
                   "endSegment": 3,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "An illustration of a Renaissance-era printing shop. Workers operate a wooden printing press similar to Gutenberg's original design. One worker inks the type, another operates the press mechanism, and a third hangs freshly printed pages to dry."
+                "audioDescription": "An illustration of a Renaissance-era printing shop. Workers operate a wooden printing press similar to Gutenberg's original design. One worker inks the type, another operates the press mechanism, and a third hangs freshly printed pages to dry.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-gutenberg-bible",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg/800px-Gutenberg_Bible%2C_Lenox_Copy%2C_New_York_Public_Library%2C_2009._Pic_01.jpg",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Gutenberg_Bible_LoC_display.jpg",
                 "title": "The Gutenberg Bible",
                 "alt": "An open Gutenberg Bible showing two pages of beautifully printed text",
                 "caption": "The Gutenberg Bible - the first major book printed with movable type in Europe",
@@ -2417,12 +2449,13 @@
                   "endSegment": 5,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "An open copy of the Gutenberg Bible, the first major book printed with movable type in Europe. The pages show beautifully printed Latin text in two columns. Though printed by machine, each copy was hand-illuminated with colored decorations, making each one unique."
+                "audioDescription": "An open copy of the Gutenberg Bible, the first major book printed with movable type in Europe. The pages show beautifully printed Latin text in two columns. Though printed by machine, each copy was hand-illuminated with colored decorations, making each one unique.",
+                "attribution": "Image from Wikimedia Commons by Photo: Andreas Praefcke (Public domain)"
               },
               {
                 "id": "img-movable-type",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Metal_movable_type.jpg/800px-Metal_movable_type.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0UzRjJGRCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5Nb3ZhYmxlIE1ldGFsIFR5cGU8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMxOTc2RDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIG9wYWNpdHk9IjAuNyI+UGxhY2Vob2xkZXIgLSBvcmlnaW5hbCBpbWFnZSB1bmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+",
                 "title": "Movable Metal Type",
                 "alt": "Close-up photograph of metal movable type letters used in printing presses",
                 "caption": "Movable type - individual metal letters that could be arranged, printed, and reused",
@@ -2436,12 +2469,14 @@
                   "endSegment": 2,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A close-up view of metal movable type pieces. Each small metal block has a single letter cast in reverse on its surface. Printers would arrange these letters into words and sentences, ink them, and press paper against them to create printed pages."
+                "audioDescription": "A close-up view of metal movable type pieces. Each small metal block has a single letter cast in reverse on its surface. Printers would arrange these letters into words and sentences, ink them, and press paper against them to create printed pages.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-luther-95-theses",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Luther95theses.jpg/550px-Luther95theses.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1NTAiIGhlaWdodD0iNzU3IiB2aWV3Qm94PSIwIDAgNTUwIDc1NyI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjU1MCIgaGVpZ2h0PSI3NTciLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNTMwIiBoZWlnaHQ9IjczNyIgcng9IjgiLz4KICA8dGV4dCB4PSIyNzUiIHk9IjM0OCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjI3NSIgeT0iNDA4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NYXJ0aW4gTHV0aGVyJ3MgOTUgVGhlc2VzPC90ZXh0PgogIDx0ZXh0IHg9IjI3NSIgeT0iNDM4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "Martin Luther's 95 Theses",
                 "alt": "Printed copy of Martin Luther's 95 Theses that sparked the Protestant Reformation",
                 "caption": "Luther's 95 Theses spread across Europe within weeks thanks to the printing press",
@@ -2455,14 +2490,16 @@
                   "endSegment": 10,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "A printed copy of Martin Luther's 95 Theses from 1517. The text is printed in dense Latin columns. When Luther nailed his criticisms of the Church to a door in Wittenberg, printers quickly copied and distributed them. Within weeks, his ideas had spread across Europe."
+                "audioDescription": "A printed copy of Martin Luther's 95 Theses from 1517. The text is printed in dense Latin columns. When Luther nailed his criticisms of the Church to a door in Wittenberg, printers quickly copied and distributed them. Within weeks, his ideas had spread across Europe.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ],
             "reference": [
               {
                 "id": "ref-book-production-timeline",
                 "type": "chart",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/European_Output_of_Manuscripts_And_Printed_Books.png/800px-European_Output_of_Manuscripts_And_Printed_Books.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0U4RjVFOSIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRThGNUU5IiBzdHJva2U9IiMzODhFM0MiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzM4OEUzQyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Qzg7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMzg4RTNDIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5FdXJvcGVhbiBCb29rIFByb2R1Y3Rpb24gQmVmb3JlIGFuZCBBZnRlciBHdXRlbi4uLjwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzM4OEUzQyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "European Book Production Before and After Gutenberg",
                 "description": "Chart showing the dramatic increase in book production after the invention of the printing press",
                 "keywords": [
@@ -2471,12 +2508,14 @@
                   "printing",
                   "statistics",
                   "gutenberg"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "ref-printing-spread",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Printing_towns_incunabula.svg/1200px-Printing_towns_incunabula.svg.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0UzRjJGRCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5TcHJlYWQgb2YgUHJpbnRpbmcgQWNyb3NzIEV1cm9wZTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Spread of Printing Across Europe",
                 "description": "Map showing how printing technology spread from Mainz across Europe by 1500",
                 "keywords": [
@@ -2485,7 +2524,9 @@
                   "map",
                   "europe",
                   "incunabula"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ]
           }
@@ -2512,48 +2553,48 @@
           "transcript": {
             "pronunciationGuide": {
               "Jan van Eyck": {
-                "ipa": "/jɑːn vɑːn ˈaɪk/",
+                "ipa": "/j\u0251\u02d0n v\u0251\u02d0n \u02c8a\u026ak/",
                 "respelling": "YAHN vahn IKE",
                 "language": "nl",
                 "notes": "Dutch painter"
               },
               "Erasmus": {
-                "ipa": "/ɪˈræzməs/",
+                "ipa": "/\u026a\u02c8r\u00e6zm\u0259s/",
                 "respelling": "ih-RAZ-mus",
                 "language": "la"
               },
               "Erasmus of Rotterdam": {
-                "ipa": "/ɪˈræzməs əv ˈrɒtərdæm/",
+                "ipa": "/\u026a\u02c8r\u00e6zm\u0259s \u0259v \u02c8r\u0252t\u0259rd\u00e6m/",
                 "respelling": "ih-RAZ-mus of ROT-er-dam",
                 "language": "en"
               },
               "Rotterdam": {
-                "ipa": "/ˈrɒtərdæm/",
+                "ipa": "/\u02c8r\u0252t\u0259rd\u00e6m/",
                 "respelling": "ROT-er-dam",
                 "language": "nl"
               },
               "William Shakespeare": {
-                "ipa": "/ˈwɪljəm ˈʃeɪkspɪər/",
+                "ipa": "/\u02c8w\u026alj\u0259m \u02c8\u0283e\u026aksp\u026a\u0259r/",
                 "respelling": "WIL-yum SHAKE-speer",
                 "language": "en"
               },
               "Shakespeare": {
-                "ipa": "/ˈʃeɪkspɪər/",
+                "ipa": "/\u02c8\u0283e\u026aksp\u026a\u0259r/",
                 "respelling": "SHAKE-speer",
                 "language": "en"
               },
               "Hamlet": {
-                "ipa": "/ˈhæmlɪt/",
+                "ipa": "/\u02c8h\u00e6ml\u026at/",
                 "respelling": "HAM-lit",
                 "language": "en"
               },
               "Macbeth": {
-                "ipa": "/məkˈbɛθ/",
+                "ipa": "/m\u0259k\u02c8b\u025b\u03b8/",
                 "respelling": "muk-BETH",
                 "language": "en"
               },
               "Bruges": {
-                "ipa": "/bruːʒ/",
+                "ipa": "/bru\u02d0\u0292/",
                 "respelling": "BROOZH",
                 "language": "fr",
                 "notes": "Belgian city; Flemish is Brugge"
@@ -2681,7 +2722,7 @@
               {
                 "id": "img-arnolfini-portrait",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Van_Eyck_-_Arnolfini_Portrait.jpg/800px-Van_Eyck_-_Arnolfini_Portrait.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iMTE1MCIgdmlld0JveD0iMCAwIDgwMCAxMTUwIj4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjExNTAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjExMzAiIHJ4PSI4Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSI1NDUiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZpbGw9IiNGNTdDMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPiYjeDFGNUJDOzwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjYwNSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9IjUwMCI+QXJub2xmaW5pIFBvcnRyYWl0IGJ5IEphbiB2YW4gRXljazwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjYzNSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Arnolfini Portrait by Jan van Eyck",
                 "alt": "The Arnolfini Portrait showing a wealthy couple in their home, demonstrating incredible oil painting technique",
                 "caption": "Jan van Eyck's Arnolfini Portrait - a masterpiece of oil painting technique from the Netherlands",
@@ -2695,15 +2736,17 @@
                   "endSegment": 5,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "Jan van Eyck's famous Arnolfini Portrait from 1434. A wealthy merchant and his wife stand in their home, surrounded by intricate details: a small dog, a chandelier, oranges on the windowsill, and a convex mirror reflecting the whole room. The oil painting technique captures light and texture with unprecedented realism."
+                "audioDescription": "Jan van Eyck's famous Arnolfini Portrait from 1434. A wealthy merchant and his wife stand in their home, surrounded by intricate details: a small dog, a chandelier, oranges on the windowsill, and a convex mirror reflecting the whole room. The oil painting technique captures light and texture with unprecedented realism.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-durer-self-portrait",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Albrecht_D%C3%BCrer_-_Self-Portrait_at_28_%281500%29.jpg/460px-Albrecht_D%C3%BCrer_-_Self-Portrait_at_28_%281500%29.jpg",
-                "title": "Self-Portrait by Albrecht Dürer",
-                "alt": "Albrecht Dürer's famous self-portrait showing the German artist in a Christ-like pose",
-                "caption": "Dürer's Self-Portrait at 28 - the German artist who brought Renaissance ideas north",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NjAiIGhlaWdodD0iNjM1IiB2aWV3Qm94PSIwIDAgNDYwIDYzNSI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjQ2MCIgaGVpZ2h0PSI2MzUiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNDQwIiBoZWlnaHQ9IjYxNSIgcng9IjgiLz4KICA8dGV4dCB4PSIyMzAiIHk9IjI4NyIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjIzMCIgeT0iMzQ3IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5TZWxmLVBvcnRyYWl0IGJ5IEFsYnJlY2h0IETDvHJlcjwvdGV4dD4KICA8dGV4dCB4PSIyMzAiIHk9IjM3NyIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
+                "title": "Self-Portrait by Albrecht D\u00fcrer",
+                "alt": "Albrecht D\u00fcrer's famous self-portrait showing the German artist in a Christ-like pose",
+                "caption": "D\u00fcrer's Self-Portrait at 28 - the German artist who brought Renaissance ideas north",
                 "mimeType": "image/jpeg",
                 "dimensions": {
                   "width": 460,
@@ -2714,12 +2757,14 @@
                   "endSegment": 7,
                   "displayMode": "inline"
                 },
-                "audioDescription": "Albrecht Dürer's striking self-portrait from 1500. The German artist depicts himself facing forward in a Christ-like pose, with long curling hair and a rich fur coat. Dürer traveled to Italy to study Renaissance techniques and brought these ideas back to Germany."
+                "audioDescription": "Albrecht D\u00fcrer's striking self-portrait from 1500. The German artist depicts himself facing forward in a Christ-like pose, with long curling hair and a rich fur coat. D\u00fcrer traveled to Italy to study Renaissance techniques and brought these ideas back to Germany.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-shakespeare-portrait",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shakespeare.jpg/440px-Shakespeare.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NDAiIGhlaWdodD0iNTM2IiB2aWV3Qm94PSIwIDAgNDQwIDUzNiI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1MzYiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNDIwIiBoZWlnaHQ9IjUxNiIgcng9IjgiLz4KICA8dGV4dCB4PSIyMjAiIHk9IjIzOCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjIyMCIgeT0iMjk4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5XaWxsaWFtIFNoYWtlc3BlYXJlPC90ZXh0PgogIDx0ZXh0IHg9IjIyMCIgeT0iMzI4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "William Shakespeare",
                 "alt": "The Chandos portrait believed to show William Shakespeare, England's greatest playwright",
                 "caption": "William Shakespeare - the Bard of Avon who invented over 1,700 English words",
@@ -2733,12 +2778,14 @@
                   "endSegment": 13,
                   "displayMode": "persistent"
                 },
-                "audioDescription": "The Chandos portrait, believed to show William Shakespeare. The playwright has a receding hairline, a small beard, and wears a gold earring. Shakespeare wrote at least 37 plays and 154 sonnets, and invented over 1,700 words that we still use today."
+                "audioDescription": "The Chandos portrait, believed to show William Shakespeare. The playwright has a receding hairline, a small beard, and wears a gold earring. Shakespeare wrote at least 37 plays and 154 sonnets, and invented over 1,700 words that we still use today.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-globe-theatre",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Globetheatre.jpg/800px-Globetheatre.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5UaGUgR2xvYmUgVGhlYXRyZTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "The Globe Theatre",
                 "alt": "The reconstructed Globe Theatre in London where Shakespeare's plays were performed",
                 "caption": "The Globe Theatre - where Shakespeare's plays came to life for Elizabethan audiences",
@@ -2752,14 +2799,16 @@
                   "endSegment": 12,
                   "displayMode": "inline"
                 },
-                "audioDescription": "The reconstructed Globe Theatre in London. The circular wooden structure has an open-air central area where groundlings stood to watch performances. Wealthier patrons sat in the covered galleries surrounding the stage. This is where audiences first watched Hamlet, Macbeth, and Romeo and Juliet."
+                "audioDescription": "The reconstructed Globe Theatre in London. The circular wooden structure has an open-air central area where groundlings stood to watch performances. Wealthier patrons sat in the covered galleries surrounding the stage. This is where audiences first watched Hamlet, Macbeth, and Romeo and Juliet.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ],
             "reference": [
               {
                 "id": "ref-northern-europe-map",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Europe_in_1519.png/1200px-Europe_in_1519.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0UzRjJGRCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRTNGMkZEIiBzdHJva2U9IiMxOTc2RDIiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Q0E7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMTk3NkQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5Ob3J0aGVybiBFdXJvcGUgaW4gMTUxOTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzE5NzZEMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Northern Europe in 1519",
                 "description": "Map showing the political divisions of Northern Europe during the Renaissance",
                 "keywords": [
@@ -2769,14 +2818,16 @@
                   "england",
                   "netherlands",
                   "renaissance"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "ref-durer-engravings",
                 "type": "slideDeck",
                 "url": "https://www.metmuseum.org/art/collection/search/336228",
-                "title": "Dürer's Engravings and Woodcuts (Met Museum)",
-                "description": "Collection of Albrecht Dürer's famous prints including Knight, Death and the Devil",
+                "title": "D\u00fcrer's Engravings and Woodcuts (Met Museum)",
+                "description": "Collection of Albrecht D\u00fcrer's famous prints including Knight, Death and the Devil",
                 "keywords": [
                   "durer",
                   "engravings",
@@ -2977,7 +3028,7 @@
               {
                 "id": "img-us-capitol",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/US_Capitol_west_side.JPG/1200px-US_Capitol_west_side.JPG",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/US_Capitol_dome_Jan_2006.jpg/960px-US_Capitol_dome_Jan_2006.jpg",
                 "title": "United States Capitol Building",
                 "alt": "The US Capitol Building in Washington DC showing Renaissance-inspired classical architecture with its famous dome",
                 "caption": "The US Capitol - Renaissance ideals in architecture still shape our government buildings today",
@@ -2992,12 +3043,13 @@
                   "displayMode": "persistent"
                 },
                 "audioDescription": "The United States Capitol Building in Washington DC. The building features Renaissance-inspired classical architecture, with its famous dome directly modeled on the dome of St. Peter's Basilica in Rome. The columns, symmetry, and proportions all reflect Renaissance ideals of beauty and order.",
-                "localPath": "curriculum/assets/e5f6a7b8-c9d0-1234-ef56-789012345678/topic-legacy-today/img-us-capitol.jpg"
+                "localPath": "curriculum/assets/e5f6a7b8-c9d0-1234-ef56-789012345678/topic-legacy-today/img-us-capitol.jpg",
+                "attribution": "Image from Wikimedia Commons by Diliff (CC BY 2.5)"
               },
               {
                 "id": "img-scientific-method",
                 "type": "diagram",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/The_Scientific_Method.svg/800px-The_Scientific_Method.svg.png",
+                "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/The_Scientific_Method_%28simple%29.png",
                 "title": "The Scientific Method",
                 "alt": "Diagram showing the steps of the scientific method: observation, hypothesis, experiment, analysis, conclusion",
                 "caption": "The Scientific Method - Renaissance thinkers pioneered this approach to understanding the world",
@@ -3011,12 +3063,13 @@
                   "endSegment": 7,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A circular diagram showing the steps of the scientific method. Starting with observation, it moves through forming a hypothesis, designing experiments, collecting data, analyzing results, and drawing conclusions. This systematic approach to knowledge began during the Renaissance."
+                "audioDescription": "A circular diagram showing the steps of the scientific method. Starting with observation, it moves through forming a hypothesis, designing experiments, collecting data, analyzing results, and drawing conclusions. This systematic approach to knowledge began during the Renaissance.",
+                "attribution": "Image from Wikimedia Commons by Thebiologyprimer (CC0)"
               },
               {
                 "id": "img-declaration-independence",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/US_Declaration_of_Independence.jpg/800px-US_Declaration_of_Independence.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iOTcyIiB2aWV3Qm94PSIwIDAgODAwIDk3MiI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI5NzIiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9Ijk1MiIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ1NiIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNTE2IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5UaGUgRGVjbGFyYXRpb24gb2YgSW5kZXBlbmRlbmNlPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNTQ2IiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "The Declaration of Independence",
                 "alt": "The original Declaration of Independence document from 1776",
                 "caption": "The Declaration of Independence - built on Renaissance humanist ideas about individual rights",
@@ -3030,12 +3083,14 @@
                   "endSegment": 9,
                   "displayMode": "highlight"
                 },
-                "audioDescription": "The original Declaration of Independence from 1776. This founding document of the United States reflects Renaissance humanist ideas about the worth and rights of individuals. Concepts like natural rights and government by consent of the governed trace back to Renaissance political philosophy."
+                "audioDescription": "The original Declaration of Independence from 1776. This founding document of the United States reflects Renaissance humanist ideas about the worth and rights of individuals. Concepts like natural rights and government by consent of the governed trace back to Renaissance political philosophy.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "img-mona-lisa-museum",
                 "type": "image",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Mona_Lisa_viewing%2C_mus%C3%A9e_du_Louvre.jpg/800px-Mona_Lisa_viewing%2C_mus%C3%A9e_du_Louvre.jpg",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0ZGRjNFMCIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRkZGM0UwIiBzdHJva2U9IiNGNTdDMDAiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0Y1N0MwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY1QkM7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjRjU3QzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5WaXNpdG9ycyBWaWV3aW5nIHRoZSBNb25hIExpc2E8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzNjAiIGZvbnQtZmFtaWx5PSJzeXN0ZW0tdWksIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiNGNTdDMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIG9wYWNpdHk9IjAuNyI+UGxhY2Vob2xkZXIgLSBvcmlnaW5hbCBpbWFnZSB1bmF2YWlsYWJsZTwvdGV4dD4KPC9zdmc+",
                 "title": "Visitors Viewing the Mona Lisa",
                 "alt": "Crowds of museum visitors photographing the Mona Lisa at the Louvre in Paris",
                 "caption": "The Mona Lisa today - still captivating millions of visitors at the Louvre 500 years later",
@@ -3049,14 +3104,16 @@
                   "endSegment": 11,
                   "displayMode": "inline"
                 },
-                "audioDescription": "A crowd of visitors at the Louvre museum in Paris, all facing the Mona Lisa and taking photos. The painting hangs behind protective glass on its own wall. This scene demonstrates how Renaissance art continues to captivate audiences more than 500 years after it was created."
+                "audioDescription": "A crowd of visitors at the Louvre museum in Paris, all facing the Mona Lisa and taking photos. The painting hangs behind protective glass on its own wall. This scene demonstrates how Renaissance art continues to captivate audiences more than 500 years after it was created.",
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ],
             "reference": [
               {
                 "id": "ref-renaissance-timeline",
                 "type": "chart",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Renaissance_timeline.svg/1200px-Renaissance_timeline.svg.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0U4RjVFOSIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRThGNUU5IiBzdHJva2U9IiMzODhFM0MiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzM4OEUzQyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Qzg7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMzg4RTNDIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5SZW5haXNzYW5jZSBUaW1lbGluZTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM2MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzM4OEUzQyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC43Ij5QbGFjZWhvbGRlciAtIG9yaWdpbmFsIGltYWdlIHVuYXZhaWxhYmxlPC90ZXh0Pgo8L3N2Zz4=",
                 "title": "Renaissance Timeline",
                 "description": "Comprehensive timeline showing major events, figures, and developments of the Renaissance",
                 "keywords": [
@@ -3065,7 +3122,9 @@
                   "dates",
                   "events",
                   "overview"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               },
               {
                 "id": "ref-museum-virtual-tours",
@@ -3085,7 +3144,7 @@
               {
                 "id": "ref-comparison-table",
                 "type": "chart",
-                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Medieval_to_Renaissance_comparison_table.svg/800px-Medieval_to_Renaissance_comparison_table.svg.png",
+                "url": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiB2aWV3Qm94PSIwIDAgODAwIDYwMCI+CiAgPHJlY3QgZmlsbD0iI0U4RjVFOSIgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiLz4KICA8cmVjdCBmaWxsPSIjRThGNUU5IiBzdHJva2U9IiMzODhFM0MiIHN0cm9rZS13aWR0aD0iMiIgeD0iMTAiIHk9IjEwIiB3aWR0aD0iNzgwIiBoZWlnaHQ9IjU4MCIgcng9IjgiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI3MCIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzM4OEUzQyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JiN4MUY0Qzg7PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMzg4RTNDIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNTAwIj5NZWRpZXZhbCB2cyBSZW5haXNzYW5jZSBDb21wYXJpc29uIFRhYmxlPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzYwIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzg4RTNDIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjciPlBsYWNlaG9sZGVyIC0gb3JpZ2luYWwgaW1hZ2UgdW5hdmFpbGFibGU8L3RleHQ+Cjwvc3ZnPg==",
                 "title": "Medieval vs Renaissance Comparison Table",
                 "description": "Table comparing key aspects of medieval and Renaissance society, art, and thought",
                 "keywords": [
@@ -3094,7 +3153,9 @@
                   "medieval",
                   "renaissance",
                   "differences"
-                ]
+                ],
+                "isPlaceholder": true,
+                "attribution": "Generated placeholder image"
               }
             ]
           }

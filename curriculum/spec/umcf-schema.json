@@ -1078,6 +1078,15 @@
           "description": "Visual and media assets for this content node. Source: UMCF native, LOM Technical.",
           "$ref": "#/$defs/mediaCollection"
         },
+        "keyConceptForRetrieval": {
+          "description": "Flag this concept for spaced retrieval practice across sessions. Source: UMCF native, learning science.",
+          "type": "boolean",
+          "default": false
+        },
+        "retrievalConfig": {
+          "description": "Configuration for spaced retrieval of this concept. Source: UMCF native, SM2/Leitner algorithms.",
+          "$ref": "#/$defs/retrievalConfig"
+        },
         "extensions": {
           "description": "Node-level extensions. Source: xAPI extensions pattern.",
           "$ref": "#/$defs/extensions"
@@ -1390,7 +1399,79 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["simple_confirmation", "comprehension_check", "knowledge_check", "application_check"]
+          "enum": ["simple_confirmation", "comprehension_check", "knowledge_check", "application_check", "teachback"]
+        },
+        "conceptId": {
+          "description": "For teachback: identifier of the concept being taught back. Source: UMCF native.",
+          "type": "string"
+        },
+        "evaluationCriteria": {
+          "description": "For teachback: criteria for evaluating learner's explanation. Source: UMCF native.",
+          "type": "object",
+          "properties": {
+            "requiredConcepts": {
+              "description": "Concepts that must be mentioned for a passing explanation.",
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "bonusConcepts": {
+              "description": "Additional concepts that indicate deeper understanding.",
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "minimumDepth": {
+              "description": "Minimum depth of understanding required.",
+              "type": "string",
+              "enum": ["surface", "moderate", "deep"]
+            },
+            "maxAttempts": {
+              "description": "Maximum number of teachback attempts before moving on.",
+              "type": "integer",
+              "minimum": 1,
+              "default": 3
+            }
+          }
+        },
+        "feedbackTiers": {
+          "description": "Tiered feedback based on evaluation score. Source: UMCF native.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "threshold": {
+                "description": "Minimum score (0-1) to trigger this tier.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "feedbackText": { "type": "string" },
+              "nextAction": {
+                "type": "string",
+                "enum": ["continue", "supplement", "guided_review", "reteach"]
+              }
+            }
+          }
+        },
+        "struggleMetrics": {
+          "description": "Configuration for tracking productive struggle. Source: UMCF native.",
+          "type": "object",
+          "properties": {
+            "trackThinkTime": {
+              "description": "Track time spent thinking before responding.",
+              "type": "boolean",
+              "default": true
+            },
+            "encourageAttempts": {
+              "description": "Encourage multiple attempts before giving up.",
+              "type": "boolean",
+              "default": true
+            },
+            "celebrateEffort": {
+              "description": "Provide encouragement for effort regardless of outcome.",
+              "type": "boolean",
+              "default": true
+            }
+          }
         },
         "prompt": {
           "description": "Question or prompt to learner.",
@@ -2273,6 +2354,57 @@
           "minimum": 0,
           "maximum": 1,
           "default": 0.3
+        }
+      }
+    },
+
+    "retrievalConfig": {
+      "description": "Configuration for spaced retrieval of key concepts. Source: UMCF native, SM2/Leitner algorithms, learning science.",
+      "type": "object",
+      "properties": {
+        "difficulty": {
+          "description": "Difficulty level of this concept for retrieval purposes.",
+          "type": "string",
+          "enum": ["easy", "medium", "hard"],
+          "default": "medium"
+        },
+        "retrievalPrompts": {
+          "description": "Questions to ask during retrieval checks.",
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "minimumRetention": {
+          "description": "Target retention rate (0-1). System adjusts spacing to achieve this.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        },
+        "spacingAlgorithm": {
+          "description": "Algorithm for calculating retrieval intervals.",
+          "type": "string",
+          "enum": ["leitner", "sm2", "custom"],
+          "default": "leitner"
+        },
+        "initialInterval": {
+          "description": "First retrieval interval after learning (ISO 8601 duration).",
+          "type": "string",
+          "pattern": "^P\\d+[DWMY]$",
+          "default": "P1D",
+          "examples": ["P1D", "P3D", "P1W"]
+        },
+        "maxInterval": {
+          "description": "Maximum interval between retrievals (ISO 8601 duration).",
+          "type": "string",
+          "pattern": "^P\\d+[DWMY]$",
+          "default": "P30D",
+          "examples": ["P30D", "P90D", "P180D"]
+        },
+        "customSpacingConfig": {
+          "description": "Custom spacing configuration for 'custom' algorithm.",
+          "type": "object",
+          "additionalProperties": true
         }
       }
     },

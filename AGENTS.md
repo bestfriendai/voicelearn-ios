@@ -181,10 +181,10 @@ xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
 ## Working with This Codebase
 
 ### Before Implementation
-1. **Read the iOS Style Guide**: `docs/IOS_STYLE_GUIDE.md` (MANDATORY)
+1. **Read the iOS Style Guide**: `docs/ios/IOS_STYLE_GUIDE.md` (MANDATORY)
 2. Read relevant tests first - they document expected behavior
 3. Check existing patterns in similar components
-4. Reference `docs/UnaMentis_TDD.md` for architectural decisions
+4. Reference `docs/architecture/UnaMentis_TDD.md` for architectural decisions
 
 ### During Implementation
 1. Write tests first (TDD)
@@ -298,7 +298,7 @@ cd server/web && npm run dev
 - Balanced preset: <$3/hour
 - Cost-optimized: <$1.50/hour
 
-See `docs/UnaMentis_TDD.md` for complete specifications.
+See `docs/architecture/UnaMentis_TDD.md` for complete specifications.
 
 ---
 

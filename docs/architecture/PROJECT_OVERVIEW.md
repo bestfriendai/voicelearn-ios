@@ -4,9 +4,13 @@
 
 UnaMentis is an AI-powered voice tutoring platform that enables extended (60-90+ minute) educational conversations. The project addresses limitations in existing voice AI (like ChatGPT's Advanced Voice Mode) by providing low-latency, natural voice interaction with curriculum-driven learning.
 
-**Vision:** A personalized AI tutor that works with you over long stretches of time, understands your learning progress and style, and evolves into a true personal tutor.
+**Vision:** AI-powered learning that makes you smarter, not dependent. A personalized tutor that works with you over long stretches of time, understands your learning progress and style, and evolves into a true personal tutor, while ensuring genuine understanding through teachback, productive struggle, and spaced retrieval.
 
-**Development Model:** 100% AI-assisted development (Claude CodeC mostly). 
+**Core Principle:** AI is at the core of what we're building, but the real core is the individual learner. UnaMentis exists to strengthen, not replace, the cognitive work of genuine understanding.
+
+**Development Model:** 100% AI-assisted development (Claude Code mostly).
+
+See [About UnaMentis](ABOUT.md) for our complete philosophy and values. 
 
 ---
 

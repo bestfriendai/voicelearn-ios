@@ -686,6 +686,63 @@ Interactive verification:
 }
 ```
 
+### Checkpoint Types
+
+| Type | Purpose | Evaluation Approach |
+|------|---------|---------------------|
+| `simple_confirmation` | Quick "does that make sense?" check | Accept acknowledgment |
+| `comprehension_check` | Verify basic understanding | Pattern matching on response |
+| `knowledge_check` | Test recall of facts | Match against expected answers |
+| `application_check` | Verify ability to apply concept | Evaluate worked example |
+| `teachback` | Have learner explain concept in own words | AI evaluates depth and accuracy |
+
+### Teachback Checkpoints (v1.1.0)
+
+Teachback is a pedagogically powerful checkpoint type that asks learners to explain concepts in their own words. This reinforces genuine understanding rather than surface-level recognition.
+
+```json
+{
+  "checkpoint": {
+    "type": "teachback",
+    "prompt": "Now I'd like you to explain neural network backpropagation in your own words. Imagine you're teaching it to a friend who knows basic calculus.",
+    "conceptId": "backpropagation",
+    "evaluationCriteria": {
+      "requiredConcepts": ["error", "gradient", "weights", "backwards"],
+      "bonusConcepts": ["chain rule", "partial derivatives"],
+      "minimumDepth": "surface",
+      "maxAttempts": 3
+    },
+    "feedbackTiers": {
+      "excellent": {
+        "threshold": 0.9,
+        "feedbackText": "That's an excellent explanation! You clearly understand the core concepts.",
+        "nextAction": "continue"
+      },
+      "good": {
+        "threshold": 0.7,
+        "feedbackText": "Good! You've got the main idea. Let me add one clarification...",
+        "nextAction": "supplement"
+      },
+      "partial": {
+        "threshold": 0.4,
+        "feedbackText": "You're on the right track. Let's work through this together...",
+        "nextAction": "guided_review"
+      },
+      "struggling": {
+        "threshold": 0.0,
+        "feedbackText": "No worries, this is a tricky concept. Let me explain it a different way...",
+        "nextAction": "reteach"
+      }
+    },
+    "struggleMetrics": {
+      "trackThinkTime": true,
+      "encourageAttempts": true,
+      "celebrateEffort": true
+    }
+  }
+}
+```
+
 ### Alternative Explanations
 
 For rephrasing the same concept:
@@ -726,6 +783,51 @@ Detect and correct common errors:
   ]
 }
 ```
+
+### Key Concepts for Spaced Retrieval (v1.1.0)
+
+Content nodes can flag key concepts that should be revisited across sessions to verify long-term retention. This supports spaced retrieval practice, a learning science technique that strengthens memory through periodic recall.
+
+```json
+{
+  "id": { "value": "topic-backpropagation" },
+  "title": "Backpropagation Algorithm",
+  "type": "topic",
+  "keyConceptForRetrieval": true,
+  "retrievalConfig": {
+    "difficulty": "medium",
+    "retrievalPrompts": [
+      "What is backpropagation and why is it important in neural networks?",
+      "How does the gradient flow backwards through the network?",
+      "What role does the chain rule play in backpropagation?"
+    ],
+    "minimumRetention": 0.7,
+    "spacingAlgorithm": "leitner",
+    "initialInterval": "P1D",
+    "maxInterval": "P30D"
+  }
+}
+```
+
+**Key Concept Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `keyConceptForRetrieval` | boolean | Flag this concept for spaced retrieval |
+| `retrievalConfig.difficulty` | string | easy, medium, or hard |
+| `retrievalConfig.retrievalPrompts` | string[] | Questions to ask during retrieval checks |
+| `retrievalConfig.minimumRetention` | number | Target retention rate (0-1) |
+| `retrievalConfig.spacingAlgorithm` | string | Algorithm: leitner, sm2, or custom |
+| `retrievalConfig.initialInterval` | string | First retrieval interval (ISO 8601) |
+| `retrievalConfig.maxInterval` | string | Maximum interval between retrievals |
+
+**Spacing Algorithms:**
+
+| Algorithm | Description |
+|-----------|-------------|
+| `leitner` | Box-based system: success increases interval, failure resets |
+| `sm2` | SuperMemo 2 algorithm with easiness factor |
+| `custom` | Use `customSpacingConfig` for application-specific logic |
 
 ### Time Estimates
 

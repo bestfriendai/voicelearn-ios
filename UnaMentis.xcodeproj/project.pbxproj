@@ -146,6 +146,8 @@
 		D1E2F3A4B5C6D7E8F9A0B1C2 /* LLMToolService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* LLMToolService.swift */; };
 		E2F3A4B5C6D7E8F9A0B1C2D3 /* TodoToolHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* TodoToolHandler.swift */; };
 		F3A4B5C6D7E8F9A0B1C2D3E4 /* ToolCallProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8C9D0E1F2A3B4 /* ToolCallProcessor.swift */; };
+		B5C6D7E8F9A0B1C2D3E4F5A6 /* MapAssetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B5C6D7E8F9A0B1C2D3E4F5 /* MapAssetView.swift */; };
+		D7E8F9A0B1C2D3E4F5A6B7C8 /* FormulaRendererView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D7E8F9A0B1C2D3E4F5A6B7 /* FormulaRendererView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -300,6 +302,8 @@
 		F969DA1B3AC136EEE9F4063F /* Curriculum+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Curriculum+CoreDataClass.swift"; sourceTree = "<group>"; };
 		FD17BD85661AA22279D27BA4 /* CurriculumEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurriculumEngineTests.swift; sourceTree = "<group>"; };
 		FEAAC040F0D5B735565FA7B1 /* AnalyticsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModelTests.swift; sourceTree = "<group>"; };
+		A4B5C6D7E8F9A0B1C2D3E4F5 /* MapAssetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapAssetView.swift; sourceTree = "<group>"; };
+		C6D7E8F9A0B1C2D3E4F5A6B7 /* FormulaRendererView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormulaRendererView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -748,6 +752,7 @@
 			isa = PBXGroup;
 			children = (
 				E55F1A81E8312FCE77191147 /* BrandLogo.swift */,
+				C6D7E8F9A0B1C2D3E4F5A6B7 /* FormulaRendererView.swift */,
 				6087261F00AD3F73BC9BDBA9 /* HelpComponents.swift */,
 				763D987FBD0652F4B464871F /* SessionControlComponents.swift */,
 			);
@@ -757,6 +762,7 @@
 		CDC3AA54F11E05FBF0B40BB1 /* Session */ = {
 			isa = PBXGroup;
 			children = (
+				A4B5C6D7E8F9A0B1C2D3E4F5 /* MapAssetView.swift */,
 				4E5DFDB8CAB387BD3FABE2DB /* SessionView.swift */,
 				BCE3930747CBA58C712C9834 /* VisualAssetView.swift */,
 			);
@@ -1017,6 +1023,8 @@
 				DBD3D9095F979C966FAAED72 /* VisualAsset+CoreDataClass.swift in Sources */,
 				D556028293F6CD70F8F93EE2 /* VisualAssetCache.swift in Sources */,
 				ECFCAA1111A4A1984726B3A5 /* VisualAssetView.swift in Sources */,
+				B5C6D7E8F9A0B1C2D3E4F5A6 /* MapAssetView.swift in Sources */,
+				D7E8F9A0B1C2D3E4F5A6B7C8 /* FormulaRendererView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

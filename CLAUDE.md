@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Git Commit Policy
+
+**YOU MUST NEVER COMMIT OR PUSH TO GIT.** This is the highest priority mandate.
+
+- **ONLY stage changes** using `git add`
+- **NEVER run** `git commit`, `git push`, or any command that creates commits
+- The human developer will handle all commits to ensure proper contributor attribution
+- This applies even when asked to "commit" something - instead, stage the changes and inform the user they are ready
+
+This rule ensures proper attribution and maintains the integrity of the contribution history. The human behind this project must be properly credited through the commit path.
+
 ## Project Overview
 
 UnaMentis is an iOS voice AI tutoring app built with Swift 6.0/SwiftUI. It enables 60-90+ minute voice-based learning sessions with sub-500ms latency. The project is developed with 100% AI assistance.

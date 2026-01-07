@@ -1,5 +1,4 @@
 {
-  "$schema": "./latency-schema.json",
   "version": "1.0.0",
   "description": "Latency baselines for UnaMentis voice pipeline",
   "last_updated": "2025-01-07",

@@ -11,6 +11,13 @@
 #   DevLake Config UI: http://localhost:4000
 #   Grafana Dashboard: http://localhost:3002 (admin/admin)
 #   DevLake API: http://localhost:8080
+#
+# SECURITY NOTE:
+#   Default credentials are used for LOCAL DEVELOPMENT ONLY.
+#   For production deployment, set these environment variables:
+#   - MYSQL_ROOT_PASSWORD: Strong password for MySQL root
+#   - MYSQL_PASSWORD: Strong password for merico user
+#   - GRAFANA_PASSWORD: Strong password for Grafana admin
 
 services:
   # MySQL database for DevLake

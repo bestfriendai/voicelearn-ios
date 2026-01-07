@@ -136,6 +136,7 @@ $$ LANGUAGE plpgsql;
 -- SELECT register_flag('maintenance_mode', 'ramerman', 'Enable maintenance mode', 'ops', 0, TRUE);
 
 -- Grant permissions (Unleash user needs access)
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO unleash;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO unleash;
+-- Using least-privilege principle: only grant what's necessary for operations
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO unleash;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO unleash;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO unleash;

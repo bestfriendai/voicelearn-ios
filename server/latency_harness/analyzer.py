@@ -465,7 +465,7 @@ class ResultsAnalyzer:
 
     def compare_runs(
         self, run1: TestRun, run2: TestRun
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """
         Compare two test runs.
 

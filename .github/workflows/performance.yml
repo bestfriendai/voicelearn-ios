@@ -136,13 +136,16 @@ jobs:
         THRESHOLD="${{ steps.baselines.outputs.regression_threshold }}"
 
         echo "Checking regression..."
-        echo "P50: ${P50:-0}ms (target: ${P50_TARGET}ms)"
-        echo "P99: ${P99:-0}ms (target: ${P99_TARGET}ms)"
-        echo "Threshold: ${THRESHOLD}%"
+        echo "P50: ${P50:-0}ms (target: ${P50_TARGET:-0}ms)"
+        echo "P99: ${P99:-0}ms (target: ${P99_TARGET:-0}ms)"
+        echo "Threshold: ${THRESHOLD:-20}%"
 
         # Default to 0 if not set
-        P50=${P50:-0}
-        P99=${P99:-0}
+        P50="${P50:-0}"
+        P99="${P99:-0}"
+        P50_TARGET="${P50_TARGET:-500}"
+        P99_TARGET="${P99_TARGET:-1000}"
+        THRESHOLD="${THRESHOLD:-20}"
 
         REGRESSION="false"
         WARNING="false"
@@ -171,8 +174,8 @@ jobs:
           fi
         fi
 
-        echo "regression=$REGRESSION" >> $GITHUB_OUTPUT
-        echo "warning=$WARNING" >> $GITHUB_OUTPUT
+        echo "regression=$REGRESSION" >> "$GITHUB_OUTPUT"
+        echo "warning=$WARNING" >> "$GITHUB_OUTPUT"
 
     - name: Upload Results
       uses: actions/upload-artifact@v4
@@ -200,8 +203,8 @@ jobs:
         try:
             with open('latency_results.json') as f:
                 results = json.load(f)
-        except:
-            print("Could not load results")
+        except (IOError, json.JSONDecodeError) as e:
+            print(f"Could not load results: {e}")
             exit(0)
 
         metrics = results.get('summary', {}).get('metrics', {})

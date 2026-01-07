@@ -120,30 +120,46 @@ async def init_latency_harness():
     storage_type = os.environ.get("LATENCY_STORAGE_TYPE", "file")
     data_dir = Path(__file__).parent.parent / "data" / "latency_harness"
 
-    _storage = create_latency_storage(storage_type=storage_type, data_dir=data_dir)
+    try:
+        _storage = create_latency_storage(storage_type=storage_type, data_dir=data_dir)
+    except Exception as e:
+        logger.error("Failed to create latency storage: %s", e)
+        raise
 
     # Initialize file-based storage
-    if hasattr(_storage, 'initialize'):
-        await _storage.initialize()
-    elif hasattr(_storage, 'connect'):
-        await _storage.connect()
-        await _storage.initialize_schema()
+    try:
+        if hasattr(_storage, 'initialize'):
+            await _storage.initialize()
+        elif hasattr(_storage, 'connect'):
+            await _storage.connect()
+            await _storage.initialize_schema()
+    except Exception as e:
+        logger.error("Failed to initialize storage backend: %s", e)
+        raise
 
     # Create orchestrator with storage
-    _orchestrator = LatencyTestOrchestrator(storage=_storage)
+    try:
+        _orchestrator = LatencyTestOrchestrator(storage=_storage)
 
-    # Set up callbacks for real-time updates
-    _orchestrator.on_progress = _on_progress
-    _orchestrator.on_result = _on_result
-    _orchestrator.on_run_complete = _on_run_complete
+        # Set up callbacks for real-time updates
+        _orchestrator.on_progress = _on_progress
+        _orchestrator.on_result = _on_result
+        _orchestrator.on_run_complete = _on_run_complete
 
-    await _orchestrator.start()
+        await _orchestrator.start()
+    except Exception as e:
+        logger.error("Failed to start latency test orchestrator: %s", e)
+        raise
 
     # Register default test suites if not already in storage
-    if not _orchestrator.suites.get("quick_validation"):
-        await _orchestrator.register_suite(create_quick_validation_suite())
-    if not _orchestrator.suites.get("provider_comparison"):
-        await _orchestrator.register_suite(create_provider_comparison_suite())
+    try:
+        if not _orchestrator.suites.get("quick_validation"):
+            await _orchestrator.register_suite(create_quick_validation_suite())
+        if not _orchestrator.suites.get("provider_comparison"):
+            await _orchestrator.register_suite(create_provider_comparison_suite())
+    except Exception as e:
+        logger.warning("Failed to register default test suites: %s", e)
+        # Non-fatal: continue without default suites
 
     logger.info("Latency test harness initialized with %s storage", storage_type)
 

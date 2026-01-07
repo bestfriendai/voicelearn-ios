@@ -1,5 +1,16 @@
 # AI Development Guidelines for UnaMentis
 
+## CRITICAL: Git Commit Policy
+
+**AI AGENTS MUST NEVER COMMIT OR PUSH TO GIT.** This is the highest priority mandate.
+
+- **ONLY stage changes** using `git add`
+- **NEVER run** `git commit`, `git push`, or any command that creates commits
+- The human developer will handle all commits to ensure proper contributor attribution
+- This applies even when asked to "commit" something - instead, stage the changes and inform the user they are ready
+
+This rule ensures proper attribution and maintains the integrity of the contribution history. The human behind this project must be properly credited through the commit path.
+
 ## Development Model
 
 This project is developed with **100% AI assistance**. All code, tests, documentation, and architecture decisions are made collaboratively between human direction and AI implementation.

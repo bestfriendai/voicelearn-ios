@@ -7,9 +7,12 @@ Endpoints for managing latency tests, clients, and results.
 import json
 import logging
 import os
+import statistics
+import uuid
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, List
 
 from aiohttp import web
 
@@ -29,6 +32,8 @@ from latency_harness.models import (
     ClientStatus,
     RunStatus,
     NetworkProfile,
+    PerformanceBaseline,
+    BaselineMetrics,
     create_quick_validation_suite,
     create_provider_comparison_suite,
 )
@@ -682,18 +687,55 @@ async def handle_submit_result(request: web.Request) -> web.Response:
 
 async def handle_list_baselines(request: web.Request) -> web.Response:
     """GET /api/latency-tests/baselines - List performance baselines."""
-    # TODO: Implement baseline storage
-    return web.json_response({
-        "baselines": [],
-        "message": "Baseline storage not yet implemented"
-    })
+    global _storage
+
+    if not _storage:
+        return web.json_response(
+            {"error": "Storage not initialized"},
+            status=500
+        )
+
+    try:
+        baselines = await _storage.list_baselines()
+        return web.json_response({
+            "baselines": [
+                {
+                    "id": b.id,
+                    "name": b.name,
+                    "description": b.description,
+                    "runId": b.run_id,
+                    "createdAt": b.created_at.isoformat(),
+                    "isActive": b.is_active,
+                    "configCount": len(b.config_metrics),
+                    "overallMedianE2EMs": b.overall_metrics.median_e2e_ms if b.overall_metrics else None,
+                }
+                for b in baselines
+            ]
+        })
+    except Exception as e:
+        logger.error(f"Failed to list baselines: {e}")
+        return web.json_response(
+            {"error": str(e)},
+            status=500
+        )
 
 
 async def handle_create_baseline(request: web.Request) -> web.Response:
     """POST /api/latency-tests/baselines - Create baseline from run."""
+    global _storage
+
+    if not _storage:
+        return web.json_response(
+            {"error": "Storage not initialized"},
+            status=500
+        )
+
     try:
         data = await request.json()
         run_id = data.get("runId")
+        name = data.get("name", f"Baseline from {run_id}")
+        description = data.get("description", "")
+        set_active = data.get("setActive", False)
 
         if not run_id:
             return web.json_response(
@@ -701,21 +743,131 @@ async def handle_create_baseline(request: web.Request) -> web.Response:
                 status=400
             )
 
-        # TODO: Implement baseline creation
+        # Get the run
+        orchestrator = get_orchestrator()
+        run = orchestrator.get_run(run_id)
+
+        if not run:
+            return web.json_response(
+                {"error": f"Run not found: {run_id}"},
+                status=404
+            )
+
+        if run.status != RunStatus.COMPLETED:
+            return web.json_response(
+                {"error": f"Run is not completed (status: {run.status.value})"},
+                status=400
+            )
+
+        # Filter to successful results
+        successful_results = [r for r in run.results if r.is_success]
+
+        if not successful_results:
+            return web.json_response(
+                {"error": "Run has no successful results"},
+                status=400
+            )
+
+        # Compute per-config metrics
+        config_metrics: Dict[str, BaselineMetrics] = {}
+        by_config: Dict[str, List] = defaultdict(list)
+
+        for r in successful_results:
+            by_config[r.config_id].append(r)
+
+        for config_id, results in by_config.items():
+            e2e = [r.e2e_latency_ms for r in results]
+            stt = [r.stt_latency_ms for r in results if r.stt_latency_ms]
+            llm_ttfb = [r.llm_ttfb_ms for r in results]
+            llm_completion = [r.llm_completion_ms for r in results]
+            tts_ttfb = [r.tts_ttfb_ms for r in results]
+            tts_completion = [r.tts_completion_ms for r in results]
+
+            config_metrics[config_id] = BaselineMetrics(
+                median_e2e_ms=statistics.median(e2e),
+                p99_e2e_ms=sorted(e2e)[int(len(e2e) * 0.99)] if len(e2e) > 1 else e2e[0],
+                min_e2e_ms=min(e2e),
+                max_e2e_ms=max(e2e),
+                median_stt_ms=statistics.median(stt) if stt else None,
+                median_llm_ttfb_ms=statistics.median(llm_ttfb),
+                median_llm_completion_ms=statistics.median(llm_completion),
+                median_tts_ttfb_ms=statistics.median(tts_ttfb),
+                median_tts_completion_ms=statistics.median(tts_completion),
+                sample_count=len(results),
+            )
+
+        # Compute overall metrics
+        all_e2e = [r.e2e_latency_ms for r in successful_results]
+        all_stt = [r.stt_latency_ms for r in successful_results if r.stt_latency_ms]
+        all_llm_ttfb = [r.llm_ttfb_ms for r in successful_results]
+        all_llm_completion = [r.llm_completion_ms for r in successful_results]
+        all_tts_ttfb = [r.tts_ttfb_ms for r in successful_results]
+        all_tts_completion = [r.tts_completion_ms for r in successful_results]
+
+        overall_metrics = BaselineMetrics(
+            median_e2e_ms=statistics.median(all_e2e),
+            p99_e2e_ms=sorted(all_e2e)[int(len(all_e2e) * 0.99)] if len(all_e2e) > 1 else all_e2e[0],
+            min_e2e_ms=min(all_e2e),
+            max_e2e_ms=max(all_e2e),
+            median_stt_ms=statistics.median(all_stt) if all_stt else None,
+            median_llm_ttfb_ms=statistics.median(all_llm_ttfb),
+            median_llm_completion_ms=statistics.median(all_llm_completion),
+            median_tts_ttfb_ms=statistics.median(all_tts_ttfb),
+            median_tts_completion_ms=statistics.median(all_tts_completion),
+            sample_count=len(successful_results),
+        )
+
+        # Create baseline
+        baseline_id = str(uuid.uuid4())[:8]
+        baseline = PerformanceBaseline(
+            id=baseline_id,
+            name=name,
+            description=description,
+            run_id=run_id,
+            created_at=datetime.now(),
+            is_active=set_active,
+            config_metrics=config_metrics,
+            overall_metrics=overall_metrics,
+        )
+
+        # Save baseline
+        await _storage.save_baseline(baseline)
+
+        logger.info(f"Created baseline {baseline_id} from run {run_id}")
+
         return web.json_response({
-            "message": "Baseline creation not yet implemented",
-            "runId": run_id
-        }, status=501)
+            "id": baseline.id,
+            "name": baseline.name,
+            "runId": baseline.run_id,
+            "createdAt": baseline.created_at.isoformat(),
+            "isActive": baseline.is_active,
+            "configCount": len(baseline.config_metrics),
+            "overallMetrics": baseline.overall_metrics.to_dict() if baseline.overall_metrics else None,
+        })
 
     except json.JSONDecodeError:
         return web.json_response(
             {"error": "Invalid JSON"},
             status=400
         )
+    except Exception as e:
+        logger.error(f"Failed to create baseline: {e}")
+        return web.json_response(
+            {"error": str(e)},
+            status=500
+        )
 
 
 async def handle_check_baseline(request: web.Request) -> web.Response:
     """GET /api/latency-tests/baselines/{baseline_id}/check - Check run against baseline."""
+    global _storage
+
+    if not _storage:
+        return web.json_response(
+            {"error": "Storage not initialized"},
+            status=500
+        )
+
     baseline_id = request.match_info["baseline_id"]
     run_id = request.query.get("runId")
 
@@ -725,12 +877,134 @@ async def handle_check_baseline(request: web.Request) -> web.Response:
             status=400
         )
 
-    # TODO: Implement baseline checking
-    return web.json_response({
-        "message": "Baseline checking not yet implemented",
-        "baselineId": baseline_id,
-        "runId": run_id
-    }, status=501)
+    try:
+        # Get the baseline
+        baseline = await _storage.get_baseline(baseline_id)
+        if not baseline:
+            return web.json_response(
+                {"error": f"Baseline not found: {baseline_id}"},
+                status=404
+            )
+
+        # Get the run
+        orchestrator = get_orchestrator()
+        run = orchestrator.get_run(run_id)
+
+        if not run:
+            return web.json_response(
+                {"error": f"Run not found: {run_id}"},
+                status=404
+            )
+
+        # Convert baseline to format expected by analyzer
+        baseline_dict: Dict[str, Dict[str, float]] = {}
+        for config_id, metrics in baseline.config_metrics.items():
+            baseline_dict[config_id] = {
+                "e2e_median_ms": metrics.median_e2e_ms,
+                "e2e_p99_ms": metrics.p99_e2e_ms,
+                "stt_median_ms": metrics.median_stt_ms,
+                "llm_ttfb_median_ms": metrics.median_llm_ttfb_ms,
+                "llm_completion_median_ms": metrics.median_llm_completion_ms,
+                "tts_ttfb_median_ms": metrics.median_tts_ttfb_ms,
+                "tts_completion_median_ms": metrics.median_tts_completion_ms,
+            }
+
+        # Analyze with baseline for regression detection
+        analyzer = ResultsAnalyzer(baselines=baseline_dict)
+        report = analyzer.analyze(run)
+
+        # Compute comparison summary
+        comparison_results = []
+        by_config: Dict[str, List] = defaultdict(list)
+
+        successful_results = [r for r in run.results if r.is_success]
+        for r in successful_results:
+            by_config[r.config_id].append(r)
+
+        for config_id, results in by_config.items():
+            current_median = statistics.median([r.e2e_latency_ms for r in results])
+
+            baseline_metrics = baseline.config_metrics.get(config_id)
+            if baseline_metrics:
+                baseline_median = baseline_metrics.median_e2e_ms
+                change_percent = ((current_median - baseline_median) / baseline_median * 100)
+
+                comparison_results.append({
+                    "configId": config_id,
+                    "baselineMedianMs": baseline_median,
+                    "currentMedianMs": current_median,
+                    "changePercent": round(change_percent, 2),
+                    "improved": change_percent < -5,
+                    "regressed": change_percent > 10,
+                    "severity": (
+                        "severe" if change_percent > 50 else
+                        "moderate" if change_percent > 20 else
+                        "minor" if change_percent > 10 else
+                        "none"
+                    ),
+                })
+            else:
+                # New config not in baseline
+                comparison_results.append({
+                    "configId": config_id,
+                    "baselineMedianMs": None,
+                    "currentMedianMs": current_median,
+                    "changePercent": None,
+                    "improved": False,
+                    "regressed": False,
+                    "severity": "unknown",
+                    "note": "Configuration not in baseline"
+                })
+
+        # Overall comparison
+        overall_current_median = report.summary.overall_median_e2e_ms
+        overall_baseline_median = baseline.overall_metrics.median_e2e_ms if baseline.overall_metrics else None
+        overall_change = None
+        if overall_baseline_median:
+            overall_change = ((overall_current_median - overall_baseline_median) / overall_baseline_median * 100)
+
+        return web.json_response({
+            "baselineId": baseline_id,
+            "baselineName": baseline.name,
+            "runId": run_id,
+            "checkedAt": datetime.now().isoformat(),
+            "overall": {
+                "baselineMedianMs": overall_baseline_median,
+                "currentMedianMs": overall_current_median,
+                "changePercent": round(overall_change, 2) if overall_change else None,
+                "meetsTarget500ms": overall_current_median < 500,
+                "meetsTarget1000ms": overall_current_median < 1000,
+            },
+            "regressions": [
+                {
+                    "configId": r.config_id,
+                    "metric": r.metric,
+                    "baselineValue": r.baseline_value,
+                    "currentValue": r.current_value,
+                    "changePercent": round(r.change_percent, 2),
+                    "severity": r.severity.value,
+                }
+                for r in report.regressions
+            ],
+            "configComparisons": sorted(
+                comparison_results,
+                key=lambda x: x.get("changePercent") or 0,
+                reverse=True
+            ),
+            "summary": {
+                "totalConfigs": len(comparison_results),
+                "improvedConfigs": sum(1 for c in comparison_results if c.get("improved")),
+                "regressedConfigs": sum(1 for c in comparison_results if c.get("regressed")),
+                "newConfigs": sum(1 for c in comparison_results if c.get("baselineMedianMs") is None),
+            },
+        })
+
+    except Exception as e:
+        logger.error(f"Failed to check baseline: {e}")
+        return web.json_response(
+            {"error": str(e)},
+            status=500
+        )
 
 
 # =============================================================================

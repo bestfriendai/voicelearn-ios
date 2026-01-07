@@ -16,10 +16,11 @@ This guide covers everything you need to use, configure, troubleshoot, and exten
 4. [Understanding Results](#understanding-results)
 5. [Operations Console UI](#operations-console-ui)
 6. [CLI Reference](#cli-reference)
-7. [API Reference](#api-reference)
-8. [Troubleshooting](#troubleshooting)
-9. [Extending the Harness](#extending-the-harness)
-10. [Performance Tuning](#performance-tuning)
+7. [AI Agent Usage](#ai-agent-usage)
+8. [API Reference](#api-reference)
+9. [Troubleshooting](#troubleshooting)
+10. [Extending the Harness](#extending-the-harness)
+11. [Performance Tuning](#performance-tuning)
 
 ---
 
@@ -434,6 +435,126 @@ Exit Codes:
   1 - Test failure or regression detected
   2 - Timeout
 ```
+
+---
+
+## AI Agent Usage
+
+This section covers autonomous usage by AI agents (Claude Code, Cursor, etc.) for automated latency validation.
+
+### Autonomous Workflow
+
+AI agents should follow this workflow when making provider or performance-sensitive changes:
+
+```
+1. BEFORE making changes:
+   python -m latency_harness.cli --suite quick_validation --mock
+   (Smoke test - verifies harness infrastructure works)
+
+2. AFTER making changes:
+   python -m latency_harness.cli --suite quick_validation --no-mock --output json
+   (Real provider test with parseable output)
+
+3. IF regressions detected:
+   python -m latency_harness.cli --suite provider_comparison --no-mock
+   (Full investigation to identify bottleneck)
+```
+
+### Decision Matrix
+
+| Scenario | Suite | Mode | Expected Duration |
+|----------|-------|------|-------------------|
+| Quick infrastructure check | `quick_validation` | `--mock` | ~30 seconds |
+| Post-change validation | `quick_validation` | `--no-mock` | ~2 minutes |
+| Performance investigation | `provider_comparison` | `--no-mock` | ~30 minutes |
+| CI/CD pipeline | `quick_validation` | `--mock --ci` | ~30 seconds |
+
+### Parsing JSON Output
+
+For programmatic analysis, use JSON output:
+
+```bash
+python -m latency_harness.cli --suite quick_validation --output json > results.json
+```
+
+Key fields to check:
+```json
+{
+  "summary": {
+    "overallMedianE2EMs": 423.5,    // Must be <500ms
+    "overallP99E2EMs": 892.3,       // Must be <1000ms
+    "failedTests": 0                 // Must be 0
+  },
+  "regressions": []                  // Must be empty
+}
+```
+
+### Automated Regression Check
+
+```bash
+# Returns exit code 1 if regressions detected
+python -m latency_harness.cli \
+  --suite quick_validation \
+  --no-mock \
+  --ci \
+  --fail-on-regression
+
+# Check exit code
+if [ $? -eq 0 ]; then
+  echo "No regressions detected"
+else
+  echo "Regressions detected - investigate!"
+fi
+```
+
+### Mock vs Real Mode
+
+**Mock mode (`--mock`) is acceptable for AI agents because:**
+- Validates test infrastructure without external dependencies
+- Fast execution for quick feedback loops
+- Deterministic results (no network variance)
+- Zero cost (no API calls)
+
+**Real mode (`--no-mock`) is required when:**
+- Validating actual provider performance
+- Creating baselines for regression detection
+- After changes to provider implementations
+- Investigating performance issues
+
+### Error Handling
+
+| Exit Code | Meaning | AI Agent Action |
+|-----------|---------|-----------------|
+| 0 | Success | Continue work |
+| 1 | Failure or regression | Investigate, run provider_comparison |
+| 2 | Timeout | Increase timeout, check network |
+
+### Baseline Management for Agents
+
+```bash
+# Create baseline after successful real-provider test
+curl -X POST http://localhost:8766/api/latency-tests/baselines \
+  -H "Content-Type: application/json" \
+  -d '{"runId": "run_xxx", "name": "post-change baseline", "setActive": true}'
+
+# Check new run against baseline
+curl -s "http://localhost:8766/api/latency-tests/baselines/{id}/check?runId=run_yyy" | \
+  python -c "import json,sys; d=json.load(sys.stdin); exit(1 if d['summary']['regressedConfigs'] > 0 else 0)"
+```
+
+### Pre-Approved Commands
+
+The following commands are pre-approved in `.claude/settings.local.json` and do not require user confirmation:
+
+```bash
+# All latency harness CLI commands
+python -m latency_harness.cli [any options]
+
+# REST API calls
+curl http://localhost:8766/api/latency-tests/*
+```
+
+See `server/latency_harness/CLAUDE.md` for detailed autonomous usage guidance.
 
 ---
 

@@ -110,6 +110,38 @@ jobs:
         path: UnitTestResults.xcresult
         retention-days: 7
 
+    - name: Extract and Check Coverage
+      id: coverage
+      run: |
+        # Extract coverage percentage from xcresult
+        COVERAGE=$(xcrun xccov view --report --json UnitTestResults.xcresult 2>/dev/null | \
+          python3 -c "
+        import json, sys
+        try:
+            data = json.load(sys.stdin)
+            # Get overall line coverage
+            targets = data.get('targets', [])
+            for target in targets:
+                if target.get('name', '').startswith('UnaMentis'):
+                    coverage = target.get('lineCoverage', 0)
+                    print(f'{coverage * 100:.1f}')
+                    sys.exit(0)
+            print('0')
+        except Exception as e:
+            print('0', file=sys.stderr)
+            print('0')
+        ")
+
+        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "Code coverage: ${COVERAGE}%"
+
+        # Check minimum coverage threshold (80%)
+        MIN_COVERAGE=80
+        if (( $(echo "$COVERAGE < $MIN_COVERAGE" | bc -l) )); then
+          echo "::error::Code coverage ${COVERAGE}% is below minimum threshold of ${MIN_COVERAGE}%"
+          exit 1
+        fi
+
     - name: Summary
       if: always()
       run: |
@@ -129,6 +161,7 @@ jobs:
             print(f'|--------|-------|')
             print(f'| Tests Run | {tests} |')
             print(f'| Failures | {failures} |')
+            print(f'| Coverage | ${{ steps.coverage.outputs.coverage }}% |')
             print(f'| Status | {\"Passed\" if failures == \"0\" or failures == 0 else \"Failed\"} |')
         except:
             print('Could not parse test results')

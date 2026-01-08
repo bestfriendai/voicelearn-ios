@@ -94,6 +94,19 @@ See [docs/TASK_STATUS.md](docs/TASK_STATUS.md) for detailed task tracking.
 
 ## Documentation
 
+### 📚 Developer Wiki
+
+**[Visit the UnaMentis Wiki](https://github.com/UnaMentis/unamentis/wiki)** for comprehensive developer documentation including:
+
+- Complete development environment setup
+- Architecture deep-dives and patterns
+- Code quality standards and workflows
+- Performance testing harness guide
+- Tool configuration (CodeRabbit, MCP servers, CI/CD)
+- API and CLI references
+
+The wiki is the primary resource for contributors and maintainers.
+
 ### Getting Started
 - [Quick Start Guide](docs/QUICKSTART.md) - START HERE
 - [Setup Guide](docs/setup/SETUP.md)
@@ -169,6 +182,44 @@ Features:
 - REST API for programmatic access
 
 See [docs/LATENCY_TEST_HARNESS_GUIDE.md](docs/LATENCY_TEST_HARNESS_GUIDE.md) for complete documentation.
+
+## Code Quality Infrastructure
+
+UnaMentis implements a comprehensive **5-phase Code Quality Initiative** that enables enterprise-grade quality standards through intelligent automation:
+
+### Quality Gates
+
+| Gate | Threshold | Enforcement |
+|------|-----------|-------------|
+| Code Coverage | 80% minimum | CI fails if below |
+| Latency (P50) | 500ms | CI warns/fails on regression |
+| SwiftLint | Zero violations | Pre-commit hook |
+| Security Scan | Zero critical findings | CI + weekly audit |
+
+### Automation Tools
+
+- **Pre-commit Hooks**: SwiftLint, SwiftFormat, Ruff, ESLint, Gitleaks
+- **Dependency Management**: Renovate with auto-merge for patches
+- **AI Code Review**: CodeRabbit (free for open source)
+- **Performance Testing**: Automated latency regression detection
+- **Security Scanning**: CodeQL, Gitleaks, pip-audit, npm audit
+- **DORA Metrics**: Apache DevLake for engineering health
+
+### Feature Flags
+
+Self-hosted Unleash system with full lifecycle management:
+- iOS SDK with SwiftUI integration
+- Web SDK with React hooks
+- Automated stale flag detection
+
+```bash
+# Install quality infrastructure
+./scripts/install-hooks.sh      # Git hooks
+cd server/devlake && docker compose up -d    # DORA metrics
+cd server/feature-flags && docker compose up -d  # Feature flags
+```
+
+See [docs/CODE_QUALITY_INITIATIVE.md](docs/CODE_QUALITY_INITIATIVE.md) for the complete quality initiative documentation.
 
 ## Architecture
 

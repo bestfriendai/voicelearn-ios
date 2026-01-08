@@ -94,6 +94,19 @@ See [docs/TASK_STATUS.md](docs/TASK_STATUS.md) for detailed task tracking.
 
 ## Documentation
 
+### 📚 Developer Wiki
+
+**[Visit the UnaMentis Wiki](https://github.com/UnaMentis/unamentis/wiki)** for comprehensive developer documentation including:
+
+- Complete development environment setup
+- Architecture deep-dives and patterns
+- Code quality standards and workflows
+- Performance testing harness guide
+- Tool configuration (CodeRabbit, MCP servers, CI/CD)
+- API and CLI references
+
+The wiki is the primary resource for contributors and maintainers.
+
 ### Getting Started
 - [Quick Start Guide](docs/QUICKSTART.md) - START HERE
 - [Setup Guide](docs/setup/SETUP.md)

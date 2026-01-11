@@ -41,9 +41,10 @@ Enforces the "Definition of Done" mandate by running all quality checks before w
 ```bash
 ./scripts/test-all.sh
 ```
-- Complete test suite
-- Includes code coverage
-- Use for significant changes
+- Complete test suite (unit + integration)
+- Includes code coverage with **80% threshold enforcement**
+- Matches CI behavior exactly
+- Use for significant changes and before PR
 
 ### 3. Report Results
 - Summary of lint status (pass/fail, violation count)
@@ -53,8 +54,8 @@ Enforces the "Definition of Done" mandate by running all quality checks before w
 
 ## Success Criteria
 
-- **PASS:** Lint clean + all tests green
-- **FAIL:** Any lint violation OR any test failure
+- **PASS:** Lint clean + all tests green + (for --full) coverage >= 80%
+- **FAIL:** Any lint violation OR any test failure OR (for --full) coverage below 80%
 
 Exit codes:
 - `0` = All checks passed

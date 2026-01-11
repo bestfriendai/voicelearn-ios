@@ -154,7 +154,7 @@
   "_import_metadata": {
     "source": "mock_source",
     "course_id": "test-callback-job",
-    "imported_at": "2026-01-11T01:32:42.769962",
+    "imported_at": "2026-01-11T01:38:01.105584",
     "attribution": "Test attribution text",
     "stats": {
       "lectures": 3,

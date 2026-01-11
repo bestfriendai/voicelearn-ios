@@ -154,7 +154,7 @@
   "_import_metadata": {
     "source": "mock_source",
     "course_id": "test-list-job",
-    "imported_at": "2026-01-11T01:32:42.765024",
+    "imported_at": "2026-01-11T01:38:01.101179",
     "attribution": "Test attribution text",
     "stats": {
       "lectures": 3,

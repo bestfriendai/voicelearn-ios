@@ -314,14 +314,34 @@ When sending logs/metrics, include these headers:
 │  │  • Clients (dict)                               │   │
 │  │  • Servers (dict)                               │   │
 │  └──────────────────────────────────────────────────┘   │
+│                                                         │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              TTS Caching System                   │   │
+│  │  ┌─────────────┐  ┌─────────────────────────┐   │   │
+│  │  │  TTSCache   │  │  TTSResourcePool        │   │   │
+│  │  │  (Global)   │  │  LIVE: 7 concurrent     │   │   │
+│  │  │             │  │  BACKGROUND: 3 concurrent│   │   │
+│  │  └─────────────┘  └─────────────────────────┘   │   │
+│  │  ┌─────────────────────┐  ┌─────────────────┐   │   │
+│  │  │SessionCacheIntegr.  │  │DeploymentManager│   │   │
+│  │  │(User→Cache Bridge)  │  │(Pre-generation) │   │   │
+│  │  └─────────────────────┘  └─────────────────┘   │   │
+│  └──────────────────────────────────────────────────┘   │
+│                                                         │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              Session Management                   │   │
+│  │  UserSession: voice_config, playback_state       │   │
+│  │  Cross-device resume via server-side state       │   │
+│  └──────────────────────────────────────────────────┘   │
 └─────────────────────┬───────────────────────────────────┘
-                      │ HTTP
+                      │ HTTP/WebSocket
                       ▼
 ┌─────────────────────────────────────────────────────────┐
 │                   iOS Clients                           │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │
 │  │  iPhone 1   │  │  iPhone 2   │  │  Simulator  │    │
 │  └─────────────┘  └─────────────┘  └─────────────┘    │
+│  Cross-user cache sharing: same voice = same audio     │
 └─────────────────────────────────────────────────────────┘
                       │ HTTP
                       ▼
@@ -331,6 +351,10 @@ When sending logs/metrics, include these headers:
 │  │   Ollama    │  │   Whisper   │  │    Piper    │    │
 │  │   (LLM)     │  │   (STT)     │  │   (TTS)     │    │
 │  └─────────────┘  └─────────────┘  └─────────────┘    │
+│  ┌─────────────┐  ┌─────────────┐                      │
+│  │ Chatterbox  │  │  VibeVoice  │                      │
+│  │   (TTS)     │  │   (TTS)     │                      │
+│  └─────────────┘  └─────────────┘                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -348,3 +372,30 @@ To modify the UI, edit:
 
 To modify the API, edit:
 - `server.py` - Backend Python server
+- `tts_api.py` - TTS generation and caching endpoints
+- `deployment_api.py` - Scheduled deployment endpoints
+- `audio_ws.py` - Audio WebSocket handler
+- `session_cache_integration.py` - Session-cache bridge
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `tts_cache/cache.py` | Global TTS cache with disk persistence |
+| `tts_cache/resource_pool.py` | Priority-based TTS generation |
+| `tts_cache/prefetcher.py` | Background segment prefetching |
+| `fov_context/session.py` | UserSession, PlaybackState, UserVoiceConfig |
+| `session_cache_integration.py` | Bridge between sessions and cache |
+| `deployment_api.py` | Scheduled pre-generation manager |
+| `audio_ws.py` | Real-time audio WebSocket |
+
+### Running Tests
+
+```bash
+# Run all management server tests
+cd server/management
+python -m pytest tests/ tts_cache/tests/ -v
+
+# Run specific test file
+python -m pytest tests/test_session_integration.py -v
+```

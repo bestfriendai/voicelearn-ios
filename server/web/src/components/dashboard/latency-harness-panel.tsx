@@ -360,14 +360,27 @@ export function LatencyHarnessPanel() {
     setError(null);
 
     try {
-      // Start a run for each selected target
-      // For now, just use the first selected target
-      // TODO: Support multiple concurrent runs when architecture supports it
-      const targetId = selectedTargets[0];
-      await startTestRun(selectedSuite, targetId);
+      // Start runs for all selected targets concurrently
+      const results = await Promise.allSettled(
+        selectedTargets.map((targetId) => startTestRun(selectedSuite, targetId))
+      );
+
+      // Check for any failures
+      const failures = results.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      );
+
+      if (failures.length > 0) {
+        // Some runs failed, show first error but continue with successful ones
+        const firstError = failures[0].reason;
+        setError(
+          `${failures.length} of ${selectedTargets.length} runs failed: ${firstError instanceof Error ? firstError.message : String(firstError)}`
+        );
+      }
+
       await fetchData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start test run');
+      setError(err instanceof Error ? err.message : 'Failed to start test runs');
     } finally {
       setStarting(false);
     }

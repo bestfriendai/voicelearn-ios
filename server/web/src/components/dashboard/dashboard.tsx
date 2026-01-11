@@ -38,6 +38,7 @@ import { PluginsPanel } from './plugins-panel';
 import { ImportJobsPanel } from './import-jobs-panel';
 import { LatencyHarnessPanel } from './latency-harness-panel';
 import { FOVContextPanel } from './fov-context-panel';
+import { ReprocessPanel } from './reprocess-panel';
 import type { DashboardStats } from '@/types';
 import { getStats } from '@/lib/api-client';
 import { formatDuration } from '@/lib/utils';
@@ -58,7 +59,7 @@ const OPS_TABS = [
   'models',
   'users',
 ] as const;
-const CONTENT_TABS = ['curricula', 'sources', 'plugins', 'imports'] as const;
+const CONTENT_TABS = ['curricula', 'sources', 'plugins', 'imports', 'reprocess'] as const;
 const ALL_TABS = [...OPS_TABS, ...CONTENT_TABS] as const;
 
 export function Dashboard() {
@@ -286,6 +287,13 @@ export function Dashboard() {
           {activeTab === 'imports' && (
             <div className="animate-in fade-in duration-300">
               <ImportJobsPanel />
+            </div>
+          )}
+
+          {/* Reprocess Tab */}
+          {activeTab === 'reprocess' && (
+            <div className="animate-in fade-in duration-300">
+              <ReprocessPanel />
             </div>
           )}
         </div>

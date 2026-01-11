@@ -28,6 +28,9 @@ from metrics_history import metrics_history, MetricsHistory
 # Import curriculum importer system
 from import_api import register_import_routes, init_import_system, set_import_complete_callback
 
+# Import curriculum reprocessing system
+from reprocess_api import register_reprocess_routes, init_reprocess_system
+
 # Import plugin management system
 from plugin_api import register_plugin_routes
 
@@ -4380,6 +4383,9 @@ def create_app() -> web.Application:
 
     # Curriculum Import System (Source Browser)
     register_import_routes(app)
+
+    # Curriculum Reprocessing System
+    register_reprocess_routes(app)
 
     # Media Generation System (Diagrams, Formulas, Maps)
     register_media_routes(app)

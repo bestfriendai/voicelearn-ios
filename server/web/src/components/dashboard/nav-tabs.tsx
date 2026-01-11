@@ -17,6 +17,7 @@ import {
   Users,
   Timer,
   Brain,
+  RefreshCw,
 } from 'lucide-react';
 
 // Section types
@@ -36,7 +37,7 @@ export type OpsTabId =
   | 'users';
 
 // Content tabs
-export type ContentTabId = 'curricula' | 'sources' | 'plugins' | 'imports';
+export type ContentTabId = 'curricula' | 'sources' | 'plugins' | 'imports' | 'reprocess';
 
 // Combined tab type
 export type TabId = OpsTabId | ContentTabId;
@@ -81,6 +82,7 @@ const contentTabs: {
   { id: 'sources', label: 'Sources', shortLabel: 'Sources', icon: Library },
   { id: 'plugins', label: 'Plugins', shortLabel: 'Plugins', icon: Puzzle },
   { id: 'imports', label: 'Import Jobs', shortLabel: 'Imports', icon: Download },
+  { id: 'reprocess', label: 'Reprocess', shortLabel: 'Reprocess', icon: RefreshCw },
 ];
 
 export function SectionNav({ activeSection, onSectionChange }: SectionNavProps) {

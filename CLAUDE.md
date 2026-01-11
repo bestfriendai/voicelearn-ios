@@ -72,7 +72,7 @@ If not connected, restart the Claude Code session.
 mcp__XcodeBuildMCP__session-set-defaults({
   projectPath: "/Users/ramerman/dev/unamentis/UnaMentis.xcodeproj",
   scheme: "UnaMentis",
-  simulatorName: "iPhone 17 Pro"
+  simulatorName: "iPhone 16 Pro"
 })
 ```
 
@@ -91,19 +91,15 @@ This workflow allows autonomous debugging without manual user intervention.
 ## Quick Commands
 
 ```bash
-# iOS build
+# iOS build (uses iPhone 16 Pro for CI parity)
 xcodebuild -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 
-# Run all tests
-xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-
-# Quick tests
-./scripts/test-quick.sh
-
-# All tests
-./scripts/test-all.sh
+# Testing (use the unified test runner for CI parity)
+./scripts/test-quick.sh          # Unit tests only (fast)
+./scripts/test-all.sh            # All tests + 80% coverage enforcement
+./scripts/test-integration.sh    # Integration tests only
+./scripts/test-ci.sh             # Direct runner with env var config
 
 # Lint and format
 ./scripts/lint.sh
@@ -119,6 +115,19 @@ python -m latency_harness.cli --suite quick_validation --no-mock  # Real provide
 
 # Hook audit (check for bypasses)
 ./scripts/hook-audit.sh
+```
+
+### Unified Test Runner
+
+The `test-ci.sh` script is the single source of truth for test execution, used by both local scripts and CI workflows. This ensures local and CI environments behave identically.
+
+```bash
+# Environment variables for test-ci.sh:
+TEST_TYPE=unit|integration|all  # Default: unit
+SIMULATOR="iPhone 16 Pro"       # Default: iPhone 16 Pro (with fallback)
+COVERAGE_THRESHOLD=80           # Default: 80%
+ENABLE_COVERAGE=true|false      # Default: true
+ENFORCE_COVERAGE=true|false     # Default: true in CI, false locally
 ```
 
 ## Server Management
@@ -346,7 +355,7 @@ Skills are focused workflows that provide consistency and predictability. Invoke
 **`/validate`** - Enforces "Definition of Done"
 ```
 /validate           # Lint + quick tests
-/validate --full    # Lint + full test suite
+/validate --full    # Lint + full test suite + 80% coverage enforcement
 ```
 
 **`/service`** - USM API service management (never use pkill!)

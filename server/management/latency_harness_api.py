@@ -1510,6 +1510,277 @@ async def handle_list_mass_tests(request: web.Request) -> web.Response:
 
 
 # =============================================================================
+# Unified Metrics Ingestion Endpoints
+# =============================================================================
+
+# In-memory metrics storage (would be replaced with persistent storage in production)
+_ingested_metrics: Dict[str, List[dict]] = defaultdict(list)
+_metrics_by_session: Dict[str, dict] = {}
+
+
+async def handle_ingest_metrics(request: web.Request) -> web.Response:
+    """
+    POST /api/metrics/ingest - Ingest metrics from iOS or web clients.
+
+    Accepts both single metrics and batches in the unified format.
+
+    Request body (single):
+    {
+        "client": "ios" | "web",
+        "clientId": "device-uuid",
+        "sessionId": "session-uuid",
+        "timestamp": "2024-01-01T12:00:00Z",
+        "metrics": {
+            "stt_latency_ms": 150.0,
+            "llm_ttfb_ms": 200.0,
+            "llm_completion_ms": 800.0,
+            "tts_ttfb_ms": 100.0,
+            "tts_completion_ms": 400.0,
+            "e2e_latency_ms": 1250.0
+        },
+        "providers": {
+            "stt": "deepgram-nova3",
+            "llm": "anthropic",
+            "llm_model": "claude-3-5-haiku",
+            "tts": "chatterbox"
+        },
+        "resources": {
+            "cpu_percent": 45.2,
+            "memory_mb": 256.0,
+            "thermal_state": "nominal"
+        }
+    }
+
+    Request body (batch):
+    {
+        "client": "ios",
+        "clientId": "device-uuid",
+        "batchSize": 10,
+        "metrics": [...]
+    }
+    """
+    try:
+        data = await request.json()
+
+        client_type = data.get("client", request.headers.get("X-Client-Type", "unknown"))
+        client_id = data.get("clientId", request.headers.get("X-Client-ID", "unknown"))
+        client_name = data.get("clientName", request.headers.get("X-Client-Name"))
+
+        # Handle batch vs single
+        metrics_list = data.get("metrics", [])
+        if isinstance(metrics_list, dict):
+            # Single metric wrapped in the data
+            metrics_list = [data]
+        elif not metrics_list:
+            # Direct single metric (no wrapper)
+            metrics_list = [data]
+
+        ingested_count = 0
+        for metric in metrics_list:
+            session_id = metric.get("sessionId", str(uuid.uuid4()))
+            timestamp = metric.get("timestamp", datetime.now().isoformat())
+
+            # Store the metric
+            metric_record = {
+                "client": client_type,
+                "clientId": client_id,
+                "clientName": client_name,
+                "sessionId": session_id,
+                "timestamp": timestamp,
+                "metrics": metric.get("metrics", {}),
+                "providers": metric.get("providers", {}),
+                "resources": metric.get("resources"),
+                "networkProfile": metric.get("networkProfile"),
+                "networkProjections": metric.get("networkProjections"),
+                "quality": metric.get("quality"),
+                "ingestedAt": datetime.now().isoformat(),
+            }
+
+            # Store by client and session
+            _ingested_metrics[client_id].append(metric_record)
+
+            # Update session summary
+            if session_id not in _metrics_by_session:
+                _metrics_by_session[session_id] = {
+                    "sessionId": session_id,
+                    "client": client_type,
+                    "clientId": client_id,
+                    "clientName": client_name,
+                    "firstSeen": timestamp,
+                    "lastSeen": timestamp,
+                    "metricsCount": 0,
+                    "providers": metric.get("providers", {}),
+                    "latencies": [],
+                }
+
+            session = _metrics_by_session[session_id]
+            session["lastSeen"] = timestamp
+            session["metricsCount"] += 1
+
+            if metric.get("metrics", {}).get("e2e_latency_ms"):
+                session["latencies"].append(metric["metrics"]["e2e_latency_ms"])
+
+            ingested_count += 1
+
+        logger.info(f"Ingested {ingested_count} metrics from {client_type} client {client_id}")
+
+        return web.json_response({
+            "status": "ok",
+            "ingested": ingested_count,
+            "clientId": client_id,
+        })
+
+    except json.JSONDecodeError:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        logger.exception("Failed to ingest metrics")
+        return web.json_response({"error": str(e)}, status=500)
+
+
+async def handle_list_metric_sessions(request: web.Request) -> web.Response:
+    """
+    GET /api/metrics/sessions - List sessions with ingested metrics.
+
+    Query params:
+    - client: Filter by client type (ios, web)
+    - clientId: Filter by specific client ID
+    - limit: Max sessions to return (default 50)
+    """
+    client_filter = request.query.get("client")
+    client_id_filter = request.query.get("clientId")
+    limit = int(request.query.get("limit", "50"))
+
+    sessions = list(_metrics_by_session.values())
+
+    # Apply filters
+    if client_filter:
+        sessions = [s for s in sessions if s["client"] == client_filter]
+    if client_id_filter:
+        sessions = [s for s in sessions if s["clientId"] == client_id_filter]
+
+    # Sort by last seen (most recent first)
+    sessions.sort(key=lambda s: s["lastSeen"], reverse=True)
+
+    # Limit
+    sessions = sessions[:limit]
+
+    # Add computed stats
+    for session in sessions:
+        latencies = session.get("latencies", [])
+        if latencies:
+            session["stats"] = {
+                "count": len(latencies),
+                "median_e2e_ms": statistics.median(latencies) if latencies else None,
+                "p99_e2e_ms": sorted(latencies)[int(len(latencies) * 0.99)] if len(latencies) > 1 else latencies[0] if latencies else None,
+                "min_e2e_ms": min(latencies) if latencies else None,
+                "max_e2e_ms": max(latencies) if latencies else None,
+            }
+        else:
+            session["stats"] = None
+
+        # Remove raw latencies from response
+        del session["latencies"]
+
+    return web.json_response({
+        "sessions": sessions,
+        "total": len(_metrics_by_session),
+        "filtered": len(sessions),
+    })
+
+
+async def handle_get_metrics_summary(request: web.Request) -> web.Response:
+    """
+    GET /api/metrics/summary - Get aggregate metrics summary.
+
+    Query params:
+    - client: Filter by client type
+    - hours: Time window in hours (default 24)
+    """
+    client_filter = request.query.get("client")
+    hours = int(request.query.get("hours", "24"))
+
+    # Note: In production, filter by timestamp within hours window
+    # For now, we aggregate all stored data
+
+    # Aggregate all metrics
+    all_latencies = []
+    clients_seen = set()
+    sessions_seen = set()
+    by_provider = defaultdict(list)
+
+    for client_id, metrics in _ingested_metrics.items():
+        for metric in metrics:
+            if client_filter and metric.get("client") != client_filter:
+                continue
+
+            clients_seen.add(client_id)
+            sessions_seen.add(metric.get("sessionId"))
+
+            e2e = metric.get("metrics", {}).get("e2e_latency_ms")
+            if e2e:
+                all_latencies.append(e2e)
+
+                # Track by LLM provider
+                llm = metric.get("providers", {}).get("llm", "unknown")
+                by_provider[llm].append(e2e)
+
+    # Compute stats
+    summary = {
+        "timeWindow": f"{hours} hours",
+        "totalMetrics": sum(len(m) for m in _ingested_metrics.values()),
+        "uniqueClients": len(clients_seen),
+        "uniqueSessions": len(sessions_seen),
+    }
+
+    if all_latencies:
+        sorted_latencies = sorted(all_latencies)
+        summary["latencyStats"] = {
+            "count": len(all_latencies),
+            "median_e2e_ms": statistics.median(all_latencies),
+            "p50_e2e_ms": statistics.median(all_latencies),
+            "p95_e2e_ms": sorted_latencies[int(len(sorted_latencies) * 0.95)] if len(sorted_latencies) > 1 else sorted_latencies[0],
+            "p99_e2e_ms": sorted_latencies[int(len(sorted_latencies) * 0.99)] if len(sorted_latencies) > 1 else sorted_latencies[0],
+            "min_e2e_ms": min(all_latencies),
+            "max_e2e_ms": max(all_latencies),
+            "avg_e2e_ms": statistics.mean(all_latencies),
+        }
+    else:
+        summary["latencyStats"] = None
+
+    # Per-provider breakdown
+    summary["byProvider"] = {}
+    for provider, latencies in by_provider.items():
+        if latencies:
+            sorted_l = sorted(latencies)
+            summary["byProvider"][provider] = {
+                "count": len(latencies),
+                "median_e2e_ms": statistics.median(latencies),
+                "p99_e2e_ms": sorted_l[int(len(sorted_l) * 0.99)] if len(sorted_l) > 1 else sorted_l[0],
+            }
+
+    return web.json_response(summary)
+
+
+async def handle_get_client_metrics(request: web.Request) -> web.Response:
+    """
+    GET /api/metrics/clients/{client_id} - Get metrics for a specific client.
+    """
+    client_id = request.match_info["client_id"]
+    limit = int(request.query.get("limit", "100"))
+
+    metrics = _ingested_metrics.get(client_id, [])
+
+    # Sort by timestamp (most recent first)
+    metrics = sorted(metrics, key=lambda m: m.get("timestamp", ""), reverse=True)[:limit]
+
+    return web.json_response({
+        "clientId": client_id,
+        "metricsCount": len(_ingested_metrics.get(client_id, [])),
+        "metrics": metrics,
+    })
+
+
+# =============================================================================
 # Route Registration
 # =============================================================================
 
@@ -1555,5 +1826,11 @@ def register_latency_harness_routes(app: web.Application):
     app.router.add_get("/api/test-orchestrator/status/{run_id}", handle_get_mass_test_status)
     app.router.add_post("/api/test-orchestrator/stop/{run_id}", handle_stop_mass_test)
     app.router.add_get("/api/test-orchestrator/runs", handle_list_mass_tests)
+
+    # Unified Metrics Ingestion (iOS/Web clients)
+    app.router.add_post("/api/metrics/ingest", handle_ingest_metrics)
+    app.router.add_get("/api/metrics/sessions", handle_list_metric_sessions)
+    app.router.add_get("/api/metrics/summary", handle_get_metrics_summary)
+    app.router.add_get("/api/metrics/clients/{client_id}", handle_get_client_metrics)
 
     logger.info("Latency harness API routes registered")

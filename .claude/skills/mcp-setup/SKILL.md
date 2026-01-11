@@ -26,14 +26,14 @@ Configures MCP (Model Context Protocol) session defaults for iOS simulator and X
 ```
 Project: $PROJECT_ROOT/UnaMentis.xcodeproj
 Scheme: UnaMentis
-Simulator: iPhone 17 Pro
+Simulator: iPhone 16 Pro
 ```
 
 ### Server Manager (USM)
 ```
 Workspace: $PROJECT_ROOT/server/server-manager/USMXcode/USM.xcworkspace
 Scheme: USM
-Simulator: iPhone 17 Pro
+Simulator: iPhone 16 Pro
 ```
 
 Where `$PROJECT_ROOT` is the absolute path to the unamentis repository on this machine (the current working directory).
@@ -47,7 +47,7 @@ For iOS app:
 mcp__XcodeBuildMCP__session-set-defaults({
   projectPath: "$PROJECT_ROOT/UnaMentis.xcodeproj",
   scheme: "UnaMentis",
-  simulatorName: "iPhone 17 Pro"
+  simulatorName: "iPhone 16 Pro"
 })
 ```
 
@@ -56,7 +56,7 @@ For USM:
 mcp__XcodeBuildMCP__session-set-defaults({
   workspacePath: "$PROJECT_ROOT/server/server-manager/USMXcode/USM.xcworkspace",
   scheme: "USM",
-  simulatorName: "iPhone 17 Pro"
+  simulatorName: "iPhone 16 Pro"
 })
 ```
 
@@ -92,7 +92,7 @@ Claude: Configuring MCP for iOS app development...
 Setting defaults:
 - Project: UnaMentis.xcodeproj
 - Scheme: UnaMentis
-- Simulator: iPhone 17 Pro
+- Simulator: iPhone 16 Pro
 
 Configuration complete. You can now use:
 - /ios-build or build commands
@@ -107,7 +107,7 @@ Claude: Configuring MCP for Server Manager development...
 Setting defaults:
 - Workspace: USM.xcworkspace
 - Scheme: USM
-- Simulator: iPhone 17 Pro
+- Simulator: iPhone 16 Pro
 
 Configuration complete. Ready to build USM.
 ```
@@ -119,7 +119,7 @@ Claude: Current MCP session defaults:
 
 Project: $PROJECT_ROOT/UnaMentis.xcodeproj
 Scheme: UnaMentis
-Simulator: iPhone 17 Pro (ID: 12345678-1234-1234-1234-123456789ABC)
+Simulator: iPhone 16 Pro (ID: 12345678-1234-1234-1234-123456789ABC)
 Configuration: Debug
 ```
 
@@ -134,10 +134,12 @@ All session defaults cleared. Run /mcp-setup ios or /mcp-setup usm to reconfigur
 ## Available Simulators
 
 Common simulators (verify with `list_sims`):
-- iPhone 17 Pro (preferred)
-- iPhone 17
-- iPhone 16 Pro
+- iPhone 16 Pro (preferred for CI parity)
+- iPhone 17 Pro
+- iPhone 15 Pro
 - iPad Pro 13-inch
+
+**Note:** iPhone 16 Pro is the default to match CI. The test runner includes automatic fallback to other available simulators if the preferred one is not found.
 
 ## Integration
 

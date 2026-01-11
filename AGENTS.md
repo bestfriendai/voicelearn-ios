@@ -174,17 +174,19 @@ There are TWO separate web interfaces. Do not confuse them:
 
 ### Build & Test Commands
 ```bash
-# Build for simulator
+# Build for simulator (iPhone 16 Pro for CI parity)
 xcodebuild -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 
-# Run all tests
-xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+# Testing - use the unified test runner for CI parity
+./scripts/test-quick.sh          # Unit tests only (fast)
+./scripts/test-all.sh            # All tests + 80% coverage enforcement
+./scripts/test-integration.sh    # Integration tests only
+./scripts/test-ci.sh             # Direct runner with env var config
 
-# Run specific test class
+# Run specific test class (direct xcodebuild)
 xcodebuild test -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
   -only-testing:UnaMentisTests/ProgressTrackerTests
 ```
 

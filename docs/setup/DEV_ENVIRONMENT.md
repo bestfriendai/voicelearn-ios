@@ -227,6 +227,8 @@ See the full reference in [MCP_SETUP.md](../explorations/MCP_SETUP.md).
 
 ### 4.1 Create Required Simulators
 
+The project uses **iPhone 16 Pro** as the default simulator to match CI. The test runner will automatically fall back to available simulators if needed.
+
 ```bash
 # List available runtimes
 xcrun simctl list runtimes
@@ -234,15 +236,15 @@ xcrun simctl list runtimes
 # List existing devices
 xcrun simctl list devices
 
-# Create iPhone 17 Pro simulator (if not exists)
-xcrun simctl create "iPhone 17 Pro" "iPhone 17 Pro" iOS18.0
+# Create iPhone 16 Pro simulator (if not exists)
+xcrun simctl create "iPhone 16 Pro" "iPhone 16 Pro" iOS18.0
 ```
 
 ### 4.2 Boot Simulator
 
 ```bash
 # Boot the simulator
-xcrun simctl boot "iPhone 17 Pro"
+xcrun simctl boot "iPhone 16 Pro"
 
 # Open Simulator app
 open -a Simulator
@@ -343,9 +345,9 @@ open http://localhost:8765/
 ### 6.2 Build and Run iOS App
 
 ```bash
-# Build for simulator
+# Build for simulator (iPhone 16 Pro for CI parity)
 xcodebuild -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 
 # Install on simulator
 xcrun simctl install booted \
@@ -447,14 +449,14 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/UnaMentis-*
 # Clean and rebuild
 xcodebuild clean -project UnaMentis.xcodeproj -scheme UnaMentis
 xcodebuild -project UnaMentis.xcodeproj -scheme UnaMentis \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 ```
 
 ### Simulator Issues
 
 ```bash
 # Reset simulator
-xcrun simctl erase "iPhone 17 Pro"
+xcrun simctl erase "iPhone 16 Pro"
 
 # Restart CoreSimulatorService
 sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService
@@ -489,8 +491,10 @@ sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService
 | `./scripts/hook-audit.sh` | Audit for hook bypasses (`--no-verify`) |
 | `./scripts/lint.sh` | Run SwiftLint |
 | `./scripts/format.sh` | Run SwiftFormat |
-| `./scripts/test-quick.sh` | Run unit tests |
-| `./scripts/test-all.sh` | Run all tests |
+| `./scripts/test-quick.sh` | Run unit tests (fast, no coverage) |
+| `./scripts/test-all.sh` | Run all tests + 80% coverage enforcement |
+| `./scripts/test-integration.sh` | Run integration tests only |
+| `./scripts/test-ci.sh` | Unified test runner (CI parity) |
 | `./scripts/health-check.sh` | Lint + quick tests |
 | `./scripts/refresh-mcp-creds.sh` | Refresh Slack/Trello credentials |
 | `claude mcp list` | Check MCP server status |

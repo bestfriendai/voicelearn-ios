@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
 import { WebSocketProvider } from '@/lib/websocket-provider';
 import { FeatureFlagProvider } from '@/lib/feature-flags/context';
 import type { FeatureFlagConfig } from '@/lib/feature-flags/types';

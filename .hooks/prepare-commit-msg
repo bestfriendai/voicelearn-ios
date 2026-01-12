@@ -21,8 +21,8 @@ if [ -f "$DRAFT_FILE" ]; then
     # Extract Summary
     SUMMARY=$(grep -A1 "^## Summary" "$DRAFT_FILE" | tail -1)
 
-    # Extract Changes (everything after "## Changes" line)
-    CHANGES=$(sed -n '/^## Changes/,/^## /{ /^## Changes/d; /^## /d; p; }' "$DRAFT_FILE" | sed '/^$/d')
+    # Extract Changes (everything after "## Changes" line until next section or EOF)
+    CHANGES=$(sed -n '/^## Changes/,${/^## Changes/d; /^## [^C]/d; p;}' "$DRAFT_FILE" | sed '/^$/d')
 
     # Only proceed if we have content
     if [ -n "$TYPE" ] && [ -n "$SUMMARY" ]; then

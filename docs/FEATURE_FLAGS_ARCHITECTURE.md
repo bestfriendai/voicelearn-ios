@@ -25,7 +25,7 @@ Control which capabilities are available to users.
 | `service_source_cloud_apis` | ON | Use cloud APIs (fallback) |
 
 ### Beta/Experiment Flags (`beta_*`, `exp_*`)
-Temporary flags for gradual rollout. Should be removed within 30-60 days.
+Temporary flags for gradual rollout. These flags should be removed within 30-60 days.
 
 | Flag | Purpose | Target Removal |
 |------|---------|----------------|

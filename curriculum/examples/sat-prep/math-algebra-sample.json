@@ -407,7 +407,23 @@
           "nodeType": "segment",
           "title": "Elimination Method",
           "description": "Solving systems by adding or subtracting equations",
-          "content": "Add or subtract equations to eliminate one variable. Sometimes you need to multiply first to make coefficients match.",
+          "overview": "Add or subtract equations to eliminate one variable. Sometimes you need to multiply first to make coefficients match.",
+          "content": {
+            "workedExamples": [
+              {
+                "problem": "Solve: 2x + 3y = 13 and 2x - y = 5",
+                "steps": [
+                  "Subtract second equation from first: (2x + 3y) - (2x - y) = 13 - 5",
+                  "Simplify: 4y = 8",
+                  "Divide by 4: y = 2",
+                  "Back-substitute into 2x - y = 5: 2x - 2 = 5",
+                  "Solve: 2x = 7, x = 3.5"
+                ],
+                "solution": "(x, y) = (3.5, 2)",
+                "verification": "Check both: 2(3.5) + 3(2) = 13 ✓; 2(3.5) - 2 = 5 ✓"
+              }
+            ]
+          },
           "extensions": {
             "sat": {
               "testVersion": "digital-2024",
@@ -571,9 +587,7 @@
           "timeLimit": 1800,
           "skillsCovered": [
             "linear_equations_one_variable",
-            "systems_linear_equations",
-            "linear_functions",
-            "linear_inequalities"
+            "systems_linear_equations"
           ]
         }
       }

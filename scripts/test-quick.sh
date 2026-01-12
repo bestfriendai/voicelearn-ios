@@ -15,23 +15,22 @@ if ! command -v xcodebuild &> /dev/null; then
     fi
 fi
 
+# Common xcodebuild arguments
+XCODEBUILD_ARGS=(
+    test
+    -project UnaMentis.xcodeproj
+    -scheme UnaMentis
+    -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+    -only-testing:UnaMentisTests/Unit
+    CODE_SIGNING_ALLOWED=NO
+)
+
 # Run tests with or without xcbeautify
 if command -v xcbeautify &> /dev/null; then
-    xcodebuild test \
-      -project UnaMentis.xcodeproj \
-      -scheme UnaMentis \
-      -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-      -only-testing:UnaMentisTests/Unit \
-      CODE_SIGNING_ALLOWED=NO \
-      | xcbeautify
+    xcodebuild "${XCODEBUILD_ARGS[@]}" | xcbeautify
 else
     echo "Note: xcbeautify not installed, using raw xcodebuild output"
-    xcodebuild test \
-      -project UnaMentis.xcodeproj \
-      -scheme UnaMentis \
-      -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-      -only-testing:UnaMentisTests/Unit \
-      CODE_SIGNING_ALLOWED=NO
+    xcodebuild "${XCODEBUILD_ARGS[@]}"
 fi
 
 echo "Quick tests passed"

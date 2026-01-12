@@ -1,7 +1,22 @@
 #!/bin/bash
 set -e
+set -o pipefail
 echo "Running quick tests..."
-if command -v xcodebuild &> /dev/null; then
+
+# Check if xcodebuild is available (macOS only)
+if ! command -v xcodebuild &> /dev/null; then
+    echo "WARNING: xcodebuild not available (requires macOS)"
+    if [ "${SKIP_TESTS_IF_UNAVAILABLE:-false}" = "true" ]; then
+        echo "SKIP_TESTS_IF_UNAVAILABLE=true, skipping tests"
+        exit 0
+    else
+        echo "Install Xcode or set SKIP_TESTS_IF_UNAVAILABLE=true to skip"
+        exit 1
+    fi
+fi
+
+# Run tests with or without xcbeautify
+if command -v xcbeautify &> /dev/null; then
     xcodebuild test \
       -project UnaMentis.xcodeproj \
       -scheme UnaMentis \
@@ -9,7 +24,14 @@ if command -v xcodebuild &> /dev/null; then
       -only-testing:UnaMentisTests/Unit \
       CODE_SIGNING_ALLOWED=NO \
       | xcbeautify
-    echo "Quick tests passed"
 else
-    echo "xcodebuild not available, skipping tests"
+    echo "Note: xcbeautify not installed, using raw xcodebuild output"
+    xcodebuild test \
+      -project UnaMentis.xcodeproj \
+      -scheme UnaMentis \
+      -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+      -only-testing:UnaMentisTests/Unit \
+      CODE_SIGNING_ALLOWED=NO
 fi
+
+echo "Quick tests passed"

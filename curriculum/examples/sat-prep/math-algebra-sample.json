@@ -67,7 +67,7 @@
           "nodeType": "segment",
           "title": "Basic Linear Equations",
           "description": "Equations requiring one or two steps to solve",
-          "content": "A linear equation contains a variable raised to the first power. To solve, isolate the variable by performing inverse operations on both sides.",
+          "overview": "A linear equation contains a variable raised to the first power. To solve, isolate the variable by performing inverse operations on both sides.",
           "spokenText": "Let's start with basic equations. The key is performing the same operation on both sides to keep the equation balanced.",
           "extensions": {
             "sat": {
@@ -224,7 +224,7 @@
           "nodeType": "segment",
           "title": "Multi-Step Linear Equations",
           "description": "Equations with variables on both sides, fractions, or multiple steps",
-          "content": "Complex linear equations require multiple steps: distribute, combine like terms, then isolate the variable.",
+          "overview": "Complex linear equations require multiple steps: distribute, combine like terms, then isolate the variable.",
           "spokenText": "Now let's tackle harder equations. These require more steps but use the same principles.",
           "extensions": {
             "sat": {
@@ -347,7 +347,7 @@
           "nodeType": "segment",
           "title": "Substitution Method",
           "description": "Solving systems by substituting one equation into another",
-          "content": "When one equation is solved for a variable, substitute that expression into the other equation.",
+          "overview": "When one equation is solved for a variable, substitute that expression into the other equation.",
           "extensions": {
             "sat": {
               "testVersion": "digital-2024",
@@ -473,7 +473,7 @@
           "nodeType": "segment",
           "title": "Translating Words to Equations",
           "description": "Converting verbal descriptions into mathematical expressions",
-          "content": "Key translations: 'is' = equals, 'of' = multiply, 'per' = divide, 'more than' = add, 'less than' = subtract.",
+          "overview": "Key translations: 'is' = equals, 'of' = multiply, 'per' = divide, 'more than' = add, 'less than' = subtract.",
           "extensions": {
             "sat": {
               "testVersion": "digital-2024",

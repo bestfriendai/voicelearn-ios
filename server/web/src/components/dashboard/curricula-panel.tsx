@@ -2,11 +2,26 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useQueryState, parseAsString, parseAsBoolean } from 'nuqs';
-import { BookOpen, Search, Archive, Trash2, RefreshCw, Eye, Plus, SearchCheck, Loader2 } from 'lucide-react';
+import {
+  BookOpen,
+  Search,
+  Archive,
+  Trash2,
+  RefreshCw,
+  Eye,
+  Plus,
+  SearchCheck,
+  Loader2,
+} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CurriculumDetailPanel } from './curriculum-detail-panel';
-import type { CurriculumSummary, CurriculaResponse, CurriculumAnalysis, ReprocessConfig } from '@/types';
+import type {
+  CurriculumSummary,
+  CurriculaResponse,
+  CurriculumAnalysis,
+  ReprocessConfig,
+} from '@/types';
 import { CurriculumStudio } from '@/components/curriculum/CurriculumEditor';
 import { Curriculum } from '@/types/curriculum';
 import { useMainScrollRestoration } from '@/hooks/useScrollRestoration';

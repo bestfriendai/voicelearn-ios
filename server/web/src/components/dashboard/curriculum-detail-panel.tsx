@@ -29,9 +29,7 @@ interface CurriculumDetailPanelProps {
 }
 
 // Map segment type from API format to editor format
-function mapSegmentType(
-  apiType: TranscriptSegment['type']
-): Segment['type'] {
+function mapSegmentType(apiType: TranscriptSegment['type']): Segment['type'] {
   // Map API types to editor types (they're mostly the same)
   const typeMap: Record<TranscriptSegment['type'], Segment['type']> = {
     introduction: 'introduction',
@@ -47,18 +45,20 @@ function mapSegmentType(
 // Map transcript segments from API format to editor format
 function mapTranscript(apiTranscript: TopicTranscript): Transcript {
   return {
-    segments: apiTranscript.segments.map((seg): Segment => ({
-      id: seg.id,
-      type: mapSegmentType(seg.type),
-      content: seg.content,
-      speakingNotes: seg.speakingNotes
-        ? {
-            pace: seg.speakingNotes.pace,
-            emotionalTone: seg.speakingNotes.emotionalTone,
-            emphasis: seg.speakingNotes.emphasis,
-          }
-        : undefined,
-    })),
+    segments: apiTranscript.segments.map(
+      (seg): Segment => ({
+        id: seg.id,
+        type: mapSegmentType(seg.type),
+        content: seg.content,
+        speakingNotes: seg.speakingNotes
+          ? {
+              pace: seg.speakingNotes.pace,
+              emotionalTone: seg.speakingNotes.emotionalTone,
+              emphasis: seg.speakingNotes.emphasis,
+            }
+          : undefined,
+      })
+    ),
   };
 }
 

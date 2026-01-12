@@ -366,9 +366,7 @@ export function LatencyHarnessPanel() {
       );
 
       // Check for any failures
-      const failures = results.filter(
-        (r): r is PromiseRejectedResult => r.status === 'rejected'
-      );
+      const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
       if (failures.length > 0) {
         // Some runs failed, show first error but continue with successful ones

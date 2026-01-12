@@ -4,7 +4,18 @@ import { NodeEditor } from './NodeEditor';
 import { StudioTour, STUDIO_TOUR_STEPS } from './StudioTour';
 import { StudioHelp } from './StudioHelp';
 import { Curriculum, ContentNode } from '@/types/curriculum';
-import { Search, Menu, Command, Settings, ArrowLeft, HelpCircle, Sparkles, Save, Loader2, Check } from 'lucide-react';
+import {
+  Search,
+  Menu,
+  Command,
+  Settings,
+  ArrowLeft,
+  HelpCircle,
+  Sparkles,
+  Save,
+  Loader2,
+  Check,
+} from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 
 const TOUR_STORAGE_KEY = 'curriculum-studio-tour-completed';
@@ -167,7 +178,9 @@ export const CurriculumStudio: React.FC<CurriculumStudioProps> = ({
               >
                 <button
                   onClick={handleSave}
-                  disabled={saveStatus === 'saving' || (!hasUnsavedChanges && saveStatus !== 'error')}
+                  disabled={
+                    saveStatus === 'saving' || (!hasUnsavedChanges && saveStatus !== 'error')
+                  }
                   className={`p-2 rounded-lg transition-colors ${
                     saveStatus === 'error'
                       ? 'text-red-400 hover:text-red-300 hover:bg-red-500/10'

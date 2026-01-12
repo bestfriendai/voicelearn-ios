@@ -27,12 +27,7 @@ interface AddToListModalProps {
   onSuccess?: () => void;
 }
 
-export function AddToListModal({
-  isOpen,
-  onClose,
-  courses,
-  onSuccess,
-}: AddToListModalProps) {
+export function AddToListModal({ isOpen, onClose, courses, onSuccess }: AddToListModalProps) {
   const { showToast } = useToast();
   const [lists, setLists] = useState<CurriculumList[]>([]);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
@@ -167,10 +162,7 @@ export function AddToListModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
@@ -205,9 +197,7 @@ export function AddToListModal({
             /* Create New List Form */
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  List Name
-                </label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">List Name</label>
                 <input
                   type="text"
                   value={newListName}

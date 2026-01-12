@@ -219,10 +219,7 @@ describe('FeatureFlagClient', () => {
       client = new FeatureFlagClient(testConfig);
       await client.start();
 
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        CACHE_KEY,
-        expect.any(String)
-      );
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(CACHE_KEY, expect.any(String));
     });
 
     it('loads flags from valid cache', () => {

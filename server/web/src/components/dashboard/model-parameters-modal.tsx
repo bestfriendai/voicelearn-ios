@@ -103,7 +103,9 @@ export function ModelParametersModal({ model, onClose }: ModelParametersModalPro
             {model.context_window_formatted && (
               <div className="text-right">
                 <span className="text-sm text-slate-400">Max Context:</span>
-                <span className="ml-2 font-medium text-indigo-400">{model.context_window_formatted}</span>
+                <span className="ml-2 font-medium text-indigo-400">
+                  {model.context_window_formatted}
+                </span>
               </div>
             )}
           </div>

@@ -34,7 +34,9 @@ async function getReprocessJobs(): Promise<{ success: boolean; jobs: ReprocessJo
   return response.json();
 }
 
-async function getJobProgress(jobId: string): Promise<{ success: boolean; progress: ReprocessProgress }> {
+async function getJobProgress(
+  jobId: string
+): Promise<{ success: boolean; progress: ReprocessProgress }> {
   const response = await fetch(`/api/reprocess/jobs/${jobId}`);
   if (!response.ok) {
     throw new Error('Failed to fetch job progress');
@@ -49,7 +51,9 @@ async function cancelReprocessJob(jobId: string): Promise<void> {
   }
 }
 
-async function analyzeCurriculum(curriculumId: string): Promise<{ success: boolean; analysis: CurriculumAnalysis }> {
+async function analyzeCurriculum(
+  curriculumId: string
+): Promise<{ success: boolean; analysis: CurriculumAnalysis }> {
   const response = await fetch(`/api/reprocess/analyze/${curriculumId}`, { method: 'POST' });
   if (!response.ok) {
     throw new Error('Failed to analyze curriculum');
@@ -65,22 +69,79 @@ async function getCurricula(): Promise<{ curricula: CurriculumSummary[] }> {
   return response.json();
 }
 
-const statusConfig: Record<ReprocessStatus, { icon: typeof Clock; color: string; label: string }> = {
-  queued: { icon: Clock, color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', label: 'Queued' },
-  loading: { icon: Loader2, color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', label: 'Loading' },
-  analyzing: { icon: Search, color: 'bg-violet-500/20 text-violet-400 border-violet-500/30', label: 'Analyzing' },
-  fixing_images: { icon: Loader2, color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30', label: 'Fixing Images' },
-  rechunking: { icon: Loader2, color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30', label: 'Re-chunking' },
-  generating_objectives: { icon: Loader2, color: 'bg-teal-500/20 text-teal-400 border-teal-500/30', label: 'Generating Objectives' },
-  adding_checkpoints: { icon: Loader2, color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', label: 'Adding Checkpoints' },
-  adding_alternatives: { icon: Loader2, color: 'bg-green-500/20 text-green-400 border-green-500/30', label: 'Adding Alternatives' },
-  fixing_metadata: { icon: Loader2, color: 'bg-lime-500/20 text-lime-400 border-lime-500/30', label: 'Fixing Metadata' },
-  validating: { icon: Loader2, color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', label: 'Validating' },
-  storing: { icon: Loader2, color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', label: 'Storing' },
-  complete: { icon: CheckCircle, color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', label: 'Complete' },
-  failed: { icon: XCircle, color: 'bg-red-500/20 text-red-400 border-red-500/30', label: 'Failed' },
-  cancelled: { icon: XCircle, color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', label: 'Cancelled' },
-};
+const statusConfig: Record<ReprocessStatus, { icon: typeof Clock; color: string; label: string }> =
+  {
+    queued: {
+      icon: Clock,
+      color: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+      label: 'Queued',
+    },
+    loading: {
+      icon: Loader2,
+      color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      label: 'Loading',
+    },
+    analyzing: {
+      icon: Search,
+      color: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+      label: 'Analyzing',
+    },
+    fixing_images: {
+      icon: Loader2,
+      color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+      label: 'Fixing Images',
+    },
+    rechunking: {
+      icon: Loader2,
+      color: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+      label: 'Re-chunking',
+    },
+    generating_objectives: {
+      icon: Loader2,
+      color: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+      label: 'Generating Objectives',
+    },
+    adding_checkpoints: {
+      icon: Loader2,
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      label: 'Adding Checkpoints',
+    },
+    adding_alternatives: {
+      icon: Loader2,
+      color: 'bg-green-500/20 text-green-400 border-green-500/30',
+      label: 'Adding Alternatives',
+    },
+    fixing_metadata: {
+      icon: Loader2,
+      color: 'bg-lime-500/20 text-lime-400 border-lime-500/30',
+      label: 'Fixing Metadata',
+    },
+    validating: {
+      icon: Loader2,
+      color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      label: 'Validating',
+    },
+    storing: {
+      icon: Loader2,
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      label: 'Storing',
+    },
+    complete: {
+      icon: CheckCircle,
+      color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      label: 'Complete',
+    },
+    failed: {
+      icon: XCircle,
+      color: 'bg-red-500/20 text-red-400 border-red-500/30',
+      label: 'Failed',
+    },
+    cancelled: {
+      icon: XCircle,
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      label: 'Cancelled',
+    },
+  };
 
 function formatDuration(startedAt?: string): string {
   if (!startedAt) return '-';
@@ -117,12 +178,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
     setLoading(true);
     setError(null);
     try {
-      const [jobsData, curriculaData] = await Promise.all([
-        getReprocessJobs(),
-        getCurricula(),
-      ]);
+      const [jobsData, curriculaData] = await Promise.all([getReprocessJobs(), getCurricula()]);
       setJobs(jobsData.jobs);
-      setCurricula(curriculaData.curricula.map(c => ({ curriculum: c })));
+      setCurricula(curriculaData.curricula.map((c) => ({ curriculum: c })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
@@ -147,26 +205,22 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
   }, [fetchData, jobs]);
 
   const handleAnalyze = async (curriculumId: string) => {
-    setCurricula(prev =>
-      prev.map(c =>
-        c.curriculum.id === curriculumId ? { ...c, analyzing: true } : c
-      )
+    setCurricula((prev) =>
+      prev.map((c) => (c.curriculum.id === curriculumId ? { ...c, analyzing: true } : c))
     );
 
     try {
       const result = await analyzeCurriculum(curriculumId);
-      setCurricula(prev =>
-        prev.map(c =>
+      setCurricula((prev) =>
+        prev.map((c) =>
           c.curriculum.id === curriculumId
             ? { ...c, analysis: result.analysis, analyzing: false }
             : c
         )
       );
     } catch (err) {
-      setCurricula(prev =>
-        prev.map(c =>
-          c.curriculum.id === curriculumId ? { ...c, analyzing: false } : c
-        )
+      setCurricula((prev) =>
+        prev.map((c) => (c.curriculum.id === curriculumId ? { ...c, analyzing: false } : c))
       );
       setError(err instanceof Error ? err.message : 'Failed to analyze curriculum');
     }
@@ -197,7 +251,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
   const completedJobs = jobs.filter((j) => ['complete', 'failed', 'cancelled'].includes(j.status));
 
   // Curricula with issues
-  const curriculaWithIssues = curricula.filter(c => c.analysis && c.analysis.stats.totalIssues > 0);
+  const curriculaWithIssues = curricula.filter(
+    (c) => c.analysis && c.analysis.stats.totalIssues > 0
+  );
 
   return (
     <div className="space-y-6">
@@ -247,7 +303,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
                   className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-slate-700"
                 >
                   <div className="flex items-center gap-3">
-                    <StatusIcon className={`h-5 w-5 ${job.status !== 'queued' && job.status !== 'complete' && job.status !== 'failed' && job.status !== 'cancelled' ? 'animate-spin' : ''}`} />
+                    <StatusIcon
+                      className={`h-5 w-5 ${job.status !== 'queued' && job.status !== 'complete' && job.status !== 'failed' && job.status !== 'cancelled' ? 'animate-spin' : ''}`}
+                    />
                     <div>
                       <div className="font-medium text-white">{job.curriculumId}</div>
                       <div className="text-sm text-slate-400">{job.currentStage}</div>
@@ -255,7 +313,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className="text-sm font-medium text-white">{Math.round(job.overallProgress)}%</div>
+                      <div className="text-sm font-medium text-white">
+                        {Math.round(job.overallProgress)}%
+                      </div>
                       <div className="text-xs text-slate-400">{formatDuration(job.startedAt)}</div>
                     </div>
                     <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -303,9 +363,7 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
               Loading curricula...
             </div>
           ) : curricula.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
-              No curricula found
-            </div>
+            <div className="text-center py-8 text-slate-400">No curricula found</div>
           ) : (
             <div className="space-y-3">
               {curricula.map(({ curriculum, analysis, analyzing }) => (
@@ -322,25 +380,37 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
                     <div className="flex items-center gap-3">
                       {/* Issue summary badges */}
                       {analysis.stats.criticalCount > 0 && (
-                        <Badge variant="outline" className="bg-red-500/20 text-red-400 border-red-500/30 gap-1">
+                        <Badge
+                          variant="outline"
+                          className="bg-red-500/20 text-red-400 border-red-500/30 gap-1"
+                        >
                           <AlertCircle className="h-3 w-3" />
                           {analysis.stats.criticalCount}
                         </Badge>
                       )}
                       {analysis.stats.warningCount > 0 && (
-                        <Badge variant="outline" className="bg-amber-500/20 text-amber-400 border-amber-500/30 gap-1">
+                        <Badge
+                          variant="outline"
+                          className="bg-amber-500/20 text-amber-400 border-amber-500/30 gap-1"
+                        >
                           <AlertTriangle className="h-3 w-3" />
                           {analysis.stats.warningCount}
                         </Badge>
                       )}
                       {analysis.stats.infoCount > 0 && (
-                        <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-blue-500/30 gap-1">
+                        <Badge
+                          variant="outline"
+                          className="bg-blue-500/20 text-blue-400 border-blue-500/30 gap-1"
+                        >
                           <Info className="h-3 w-3" />
                           {analysis.stats.infoCount}
                         </Badge>
                       )}
                       {analysis.stats.totalIssues === 0 && (
-                        <Badge variant="outline" className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 gap-1">
+                        <Badge
+                          variant="outline"
+                          className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 gap-1"
+                        >
                           <CheckCircle className="h-3 w-3" />
                           No issues
                         </Badge>
@@ -430,11 +500,7 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
           <Card className="bg-slate-800 border-slate-700 w-full max-w-2xl max-h-[80vh] overflow-auto m-4">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Job Details: {selectedJob.id}</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedJob(null)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setSelectedJob(null)}>
                 <XCircle className="h-4 w-4" />
               </Button>
             </CardHeader>
@@ -448,7 +514,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
                 </div>
                 <div>
                   <div className="text-sm text-slate-400">Progress</div>
-                  <div className="text-lg font-medium text-white">{Math.round(selectedJob.overallProgress)}%</div>
+                  <div className="text-lg font-medium text-white">
+                    {Math.round(selectedJob.overallProgress)}%
+                  </div>
                 </div>
               </div>
 
@@ -457,13 +525,19 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
                 <div className="space-y-2">
                   {selectedJob.stages.map((stage) => (
                     <div key={stage.id} className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${
-                        stage.status === 'complete' ? 'bg-emerald-500' :
-                        stage.status === 'in_progress' ? 'bg-cyan-500 animate-pulse' :
-                        stage.status === 'failed' ? 'bg-red-500' :
-                        stage.status === 'skipped' ? 'bg-slate-600' :
-                        'bg-slate-500'
-                      }`} />
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          stage.status === 'complete'
+                            ? 'bg-emerald-500'
+                            : stage.status === 'in_progress'
+                              ? 'bg-cyan-500 animate-pulse'
+                              : stage.status === 'failed'
+                                ? 'bg-red-500'
+                                : stage.status === 'skipped'
+                                  ? 'bg-slate-600'
+                                  : 'bg-slate-500'
+                        }`}
+                      />
                       <span className="text-sm text-slate-300 flex-1">{stage.name}</span>
                       {stage.itemsTotal > 0 && (
                         <span className="text-xs text-slate-400">
@@ -477,7 +551,9 @@ export function ReprocessPanel({ onOpenAnalysisModal }: ReprocessPanelProps) {
 
               {selectedJob.fixesApplied.length > 0 && (
                 <div>
-                  <div className="text-sm text-slate-400 mb-2">Fixes Applied ({selectedJob.fixesApplied.length})</div>
+                  <div className="text-sm text-slate-400 mb-2">
+                    Fixes Applied ({selectedJob.fixesApplied.length})
+                  </div>
                   <div className="max-h-40 overflow-auto space-y-1">
                     {selectedJob.fixesApplied.map((fix, i) => (
                       <div key={i} className="text-xs text-slate-400 flex items-start gap-1">

@@ -19,7 +19,13 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import type { CurriculumAnalysis, AnalysisIssue, ReprocessConfig, IssueType, IssueSeverity } from '@/types';
+import type {
+  CurriculumAnalysis,
+  AnalysisIssue,
+  ReprocessConfig,
+  IssueType,
+  IssueSeverity,
+} from '@/types';
 import { cn } from '@/lib/utils';
 
 interface CurriculumAnalysisModalProps {
@@ -31,7 +37,10 @@ interface CurriculumAnalysisModalProps {
 }
 
 // Issue type display information
-const ISSUE_TYPE_INFO: Record<IssueType, { label: string; icon: typeof AlertCircle; description: string }> = {
+const ISSUE_TYPE_INFO: Record<
+  IssueType,
+  { label: string; icon: typeof AlertCircle; description: string }
+> = {
   broken_image: {
     label: 'Broken Image',
     icon: ImageOff,
@@ -80,7 +89,10 @@ const ISSUE_TYPE_INFO: Record<IssueType, { label: string; icon: typeof AlertCirc
 };
 
 // Severity display information
-const SEVERITY_INFO: Record<IssueSeverity, { label: string; color: string; bgColor: string; borderColor: string }> = {
+const SEVERITY_INFO: Record<
+  IssueSeverity,
+  { label: string; color: string; bgColor: string; borderColor: string }
+> = {
   critical: {
     label: 'Critical',
     color: 'text-red-400',
@@ -293,10 +305,7 @@ export function CurriculumAnalysisModal({
                     <p className="text-sm text-slate-400 ml-8">{typeInfo.description}</p>
                     <div className="ml-8 space-y-2">
                       {issues.slice(0, 10).map((issue) => (
-                        <div
-                          key={issue.id}
-                          className="p-2 bg-slate-900/50 rounded text-sm"
-                        >
+                        <div key={issue.id} className="p-2 bg-slate-900/50 rounded text-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p className="text-slate-200">{issue.description}</p>

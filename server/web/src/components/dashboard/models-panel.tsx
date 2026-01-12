@@ -448,7 +448,9 @@ export function ModelsPanel() {
                     {(model.parameter_size || model.parameters) && (
                       <div className="flex justify-between">
                         <span className="text-slate-400">Params</span>
-                        <span className="text-slate-200">{model.parameter_size || model.parameters}</span>
+                        <span className="text-slate-200">
+                          {model.parameter_size || model.parameters}
+                        </span>
                       </div>
                     )}
                     {model.quantization && (

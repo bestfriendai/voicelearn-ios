@@ -145,7 +145,9 @@ export function SourceBrowserPanel() {
   const [importJobs, setImportJobs] = useState<ImportJob[]>([]);
 
   // Import status for courses (keyed by course ID)
-  const [courseImportStatus, setCourseImportStatus] = useState<Record<string, CourseImportStatus>>({});
+  const [courseImportStatus, setCourseImportStatus] = useState<Record<string, CourseImportStatus>>(
+    {}
+  );
 
   // Multi-select state
   const [selectedCourseIds, setSelectedCourseIds] = useState<Set<string>>(new Set());
@@ -336,8 +338,12 @@ export function SourceBrowserPanel() {
     try {
       // Fetch both import status and list memberships in parallel
       const [statusResponse, membershipsResponse] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/import/status?source_id=${sourceId}&course_ids=${courseIds.join(',')}`),
-        fetch(`${BACKEND_URL}/api/lists/memberships?source_id=${sourceId}&course_ids=${courseIds.join(',')}`),
+        fetch(
+          `${BACKEND_URL}/api/import/status?source_id=${sourceId}&course_ids=${courseIds.join(',')}`
+        ),
+        fetch(
+          `${BACKEND_URL}/api/lists/memberships?source_id=${sourceId}&course_ids=${courseIds.join(',')}`
+        ),
       ]);
 
       const statusData = await statusResponse.json();
@@ -894,10 +900,7 @@ export function SourceBrowserPanel() {
             onClick={() => handleCourseSelect(course)}
           >
             {/* Selection Checkbox */}
-            <div
-              className="absolute top-3 left-3 z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="absolute top-3 left-3 z-10" onClick={(e) => e.stopPropagation()}>
               <input
                 type="checkbox"
                 checked={selectedCourseIds.has(course.id)}
@@ -922,9 +925,11 @@ export function SourceBrowserPanel() {
                     </Badge>
                   )}
                   {(courseImportStatus[course.id]?.lists?.length ?? 0) > 0 && (
-                    <Badge variant="default" className="text-xs" title={
-                      courseImportStatus[course.id]?.lists?.map((l) => l.name).join(', ')
-                    }>
+                    <Badge
+                      variant="default"
+                      className="text-xs"
+                      title={courseImportStatus[course.id]?.lists?.map((l) => l.name).join(', ')}
+                    >
                       <List className="w-3 h-3 mr-1" />
                       {courseImportStatus[course.id]?.lists?.length}{' '}
                       {courseImportStatus[course.id]?.lists?.length === 1 ? 'list' : 'lists'}

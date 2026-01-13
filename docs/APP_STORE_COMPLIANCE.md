@@ -27,7 +27,9 @@ This document provides a comprehensive review of UnaMentis's compliance with App
 
 ## Executive Summary
 
-### Overall Status: COMPLIANT
+### Overall Status: CONDITIONALLY COMPLIANT
+
+> **Note:** Pre-submission actions remain. See [Remaining Actions](#remaining-actions-before-submission) below.
 
 UnaMentis is a voice-based AI tutoring application that uses:
 - Microphone access for speech-to-text

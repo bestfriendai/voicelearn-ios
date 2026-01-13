@@ -808,6 +808,6 @@ Now, based on the curriculum specification provided above, generate a complete U
 
 ## References
 
-- UMCF Specification: `curriculum/README.md`
-- UMCF JSON Schema: `curriculum/umcf-schema.json`
+- UMCF Specification: `curriculum/spec/UMCF_SPECIFICATION.md`
+- UMCF JSON Schema: `curriculum/spec/umcf-schema.json`
 - Example Curricula: `curriculum/examples/`

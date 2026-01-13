@@ -116,11 +116,11 @@ if [ -f "UnaMentis/PrivacyInfo.xcprivacy" ]; then
     print_check "Privacy manifest is valid XML"
   else
     print_error "Privacy manifest has invalid XML"
-    ((ERRORS++))
+    ((++ERRORS))
   fi
 else
   print_error "PrivacyInfo.xcprivacy is MISSING (required since Spring 2024)"
-  ((ERRORS++))
+  ((++ERRORS))
 fi
 
 # Info.plist
@@ -133,7 +133,7 @@ if [ -f "UnaMentis/Info.plist" ]; then
     print_check "NSMicrophoneUsageDescription: set"
   else
     print_error "NSMicrophoneUsageDescription: MISSING"
-    ((ERRORS++))
+    ((++ERRORS))
   fi
 
   SPEECH_DESC=$(plutil -extract NSSpeechRecognitionUsageDescription raw UnaMentis/Info.plist 2>/dev/null || echo "")
@@ -141,11 +141,11 @@ if [ -f "UnaMentis/Info.plist" ]; then
     print_check "NSSpeechRecognitionUsageDescription: set"
   else
     print_warning "NSSpeechRecognitionUsageDescription: not set"
-    ((WARNINGS++))
+    ((++WARNINGS))
   fi
 else
   print_error "Info.plist is MISSING"
-  ((ERRORS++))
+  ((++ERRORS))
 fi
 
 # Entitlements
@@ -153,7 +153,7 @@ if [ -f "UnaMentis/UnaMentis.entitlements" ]; then
   print_check "UnaMentis.entitlements exists"
 else
   print_warning "UnaMentis.entitlements not found"
-  ((WARNINGS++))
+  ((++WARNINGS))
 fi
 
 # App Icons
@@ -163,11 +163,11 @@ if [ -d "UnaMentis/Assets.xcassets/AppIcon.appiconset" ]; then
     print_check "App icons: $ICON_COUNT image(s) found"
   else
     print_warning "App icons: no PNG files in appiconset"
-    ((WARNINGS++))
+    ((++WARNINGS))
   fi
 else
   print_warning "AppIcon.appiconset not found"
-  ((WARNINGS++))
+  ((++WARNINGS))
 fi
 
 # ============================================
@@ -178,7 +178,7 @@ print_header "Stage 3: Security Check"
 # Check for hardcoded API keys
 if grep -rE "(sk-[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16})" --include="*.swift" UnaMentis/ 2>/dev/null | grep -v "Test" | grep -v "Mock" | grep -v "example" > /dev/null; then
   print_error "Potential hardcoded API keys found!"
-  ((ERRORS++))
+  ((++ERRORS))
 else
   print_check "No hardcoded API keys detected"
 fi
@@ -188,14 +188,14 @@ if grep -q "#if DEBUG" UnaMentis/Core/Logging/RemoteLogHandler.swift 2>/dev/null
   print_check "Remote logging is DEBUG-only"
 else
   print_warning "Remote logging may be enabled in release"
-  ((WARNINGS++))
+  ((++WARNINGS))
 fi
 
 # Check for print statements
 PRINT_COUNT=$(grep -rn "print(" --include="*.swift" UnaMentis/ 2>/dev/null | wc -l | tr -d ' ')
 if [ "$PRINT_COUNT" -gt 20 ]; then
   print_warning "$PRINT_COUNT print() statements found (consider using Logger)"
-  ((WARNINGS++))
+  ((++WARNINGS))
 else
   print_check "Print statement count acceptable ($PRINT_COUNT)"
 fi
@@ -226,7 +226,7 @@ if [ ${PIPESTATUS[0]} -eq 0 ]; then
   print_check "Release build succeeded"
 else
   print_error "Release build failed"
-  ((ERRORS++))
+  ((++ERRORS))
 fi
 
 # ============================================
@@ -253,7 +253,7 @@ if [ "$SKIP_TESTS" = false ]; then
     print_check "All tests passed"
   else
     print_error "Some tests failed"
-    ((ERRORS++))
+    ((++ERRORS))
   fi
 else
   print_header "Stage 5: Test Suite (SKIPPED)"
@@ -291,7 +291,7 @@ if [ "$CREATE_ARCHIVE" = true ]; then
     print_info "App size: $APP_SIZE"
   else
     print_error "Archive creation failed"
-    ((ERRORS++))
+    ((++ERRORS))
   fi
 fi
 

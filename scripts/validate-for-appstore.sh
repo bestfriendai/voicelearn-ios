@@ -158,7 +158,7 @@ fi
 
 # App Icons
 if [ -d "UnaMentis/Assets.xcassets/AppIcon.appiconset" ]; then
-  ICON_COUNT=$(ls UnaMentis/Assets.xcassets/AppIcon.appiconset/*.png 2>/dev/null | wc -l | tr -d ' ')
+  ICON_COUNT=$(find UnaMentis/Assets.xcassets/AppIcon.appiconset -maxdepth 1 -name "*.png" -type f 2>/dev/null | wc -l | tr -d ' ')
   if [ "$ICON_COUNT" -gt 0 ]; then
     print_check "App icons: $ICON_COUNT image(s) found"
   else
@@ -209,20 +209,30 @@ mkdir -p "$BUILD_DIR"
 
 print_info "Building for iOS Simulator..."
 
-BUILD_CMD="xcodebuild build \
-  -scheme $SCHEME \
-  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
-  -configuration Release \
-  -skipPackagePluginValidation \
-  CODE_SIGNING_ALLOWED=NO"
-
+BUILD_EXIT_CODE=0
 if $USE_XCBEAUTIFY; then
-  eval "$BUILD_CMD 2>&1 | xcbeautify"
+  set +e
+  xcodebuild build \
+    -scheme "$SCHEME" \
+    -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+    -configuration Release \
+    -skipPackagePluginValidation \
+    CODE_SIGNING_ALLOWED=NO 2>&1 | xcbeautify
+  BUILD_EXIT_CODE=${PIPESTATUS[0]}
+  set -e
 else
-  eval "$BUILD_CMD 2>&1 | grep -E '(error:|warning:|Build Succeeded|BUILD SUCCEEDED)'" || true
+  set +e
+  xcodebuild build \
+    -scheme "$SCHEME" \
+    -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+    -configuration Release \
+    -skipPackagePluginValidation \
+    CODE_SIGNING_ALLOWED=NO 2>&1 | grep -E '(error:|warning:|Build Succeeded|BUILD SUCCEEDED)' || true
+  BUILD_EXIT_CODE=${PIPESTATUS[0]}
+  set -e
 fi
 
-if [ ${PIPESTATUS[0]} -eq 0 ]; then
+if [ "$BUILD_EXIT_CODE" -eq 0 ]; then
   print_check "Release build succeeded"
 else
   print_error "Release build failed"
@@ -237,19 +247,28 @@ if [ "$SKIP_TESTS" = false ]; then
 
   print_info "Running tests..."
 
-  TEST_CMD="xcodebuild test \
-    -scheme $SCHEME \
-    -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
-    -enableCodeCoverage YES \
-    CODE_SIGNING_ALLOWED=NO"
-
+  TEST_EXIT_CODE=0
   if $USE_XCBEAUTIFY; then
-    eval "$TEST_CMD 2>&1 | xcbeautify"
+    set +e
+    xcodebuild test \
+      -scheme "$SCHEME" \
+      -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+      -enableCodeCoverage YES \
+      CODE_SIGNING_ALLOWED=NO 2>&1 | xcbeautify
+    TEST_EXIT_CODE=${PIPESTATUS[0]}
+    set -e
   else
-    eval "$TEST_CMD 2>&1 | grep -E '(Test Suite|Test Case|Executed|passed|failed)'" || true
+    set +e
+    xcodebuild test \
+      -scheme "$SCHEME" \
+      -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+      -enableCodeCoverage YES \
+      CODE_SIGNING_ALLOWED=NO 2>&1 | grep -E '(Test Suite|Test Case|Executed|passed|failed)' || true
+    TEST_EXIT_CODE=${PIPESTATUS[0]}
+    set -e
   fi
 
-  if [ ${PIPESTATUS[0]} -eq 0 ]; then
+  if [ "$TEST_EXIT_CODE" -eq 0 ]; then
     print_check "All tests passed"
   else
     print_error "Some tests failed"
@@ -268,19 +287,28 @@ if [ "$CREATE_ARCHIVE" = true ]; then
 
   print_info "Creating archive..."
 
-  ARCHIVE_CMD="xcodebuild archive \
-    -scheme $SCHEME \
-    -destination 'generic/platform=iOS' \
-    -archivePath '$ARCHIVE_PATH' \
-    -configuration Release \
-    -skipPackagePluginValidation \
-    CODE_SIGNING_ALLOWED=NO \
-    CODE_SIGN_IDENTITY='-'"
-
   if $USE_XCBEAUTIFY; then
-    eval "$ARCHIVE_CMD 2>&1 | xcbeautify"
+    set +e
+    xcodebuild archive \
+      -scheme "$SCHEME" \
+      -destination 'generic/platform=iOS' \
+      -archivePath "$ARCHIVE_PATH" \
+      -configuration Release \
+      -skipPackagePluginValidation \
+      CODE_SIGNING_ALLOWED=NO \
+      CODE_SIGN_IDENTITY='-' 2>&1 | xcbeautify
+    set -e
   else
-    eval "$ARCHIVE_CMD 2>&1 | grep -E '(error:|warning:|ARCHIVE SUCCEEDED)'" || true
+    set +e
+    xcodebuild archive \
+      -scheme "$SCHEME" \
+      -destination 'generic/platform=iOS' \
+      -archivePath "$ARCHIVE_PATH" \
+      -configuration Release \
+      -skipPackagePluginValidation \
+      CODE_SIGNING_ALLOWED=NO \
+      CODE_SIGN_IDENTITY='-' 2>&1 | grep -E '(error:|warning:|ARCHIVE SUCCEEDED)' || true
+    set -e
   fi
 
   if [ -d "$ARCHIVE_PATH" ]; then

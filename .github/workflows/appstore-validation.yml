@@ -32,6 +32,8 @@ jobs:
   preflight:
     name: Pre-flight Checks
     runs-on: macos-14
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.version.outputs.version }}
       build: ${{ steps.version.outputs.build }}
@@ -95,7 +97,7 @@ jobs:
 
         # Check App Icons
         if [ -d "UnaMentis/Assets.xcassets/AppIcon.appiconset" ]; then
-          ICON_COUNT=$(ls UnaMentis/Assets.xcassets/AppIcon.appiconset/*.png 2>/dev/null | wc -l | tr -d ' ')
+          ICON_COUNT=$(find UnaMentis/Assets.xcassets/AppIcon.appiconset -maxdepth 1 -name "*.png" -type f 2>/dev/null | wc -l | tr -d ' ')
           if [ "$ICON_COUNT" -gt 0 ]; then
             echo "| App Icons | ✅ Found ($ICON_COUNT images) |" >> $GITHUB_STEP_SUMMARY
           else
@@ -139,8 +141,8 @@ jobs:
                 api_type = api.get('NSPrivacyAccessedAPIType', 'Unknown')
                 reasons = api.get('NSPrivacyAccessedAPITypeReasons', [])
                 print(f'- {api_type}: {reasons}')
-        except:
-            print('Could not parse API types')
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            print(f'Could not parse API types: {e}')
         " >> $GITHUB_STEP_SUMMARY || echo "Could not parse" >> $GITHUB_STEP_SUMMARY
 
     - name: Check Info.plist Requirements
@@ -170,6 +172,8 @@ jobs:
     name: Build & Test
     runs-on: macos-14
     needs: preflight
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -266,6 +270,8 @@ jobs:
     name: Static Analysis
     runs-on: macos-14
     needs: preflight
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -353,6 +359,8 @@ jobs:
     name: Archive Validation
     runs-on: macos-14
     needs: [preflight, build-and-test]
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -445,6 +453,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [preflight, build-and-test, static-analysis, archive-validation]
     if: always()
+    permissions:
+      contents: read
 
     steps:
     - uses: actions/checkout@v4

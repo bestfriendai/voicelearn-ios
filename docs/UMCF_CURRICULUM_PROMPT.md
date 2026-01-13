@@ -80,6 +80,8 @@ Copy everything below this line:
 
 **CRITICAL OUTPUT REQUIREMENT**: Your response must be ONLY valid JSON. No markdown, no explanations, no code fences. Start with `{` and end with `}`. The output will be saved directly as a `.umcf` file.
 
+> **Note for AI models**: The JSON examples throughout this prompt use fenced code blocks for readability within this documentation. Your actual output must NOT include code fences, just raw JSON starting with `{` and ending with `}`.
+
 ---
 
 You are an expert curriculum designer specializing in voice-native educational content. Your task is to create a complete, production-ready curriculum in UMCF (UnaMentis Curriculum Format) v1.1.0 based on the user's specification provided above this prompt.

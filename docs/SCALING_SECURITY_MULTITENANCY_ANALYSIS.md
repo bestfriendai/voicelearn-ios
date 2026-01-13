@@ -67,7 +67,7 @@ This analysis adopts the principle that user data is **never** monetizable, sell
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │                         Data Layer                                   │   │
 │  │  • Core Data (iOS) - SQLite, unencrypted                            │   │
-│  │  • File-based JSON (Server) - UMLCF curriculum files                │   │
+│  │  • File-based JSON (Server) - UMCF curriculum files                 │   │
 │  │  • PostgreSQL (optional) - No RLS, no encryption                    │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                              │

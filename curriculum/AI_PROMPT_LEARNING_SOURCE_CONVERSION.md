@@ -1,4 +1,4 @@
-# AI-Assisted Learning Source to UMLCF Conversion Guide
+# AI-Assisted Learning Source to UMCF Conversion Guide
 
 **Version:** 1.0.0
 **Date:** 2025-12-29
@@ -7,7 +7,7 @@
 
 ## Overview
 
-This guide provides prompts and instructions for using AI (ChatGPT, Claude, etc.) to convert raw learning materials into the Una Mentis Curriculum Format (UMLCF). This enables you to take documents, transcripts, lecture notes, textbook chapters, or any educational content and transform them into structured curriculum ready for conversational AI tutoring.
+This guide provides prompts and instructions for using AI (ChatGPT, Claude, etc.) to convert raw learning materials into the Una Mentis Curriculum Format (UMCF). This enables you to take documents, transcripts, lecture notes, textbook chapters, or any educational content and transform them into structured curriculum ready for conversational AI tutoring.
 
 ---
 
@@ -65,7 +65,7 @@ The conversion happens in stages:
 │         ↓                                                       │
 │  4. ENRICH            Add objectives, assessments, glossary     │
 │         ↓                                                       │
-│  5. FORMAT            Output as valid UMLCF JSON                │
+│  5. FORMAT            Output as valid UMCF JSON                │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -79,10 +79,10 @@ You can do this in a single comprehensive prompt or break it into stages.
 Use this prompt for a complete conversion. Copy the entire prompt, then paste your source content where indicated.
 
 ```markdown
-# UMLCF Curriculum Conversion Request
+# UMCF Curriculum Conversion Request
 
 ## Your Role
-You are an expert curriculum designer and instructional technologist. Your task is to convert raw educational content into the Una Mentis Curriculum Format (UMLCF) - a JSON-based format optimized for conversational AI tutoring.
+You are an expert curriculum designer and instructional technologist. Your task is to convert raw educational content into the Una Mentis Curriculum Format (UMCF) - a JSON-based format optimized for conversational AI tutoring.
 
 ## Source Content Information
 - **Target Audience**: [SPECIFY: e.g., "8th grade students", "college undergraduates", "professional developers"]
@@ -97,7 +97,7 @@ You are an expert curriculum designer and instructional technologist. Your task 
 
 ## Conversion Instructions
 
-Please convert the above content into UMLCF format following these steps:
+Please convert the above content into UMCF format following these steps:
 
 ### Step 1: Analyze the Content
 - Identify the main topic and subtopics
@@ -146,7 +146,7 @@ Note common errors learners might make:
 
 ## Output Format
 
-Generate valid JSON following this UMLCF structure:
+Generate valid JSON following this UMCF structure:
 
 ```json
 {
@@ -286,7 +286,7 @@ Ensure your output:
 
 ---
 
-Now please convert the source content provided above into UMLCF format.
+Now please convert the source content provided above into UMCF format.
 ```
 
 ---
@@ -394,7 +394,7 @@ For each question provide:
 - Feedback for correct and incorrect answers
 - Hints for struggling learners
 
-Output as JSON array matching UMLCF assessment schema.
+Output as JSON array matching UMCF assessment schema.
 ```
 
 ### Stage 5: Enrichment Prompt
@@ -496,7 +496,7 @@ Read segments aloud to check:
 
 **Input prompt:**
 ```markdown
-# UMLCF Curriculum Conversion Request
+# UMCF Curriculum Conversion Request
 
 ## Your Role
 You are an expert curriculum designer...
@@ -519,7 +519,7 @@ collection of elements. Each node in the tree has at most two children...
 
 **Input prompt:**
 ```markdown
-# UMLCF Curriculum Conversion Request
+# UMCF Curriculum Conversion Request
 
 ## Source Content Information
 - **Target Audience**: 8th grade students
@@ -585,7 +585,7 @@ others are made of many cells (multicellular)...
 
 ## Related Documentation
 
-- [UMLCF Specification](spec/UMLCF_SPECIFICATION.md) - Full format specification
+- [UMCF Specification](spec/UMCF_SPECIFICATION.md) - Full format specification
 - [AI Enrichment Pipeline](importers/AI_ENRICHMENT_PIPELINE.md) - Automated enrichment details
 - [Standards Traceability](spec/STANDARDS_TRACEABILITY.md) - Educational standards mapping
 

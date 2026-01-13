@@ -71,7 +71,7 @@ The profile isn't a form the user fills out. It's a living model that:
 ### Key Architectural Insights
 
 1. **Session-Centric Design:** Learning happens within bounded `SessionManager` instances
-2. **Transcript-Driven Tutoring:** Rich transcripts with checkpoints, misconceptions, examples (UMLCF format)
+2. **Transcript-Driven Tutoring:** Rich transcripts with checkpoints, misconceptions, examples (UMCF format)
 3. **Intent Classification:** Already planned for routing interactions (Categories A-D)
 4. **Modular Services:** Protocol-based STT/TTS/LLM allow provider swapping
 
@@ -555,9 +555,9 @@ MicroExperiment (new entity)
 └── profile: LearnerProfile        // Relationship
 ```
 
-### UMLCF Extensions for Profile-Aware Content
+### UMCF Extensions for Profile-Aware Content
 
-Extend `tutoringConfig` in UMLCF:
+Extend `tutoringConfig` in UMCF:
 
 ```json
 {
@@ -759,7 +759,7 @@ func buildSystemPrompt(with profile: LearnerProfile?) -> String {
 
 - [ ] Implement `CurriculumEngine.applyProfileAdaptations()`
 - [ ] Add profile context to LLM prompts
-- [ ] Implement UMLCF `profileAdaptations` in transcript rendering
+- [ ] Implement UMCF `profileAdaptations` in transcript rendering
 - [ ] Track adaptation effectiveness
 - [ ] Continuous profile refinement
 

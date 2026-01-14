@@ -10,8 +10,10 @@ Provides a general TTS endpoint that:
 """
 
 import asyncio
+import json as json_module
 import logging
 
+import aiofiles
 from aiohttp import web
 
 from modules_api import validate_module_id
@@ -649,7 +651,27 @@ async def handle_kb_audio_get(request: web.Request) -> web.Response:
     question_id = request.match_info.get("question_id")
     segment = request.match_info.get("segment")
     module_id = request.query.get("module_id", "knowledge-bowl")
-    hint_index = int(request.query.get("hint_index", "0"))
+
+    # Validate module_id to prevent path traversal
+    if not validate_module_id(module_id):
+        return web.json_response(
+            {"error": f"Invalid module_id: {module_id}"},
+            status=400,
+        )
+
+    # Parse and validate hint_index
+    try:
+        hint_index = int(request.query.get("hint_index", "0"))
+        if hint_index < 0:
+            return web.json_response(
+                {"error": "hint_index must be non-negative"},
+                status=400,
+            )
+    except ValueError:
+        return web.json_response(
+            {"error": "Invalid hint_index format"},
+            status=400,
+        )
 
     if not question_id or not segment:
         return web.json_response(
@@ -735,6 +757,13 @@ async def handle_kb_audio_batch(request: web.Request) -> web.Response:
     module_id = data.get("module_id", "knowledge-bowl")
     question_ids = data.get("question_ids", [])
     segments = data.get("segments", ["question", "answer", "explanation"])
+
+    # Validate module_id to prevent path traversal
+    if not validate_module_id(module_id):
+        return web.json_response(
+            {"error": f"Invalid module_id: {module_id}"},
+            status=400,
+        )
 
     if not question_ids:
         return web.json_response(
@@ -845,8 +874,9 @@ async def handle_kb_prefetch(request: web.Request) -> web.Response:
         )
 
     try:
-        with open(content_path) as f:
-            module_content = json_module.load(f)
+        async with aiofiles.open(content_path) as f:
+            content = await f.read()
+            module_content = json_module.loads(content)
     except Exception as e:
         return web.json_response(
             {"error": f"Failed to load module content: {e}"},
@@ -979,8 +1009,9 @@ async def handle_kb_coverage(request: web.Request) -> web.Response:
         )
 
     try:
-        with open(content_path) as f:
-            module_content = json_module.load(f)
+        async with aiofiles.open(content_path) as f:
+            content = await f.read()
+            module_content = json_module.loads(content)
     except Exception as e:
         return web.json_response(
             {"error": f"Failed to load module content: {e}"},

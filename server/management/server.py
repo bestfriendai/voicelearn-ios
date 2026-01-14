@@ -4581,10 +4581,14 @@ def create_app() -> web.Application:
 
         # Initialize Knowledge Bowl audio manager for pre-generated TTS
         kb_audio_dir = Path(__file__).parent / "data" / "kb_audio"
-        kb_audio_manager = KBAudioManager(str(kb_audio_dir), resource_pool)
-        await kb_audio_manager.initialize()
-        app["kb_audio_manager"] = kb_audio_manager
-        logger.info("[Startup] KB audio manager initialized")
+        try:
+            kb_audio_manager = KBAudioManager(str(kb_audio_dir), resource_pool)
+            await kb_audio_manager.initialize()
+            app["kb_audio_manager"] = kb_audio_manager
+            logger.info("[Startup] KB audio manager initialized")
+        except Exception as e:
+            logger.error(f"[Startup] KB audio manager init failed, continuing without KB audio: {e}")
+            app["kb_audio_manager"] = None
 
         # Initialize session manager (handles both FOV and user sessions)
         session_manager = SessionManager()

@@ -61,7 +61,9 @@ def get_module_content_path(module_id: str) -> Path:
     # Resolve to absolute path and verify it's within MODULES_DIR
     resolved = content_path.resolve()
     modules_resolved = MODULES_DIR.resolve()
-    if not str(resolved).startswith(str(modules_resolved)):
+    try:
+        resolved.relative_to(modules_resolved)
+    except ValueError:
         raise ValueError(f"Path traversal detected in module_id: {module_id}")
 
     return content_path

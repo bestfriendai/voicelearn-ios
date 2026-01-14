@@ -361,8 +361,12 @@ function FeatureToggle({
 }: FeatureToggleProps) {
   if (!status.supported) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-700/30 text-slate-500 text-sm">
-        <Icon className="w-4 h-4" />
+      <div
+        role="status"
+        aria-disabled="true"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-700/30 text-slate-500 text-sm"
+      >
+        <Icon className="w-4 h-4" aria-hidden="true" />
         <span>{label}</span>
         <Badge className="bg-slate-600/50 text-slate-400 text-xs">Not Supported</Badge>
       </div>
@@ -375,15 +379,21 @@ function FeatureToggle({
       onClick={onToggle}
       disabled={disabled}
       title={tooltip}
+      aria-label={`Toggle ${label}: currently ${status.enabled ? 'enabled' : 'disabled'}`}
+      aria-pressed={status.enabled}
       className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
         status.enabled
           ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
           : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
     >
-      <Icon className="w-4 h-4" />
+      <Icon className="w-4 h-4" aria-hidden="true" />
       <span>{label}</span>
-      {status.enabled ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+      {status.enabled ? (
+        <Check className="w-3.5 h-3.5" aria-hidden="true" />
+      ) : (
+        <X className="w-3.5 h-3.5" aria-hidden="true" />
+      )}
       {status.overridden && (
         <Badge className="bg-amber-500/30 text-amber-400 text-xs ml-1">Override</Badge>
       )}

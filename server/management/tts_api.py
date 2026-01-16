@@ -120,9 +120,9 @@ async def handle_tts_request(request: web.Request) -> web.Response:
                     "X-TTS-Sample-Rate": str(sample_rate),
                 },
             )
-        except Exception as e:
+        except Exception:
             return web.json_response(
-                {"error": str(e)},
+                {"error": "TTS generation failed"},
                 status=503,
             )
 
@@ -168,9 +168,9 @@ async def handle_tts_request(request: web.Request) -> web.Response:
             chatterbox_config=chatterbox_config,
             priority=Priority.LIVE,
         )
-    except Exception as e:
+    except Exception:
         return web.json_response(
-            {"error": str(e)},
+            {"error": "TTS generation failed"},
             status=503,
         )
 
@@ -420,15 +420,52 @@ async def handle_get_cache_entry(request: web.Request) -> web.Response:
 
     voice_id = request.query.get("voice_id", "nova")
     provider = request.query.get("tts_provider", "vibevoice")
-    speed = float(request.query.get("speed", "1.0"))
-    exaggeration = request.query.get("exaggeration")
-    cfg_weight = request.query.get("cfg_weight")
     language = request.query.get("language")
 
+    # Parse and validate float parameters with safe ranges
+    try:
+        speed = float(request.query.get("speed", "1.0"))
+        if not (0.25 <= speed <= 4.0):
+            return web.json_response(
+                {"error": "speed must be between 0.25 and 4.0"},
+                status=400,
+            )
+    except ValueError:
+        return web.json_response(
+            {"error": "Invalid speed value"},
+            status=400,
+        )
+
+    exaggeration = request.query.get("exaggeration")
+    cfg_weight = request.query.get("cfg_weight")
+
     if exaggeration:
-        exaggeration = float(exaggeration)
+        try:
+            exaggeration = float(exaggeration)
+            if not (0.0 <= exaggeration <= 1.0):
+                return web.json_response(
+                    {"error": "exaggeration must be between 0.0 and 1.0"},
+                    status=400,
+                )
+        except ValueError:
+            return web.json_response(
+                {"error": "Invalid exaggeration value"},
+                status=400,
+            )
+
     if cfg_weight:
-        cfg_weight = float(cfg_weight)
+        try:
+            cfg_weight = float(cfg_weight)
+            if not (0.0 <= cfg_weight <= 1.0):
+                return web.json_response(
+                    {"error": "cfg_weight must be between 0.0 and 1.0"},
+                    status=400,
+                )
+        except ValueError:
+            return web.json_response(
+                {"error": "Invalid cfg_weight value"},
+                status=400,
+            )
 
     cache: TTSCache = request.app.get("tts_cache")
     if not cache:
@@ -865,15 +902,15 @@ async def handle_kb_prefetch(request: web.Request) -> web.Response:
     # Load module content using validated path
     try:
         content_path = get_module_content_path(module_id)
-    except ValueError as e:
+    except ValueError:
         return web.json_response(
-            {"error": str(e)},
+            {"error": "Invalid module_id"},
             status=400,
         )
 
     if not content_path.exists():
         return web.json_response(
-            {"error": f"Module content not found: {module_id}"},
+            {"error": "Module content not found"},
             status=404,
         )
 
@@ -1002,15 +1039,15 @@ async def handle_kb_coverage(request: web.Request) -> web.Response:
     # Load module content using validated path
     try:
         content_path = get_module_content_path(module_id)
-    except ValueError as e:
+    except ValueError:
         return web.json_response(
-            {"error": str(e)},
+            {"error": "Invalid module_id"},
             status=400,
         )
 
     if not content_path.exists():
         return web.json_response(
-            {"error": f"Module content not found: {module_id}"},
+            {"error": "Module content not found"},
             status=404,
         )
 

@@ -4334,7 +4334,8 @@ def setup_auth_routes(app: web.Application, db_pool) -> bool:
 
 def create_app() -> web.Application:
     """Create and configure the aiohttp application."""
-    app = web.Application()
+    # Limit request body size to 1MB to prevent DoS attacks via large JSON payloads
+    app = web.Application(client_max_size=1024 * 1024)
 
     # CORS middleware
     @web.middleware

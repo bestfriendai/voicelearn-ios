@@ -588,12 +588,13 @@ class KBAudioManager:
 
         file_path = self.base_dir / module_id / question_id / filename
 
-        # Verify resolved path is still within base_dir
+        # Verify resolved path is still within base_dir using secure relative_to check
         try:
             resolved = file_path.resolve()
-            if not str(resolved).startswith(str(self.base_dir.resolve())):
-                logger.warning(f"Path traversal attempt blocked: {file_path}")
-                return None
+            resolved.relative_to(self.base_dir.resolve())
+        except ValueError:
+            logger.warning("Path traversal attempt blocked")
+            return None
         except Exception:
             return None
 
@@ -603,8 +604,8 @@ class KBAudioManager:
         try:
             with open(file_path, "rb") as f:
                 return f.read()
-        except Exception as e:
-            logger.error(f"Failed to read audio file {file_path}: {e}")
+        except Exception:
+            logger.error("Failed to read audio file")
             return None
 
     async def get_manifest(self, module_id: str) -> Optional[KBManifest]:
@@ -723,12 +724,13 @@ class KBAudioManager:
 
         file_path = self.base_dir / "feedback" / f"{feedback_type}.wav"
 
-        # Verify resolved path is still within base_dir
+        # Verify resolved path is still within base_dir using secure relative_to check
         try:
             resolved = file_path.resolve()
-            if not str(resolved).startswith(str(self.base_dir.resolve())):
-                logger.warning(f"Path traversal attempt blocked: {file_path}")
-                return None
+            resolved.relative_to(self.base_dir.resolve())
+        except ValueError:
+            logger.warning("Path traversal attempt blocked")
+            return None
         except Exception:
             return None
 
@@ -738,8 +740,8 @@ class KBAudioManager:
         try:
             with open(file_path, "rb") as f:
                 return f.read()
-        except Exception as e:
-            logger.error(f"Failed to read feedback audio {feedback_type}: {e}")
+        except Exception:
+            logger.error("Failed to read feedback audio")
             return None
 
     def cleanup_completed_jobs(self, max_age_seconds: int = 3600) -> int:

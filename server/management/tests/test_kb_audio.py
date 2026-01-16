@@ -20,6 +20,7 @@ from tts_cache.kb_audio import (
     KBManifest,
     KBPrefetchProgress,
     KBCoverageStatus,
+    _validate_path_component,
 )
 
 
@@ -533,3 +534,291 @@ class TestKBAudioManagerDuration:
         size_bytes = 48000  # Should be ~1 second
         duration = kb_manager._estimate_duration(size_bytes)
         assert abs(duration - 1.0) < 0.1
+
+
+# =============================================================================
+# PATH VALIDATION TESTS (Security Critical)
+# =============================================================================
+
+
+class TestValidatePathComponent:
+    """Tests for _validate_path_component security function."""
+
+    def test_valid_simple_name(self):
+        """Test valid simple names pass validation."""
+        assert _validate_path_component("question-001") is True
+        assert _validate_path_component("sci_phys") is True
+        assert _validate_path_component("kb-2024") is True
+        assert _validate_path_component("a") is True
+        assert _validate_path_component("test123") is True
+
+    def test_empty_string_rejected(self):
+        """Test empty string is rejected."""
+        assert _validate_path_component("") is False
+
+    def test_path_traversal_rejected(self):
+        """Test path traversal attempts are rejected."""
+        assert _validate_path_component("..") is False
+        assert _validate_path_component("../etc/passwd") is False
+        assert _validate_path_component("foo/../bar") is False
+        assert _validate_path_component("..hidden") is False
+
+    def test_forward_slash_rejected(self):
+        """Test forward slashes are rejected."""
+        assert _validate_path_component("path/to/file") is False
+        assert _validate_path_component("/tmp/foo") is False
+        assert _validate_path_component("foo/") is False
+
+    def test_backslash_rejected(self):
+        """Test backslashes are rejected."""
+        assert _validate_path_component("path\\to\\file") is False
+        assert _validate_path_component("C:\\windows") is False
+        assert _validate_path_component("foo\\") is False
+
+    def test_absolute_paths_rejected(self):
+        """Test absolute paths are rejected."""
+        assert _validate_path_component("/tmp/foo") is False
+        assert _validate_path_component("/etc/passwd") is False
+
+
+class TestPathTraversalPrevention:
+    """Tests for path traversal prevention in get_audio and get_feedback_audio."""
+
+    @pytest.mark.asyncio
+    async def test_get_audio_rejects_path_traversal_module_id(self, kb_manager):
+        """Test that path traversal in module_id is rejected."""
+        audio = await kb_manager.get_audio(
+            module_id="../etc",
+            question_id="passwd",
+            segment_type="question",
+        )
+        assert audio is None
+
+    @pytest.mark.asyncio
+    async def test_get_audio_rejects_path_traversal_question_id(self, kb_manager):
+        """Test that path traversal in question_id is rejected."""
+        audio = await kb_manager.get_audio(
+            module_id="test-module",
+            question_id="../../../etc/passwd",
+            segment_type="question",
+        )
+        assert audio is None
+
+    @pytest.mark.asyncio
+    async def test_get_audio_rejects_absolute_path(self, kb_manager):
+        """Test that absolute paths are rejected."""
+        audio = await kb_manager.get_audio(
+            module_id="/etc",
+            question_id="passwd",
+            segment_type="question",
+        )
+        assert audio is None
+
+    @pytest.mark.asyncio
+    async def test_get_feedback_rejects_path_traversal(self, kb_manager):
+        """Test that path traversal in feedback_type is rejected."""
+        audio = await kb_manager.get_feedback_audio("../../../etc/passwd")
+        assert audio is None
+
+    @pytest.mark.asyncio
+    async def test_get_feedback_rejects_empty(self, kb_manager):
+        """Test that empty feedback_type is rejected."""
+        audio = await kb_manager.get_feedback_audio("")
+        assert audio is None
+
+
+# =============================================================================
+# JOB MANAGEMENT TESTS
+# =============================================================================
+
+
+class TestCleanupCompletedJobs:
+    """Tests for cleanup_completed_jobs."""
+
+    @pytest.mark.asyncio
+    async def test_cleanup_removes_old_completed_jobs(self, kb_manager):
+        """Test that old completed jobs are removed."""
+        from datetime import timedelta
+
+        # Add a completed job with old timestamp
+        progress = KBPrefetchProgress(
+            job_id="old_job_123",
+            module_id="test-module",
+            total_segments=10,
+            completed=10,
+            status="completed",
+            completed_at=datetime.now() - timedelta(hours=2),
+        )
+        task = MagicMock()
+        kb_manager._jobs["old_job_123"] = (task, progress)
+
+        # Clean up with 1 hour max age
+        removed = kb_manager.cleanup_completed_jobs(max_age_seconds=3600)
+
+        assert removed == 1
+        assert "old_job_123" not in kb_manager._jobs
+
+    @pytest.mark.asyncio
+    async def test_cleanup_keeps_recent_jobs(self, kb_manager):
+        """Test that recent completed jobs are kept."""
+        from datetime import timedelta
+
+        # Add a recently completed job
+        progress = KBPrefetchProgress(
+            job_id="recent_job_123",
+            module_id="test-module",
+            total_segments=10,
+            completed=10,
+            status="completed",
+            completed_at=datetime.now() - timedelta(minutes=10),
+        )
+        task = MagicMock()
+        kb_manager._jobs["recent_job_123"] = (task, progress)
+
+        # Clean up with 1 hour max age
+        removed = kb_manager.cleanup_completed_jobs(max_age_seconds=3600)
+
+        assert removed == 0
+        assert "recent_job_123" in kb_manager._jobs
+
+    @pytest.mark.asyncio
+    async def test_cleanup_keeps_in_progress_jobs(self, kb_manager):
+        """Test that in-progress jobs are not removed."""
+        # Add an in-progress job
+        progress = KBPrefetchProgress(
+            job_id="active_job_123",
+            module_id="test-module",
+            total_segments=10,
+            completed=5,
+            status="in_progress",
+        )
+        task = MagicMock()
+        kb_manager._jobs["active_job_123"] = (task, progress)
+
+        # Clean up
+        removed = kb_manager.cleanup_completed_jobs(max_age_seconds=0)
+
+        assert removed == 0
+        assert "active_job_123" in kb_manager._jobs
+
+
+class TestGetAllJobs:
+    """Tests for get_all_jobs."""
+
+    @pytest.mark.asyncio
+    async def test_get_all_jobs_empty(self, kb_manager):
+        """Test getting jobs when none exist."""
+        jobs = kb_manager.get_all_jobs()
+        assert jobs == []
+
+    @pytest.mark.asyncio
+    async def test_get_all_jobs_returns_all(self, kb_manager):
+        """Test getting all jobs."""
+        # Add some jobs
+        for i in range(3):
+            progress = KBPrefetchProgress(
+                job_id=f"job_{i}",
+                module_id="test-module",
+                total_segments=10,
+                status="in_progress",
+            )
+            task = MagicMock()
+            kb_manager._jobs[f"job_{i}"] = (task, progress)
+
+        jobs = kb_manager.get_all_jobs()
+        assert len(jobs) == 3
+
+
+class TestCancelJob:
+    """Tests for job cancellation."""
+
+    @pytest.mark.asyncio
+    async def test_cancel_nonexistent_job(self, kb_manager):
+        """Test cancelling a job that doesn't exist."""
+        result = await kb_manager.cancel("nonexistent")
+        assert result is False
+
+    @pytest.mark.asyncio
+    async def test_cancel_existing_job(self, kb_manager):
+        """Test cancelling an existing job."""
+        # Add a job
+        progress = KBPrefetchProgress(
+            job_id="job_to_cancel",
+            module_id="test-module",
+            total_segments=10,
+            status="in_progress",
+        )
+        task = MagicMock()
+        kb_manager._jobs["job_to_cancel"] = (task, progress)
+
+        result = await kb_manager.cancel("job_to_cancel")
+
+        assert result is True
+        assert progress.status == "cancelled"
+        task.cancel.assert_called_once()
+
+
+# =============================================================================
+# FEEDBACK AUDIO GENERATION TESTS
+# =============================================================================
+
+
+class TestGenerateFeedbackAudio:
+    """Tests for generate_feedback_audio."""
+
+    @pytest.mark.asyncio
+    async def test_generate_feedback_creates_files(self, tmp_kb_dir, mock_resource_pool):
+        """Test that feedback audio files are created."""
+        # Set up mock to return audio data
+        mock_resource_pool.generate_with_priority = AsyncMock(
+            return_value=(b"RIFF" + b"\x00" * 100, 24000, 1.0)
+        )
+
+        manager = KBAudioManager(str(tmp_kb_dir), mock_resource_pool)
+        await manager.initialize()
+
+        await manager.generate_feedback_audio()
+
+        feedback_dir = tmp_kb_dir / "feedback"
+        assert (feedback_dir / "correct.wav").exists()
+        assert (feedback_dir / "incorrect.wav").exists()
+
+    @pytest.mark.asyncio
+    async def test_generate_feedback_skips_existing(self, tmp_kb_dir, mock_resource_pool):
+        """Test that existing feedback files are not regenerated."""
+        # Create existing feedback files
+        feedback_dir = tmp_kb_dir / "feedback"
+        feedback_dir.mkdir(parents=True)
+        (feedback_dir / "correct.wav").write_bytes(b"existing")
+        (feedback_dir / "incorrect.wav").write_bytes(b"existing")
+
+        mock_resource_pool.generate_with_priority = AsyncMock(
+            return_value=(b"RIFF" + b"\x00" * 100, 24000, 1.0)
+        )
+
+        manager = KBAudioManager(str(tmp_kb_dir), mock_resource_pool)
+        await manager.initialize()
+
+        await manager.generate_feedback_audio()
+
+        # Verify files weren't overwritten
+        assert (feedback_dir / "correct.wav").read_bytes() == b"existing"
+        # And TTS was never called
+        mock_resource_pool.generate_with_priority.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_generate_feedback_handles_errors(self, tmp_kb_dir, mock_resource_pool):
+        """Test that errors during feedback generation are handled."""
+        mock_resource_pool.generate_with_priority = AsyncMock(
+            side_effect=Exception("TTS error")
+        )
+
+        manager = KBAudioManager(str(tmp_kb_dir), mock_resource_pool)
+        await manager.initialize()
+
+        # Should not raise
+        await manager.generate_feedback_audio()
+
+        # Files should not exist
+        feedback_dir = tmp_kb_dir / "feedback"
+        assert not (feedback_dir / "correct.wav").exists()

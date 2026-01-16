@@ -15,7 +15,6 @@ Modules are server-controlled:
 import asyncio
 import json
 import logging
-import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -78,9 +77,11 @@ def get_module_content_path(module_id: str) -> Path:
         result_path = (modules_resolved / f"{module_id}.json").resolve()
 
     # Path containment check - ensure result stays within modules directory
-    # This is the canonical pattern CodeQL recognizes for path traversal prevention
-    if not str(result_path).startswith(str(modules_resolved) + os.sep):
-        raise ValueError(f"Invalid module path for: {module_id}")
+    # Use relative_to() which is the secure way to verify path containment
+    try:
+        result_path.relative_to(modules_resolved)
+    except ValueError:
+        raise ValueError("Invalid module path")
 
     return result_path
 
@@ -225,9 +226,9 @@ async def handle_list_modules(request: web.Request) -> web.Response:
             "server_version": registry.get("version", "1.0.0"),
         })
 
-    except Exception as e:
+    except Exception:
         logger.exception("Error listing modules")
-        return web.json_response({"error": str(e)}, status=500)
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 async def handle_get_module(request: web.Request) -> web.Response:
@@ -305,9 +306,9 @@ async def handle_get_module(request: web.Request) -> web.Response:
 
         return web.json_response(response)
 
-    except Exception as e:
-        logger.exception(f"Error getting module {module_id}")
-        return web.json_response({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error getting module")
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 async def handle_download_module(request: web.Request) -> web.Response:
@@ -381,9 +382,9 @@ async def handle_download_module(request: web.Request) -> web.Response:
         logger.info(f"Module downloaded: {module_id} ({total_questions} questions)")
         return web.json_response(response)
 
-    except Exception as e:
-        logger.exception(f"Error downloading module {module_id}")
-        return web.json_response({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error downloading module")
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 # Admin endpoints for managing modules
@@ -461,9 +462,9 @@ async def handle_create_module(request: web.Request) -> web.Response:
 
     except json.JSONDecodeError:
         return web.json_response({"error": "Invalid JSON"}, status=400)
-    except Exception as e:
+    except Exception:
         logger.exception("Error creating module")
-        return web.json_response({"error": str(e)}, status=500)
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 async def handle_delete_module(request: web.Request) -> web.Response:
@@ -503,9 +504,9 @@ async def handle_delete_module(request: web.Request) -> web.Response:
         logger.info(f"Deleted module: {module_id}")
         return web.json_response({"success": True, "module_id": module_id})
 
-    except Exception as e:
-        logger.exception(f"Error deleting module {module_id}")
-        return web.json_response({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error deleting module")
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 async def handle_update_module_settings(request: web.Request) -> web.Response:
@@ -615,9 +616,9 @@ async def handle_update_module_settings(request: web.Request) -> web.Response:
 
     except json.JSONDecodeError:
         return web.json_response({"error": "Invalid JSON"}, status=400)
-    except Exception as e:
-        logger.exception(f"Error updating module settings for {module_id}")
-        return web.json_response({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error updating module settings")
+        return web.json_response({"error": "Internal server error"}, status=500)
 
 
 def register_modules_routes(app: web.Application):

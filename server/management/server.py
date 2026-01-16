@@ -137,6 +137,9 @@ def validate_path_in_directory(file_path: Path, base_directory: Path) -> Path:
     This prevents path traversal attacks where attackers use '../' sequences
     to access files outside the intended directory.
 
+    Uses CodeQL-recognized patterns (resolve + startswith) for automated security
+    verification, plus relative_to() for defense in depth.
+
     Args:
         file_path: The path to validate (may contain user input)
         base_directory: The directory the file must be within
@@ -149,17 +152,27 @@ def validate_path_in_directory(file_path: Path, base_directory: Path) -> Path:
     """
     # Resolve both paths to absolute paths, following symlinks
     resolved_base = base_directory.resolve()
-    # CodeQL: This line is part of the path validation itself; file_path is validated
-    # by the subsequent relative_to() check which raises ValueError if path escapes
-    resolved_path = (base_directory / file_path).resolve()  # lgtm[py/path-injection]
+    # Resolve the combined path to check for traversal attempts
+    resolved_path = (base_directory / file_path).resolve()
 
-    # Check if the resolved path is within the base directory
+    # CodeQL-recognized pattern: str().startswith() after resolve()
+    # This pattern is explicitly recognized by CodeQL as a path sanitizer
+    # Include os.sep to prevent /var/uploads matching /var/uploads_backup
+    base_str = str(resolved_base)
+    if not base_str.endswith(os.sep):
+        base_str = base_str + os.sep
+    if not str(resolved_path).startswith(base_str) and resolved_path != resolved_base:
+        raise ValueError("Invalid path: path escapes base directory")
+
+    # Defense in depth: also use relative_to() which raises if path escapes
     try:
-        resolved_path.relative_to(resolved_base)
+        relative_part = resolved_path.relative_to(resolved_base)
     except ValueError:
-        raise ValueError(f"Invalid path: path escapes base directory")
+        raise ValueError("Invalid path: path escapes base directory")
 
-    return resolved_path
+    # Return a newly constructed path from the base and validated relative part
+    # This breaks the taint chain by building from trusted components
+    return resolved_base / relative_part
 
 
 def sanitize_path_segment(segment: str) -> str:
@@ -2860,12 +2873,13 @@ async def handle_unarchive_curriculum(request: web.Request) -> web.Response:
             return web.json_response({"error": "Invalid file name"}, status=400)
 
         # archived_path was validated by validate_path_in_directory above
-        if not archived_path.exists():  # lgtm[py/path-injection]
+        if not archived_path.exists():
             return web.json_response({"error": "Archived curriculum not found"}, status=404)
 
         # Move back to active directory
+        # Use validated filename from archived_path, not original user input
         active_dir = PROJECT_ROOT / "curriculum" / "examples" / "realistic"
-        active_path = active_dir / file_name
+        active_path = active_dir / archived_path.name
 
         # Handle name conflicts
         counter = 1
@@ -2875,7 +2889,7 @@ async def handle_unarchive_curriculum(request: web.Request) -> web.Response:
 
         import shutil
         # Path validated above via validate_path_in_directory
-        shutil.move(str(archived_path), str(active_path))  # lgtm[py/path-injection]
+        shutil.move(str(archived_path), str(active_path))
         logger.info(f"Unarchived curriculum: {archived_path} -> {active_path}")
 
         # Reload the curriculum
@@ -2924,12 +2938,11 @@ async def handle_delete_archived_curriculum(request: web.Request) -> web.Respons
             return web.json_response({"error": "Invalid file name"}, status=400)
 
         # archived_path was validated by validate_path_in_directory above
-        if not archived_path.exists():  # lgtm[py/path-injection]
+        if not archived_path.exists():
             return web.json_response({"error": "Archived curriculum not found"}, status=404)
 
         # Read info for response (path validated above)
-        with open(archived_path, 'r', encoding='utf-8') as f:  # lgtm[py/path-injection]
-            umcf = json.load(f)
+        with open(archived_path, 'r', encoding='utf-8') as f:            umcf = json.load(f)
         curriculum_id = umcf.get("id", {}).get("value", archived_path.stem)
         title = umcf.get("title", "Untitled")
 
@@ -2945,7 +2958,7 @@ async def handle_delete_archived_curriculum(request: web.Request) -> web.Respons
             })
 
         # Delete the file (path validated above)
-        archived_path.unlink()  # lgtm[py/path-injection]
+        archived_path.unlink()
         logger.info(f"Permanently deleted archived curriculum: {archived_path}")
 
         return web.json_response({
@@ -2979,8 +2992,7 @@ async def handle_save_curriculum(request: web.Request) -> web.Response:
             file_path = PROJECT_ROOT / "curriculum" / "examples" / "realistic" / f"{safe_name}.umcf"
 
         # Write the file (path is either trusted or sanitized above)
-        with open(file_path, 'w', encoding='utf-8') as f:  # lgtm[py/path-injection]
-            json.dump(data, f, indent=2)
+        with open(file_path, 'w', encoding='utf-8') as f:            json.dump(data, f, indent=2)
 
         # Reload the curriculum
         state._load_curriculum_file(file_path)
@@ -3069,12 +3081,12 @@ async def handle_import_curriculum(request: web.Request) -> web.Response:
 
         # Handle duplicate filenames (safe_name sanitized above)
         counter = 1
-        while file_path.exists():  # lgtm[py/path-injection]
+        while file_path.exists():
             file_path = curriculum_dir / f"{safe_name}-{counter}.umcf"
             counter += 1
 
         # Write the file (path uses sanitized safe_name)
-        with open(file_path, 'w', encoding='utf-8') as f:  # lgtm[py/path-injection]
+        with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(umcf_data, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Saved imported curriculum to: {file_path}")
@@ -3155,15 +3167,13 @@ async def handle_upload_visual_asset(request: web.Request) -> web.Response:
 
         # Create assets directory if needed (IDs sanitized above)
         assets_dir = PROJECT_ROOT / "curriculum" / "assets" / safe_curriculum_id / safe_topic_id
-        assets_dir.mkdir(parents=True, exist_ok=True)  # lgtm[py/path-injection]
-
+        assets_dir.mkdir(parents=True, exist_ok=True)
         # Generate unique asset ID
         asset_id = f"img-{int(time.time() * 1000)}"
         local_path = assets_dir / f"{asset_id}{ext}"
 
         # Save the file (path uses sanitized segments)
-        with open(local_path, "wb") as f:  # lgtm[py/path-injection]
-            f.write(file_data)
+        with open(local_path, "wb") as f:            f.write(file_data)
 
         logger.info(f"Saved visual asset: {local_path}")
 

@@ -121,9 +121,16 @@ struct InstanceQuery {
 }
 
 /// Helper to insert CPU and memory metrics into a JSON object
-fn insert_metrics(obj: &mut serde_json::Map<String, serde_json::Value>, cpu: f64, memory_bytes: u64) {
+fn insert_metrics(
+    obj: &mut serde_json::Map<String, serde_json::Value>,
+    cpu: f64,
+    memory_bytes: u64,
+) {
     obj.insert("cpu_percent".to_string(), serde_json::json!(cpu));
-    obj.insert("memory_mb".to_string(), serde_json::json!(memory_bytes / (1024 * 1024)));
+    obj.insert(
+        "memory_mb".to_string(),
+        serde_json::json!(memory_bytes / (1024 * 1024)),
+    );
 }
 
 async fn list_instances(
@@ -172,7 +179,7 @@ async fn list_instances(
                 Err(e) => {
                     tracing::warn!("Failed to serialize instance {}: {}", instance.id, e);
                     serde_json::json!({})
-                }
+                },
             };
             // Add metrics for running instances - try by port first (more reliable), then by PID
             if instance.status == ServiceStatus::Running {

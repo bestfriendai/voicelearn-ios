@@ -838,6 +838,197 @@ knowledge-bowl-curriculum/
 
 ---
 
+## Audio and Storage Management
+
+### Audio Format Specification
+
+**Standard Format: Opus 32 kbps**
+
+All pre-generated question audio uses Opus codec at 32 kbps. This provides:
+- Excellent speech quality (equivalent to AAC 64 kbps or MP3 128 kbps)
+- Minimal storage footprint (~4 KB/second)
+- Native support on iOS (11+) and Android
+- Royalty-free licensing
+
+| Content Type | Avg Duration | Size per Item | 1,000 Items |
+|--------------|--------------|---------------|-------------|
+| Question audio | ~15 sec | ~60 KB | ~60 MB |
+| Answer audio | ~3 sec | ~12 KB | ~12 MB |
+| Feedback audio | ~8 sec | ~32 KB | ~32 MB |
+| **Total per question set** | | | **~104 MB** |
+
+### Storage Budget
+
+| Component | Size | Notes |
+|-----------|------|-------|
+| JSON question data | ~1 MB | 1,000 questions with metadata |
+| Question audio (Opus 32k) | ~60 MB | Pre-generated TTS |
+| Answer/feedback audio | ~44 MB | Optional, can stream |
+| **Recommended bundle** | **~105 MB** | Full offline capability |
+
+### Smart Content Unloading
+
+Users can manage storage through intelligent content lifecycle:
+
+#### Mastery-Based Unloading
+
+Questions with high mastery scores can be unloaded to free storage:
+
+```
+Mastery Level    Unload Eligible    Reload Priority
+─────────────────────────────────────────────────────
+< 70%            Never              N/A
+70-85%           After 30 days      High
+85-95%           After 14 days      Medium
+> 95%            After 7 days       Low (spaced review)
+```
+
+#### Unloading Strategy
+
+1. **Granular unloading**: Individual questions, not entire domains
+2. **Audio-first**: Remove audio files first, keep JSON (can re-stream)
+3. **Preserve metadata**: Mastery data and history always retained
+4. **Lazy reload**: Audio fetched on-demand when question resurfaces
+5. **Background sync**: Reload during WiFi/charging when approaching review date
+
+#### User Controls
+
+| Setting | Options | Default |
+|---------|---------|---------|
+| Max offline storage | 100MB / 250MB / 500MB / Unlimited | 250 MB |
+| Auto-unload mastered | On / Off | On |
+| Mastery threshold | 85% / 90% / 95% | 90% |
+| Keep recent days | 7 / 14 / 30 | 14 |
+
+#### Storage Reclamation Algorithm
+
+```
+Priority Score for Unloading =
+    (Mastery Level × 0.4) +
+    (Days Since Review × 0.3) +
+    (Days Until Next Review × 0.2) +
+    (File Size Factor × 0.1)
+
+Unload when:
+- Storage > user threshold AND
+- Priority Score > 0.7 AND
+- Content is audio (not JSON metadata)
+```
+
+### Offline Capability
+
+The module is designed for full offline operation:
+
+| Feature | Offline Support | Notes |
+|---------|-----------------|-------|
+| Practice sessions | ✅ Full | All downloaded content |
+| Progress tracking | ✅ Full | Local storage, syncs later |
+| New content | ❌ Requires sync | Background download |
+| Current events | ⚠️ Cached | Weekly refresh recommended |
+| Leaderboards | ❌ Online only | Requires server |
+
+### Audio Generation Pipeline
+
+Pre-generated audio is created server-side and bundled with question packs:
+
+```
+Question JSON → TTS Engine → Opus Encoder → CDN Distribution
+                    ↓
+            [Configurable voice]
+            [Moderator cadence]
+            [Regional variants]
+```
+
+See [TTS Configuration](#tts-configuration) for voice selection and settings.
+
+### TTS Configuration
+
+#### Recommended Voice Settings for Question Audio
+
+**Primary Recommendation: Chatterbox (Self-Hosted)**
+
+Chatterbox is an open-source TTS model from Resemble AI, ideal for bulk question generation:
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| Provider | `chatterbox` | Open source, high quality, tunable |
+| Voice ID | `default` or custom clone | Consistent moderator voice |
+| Speed | `0.95` | Slightly slower for academic content comprehension |
+| Exaggeration | `0.35` | Clear enunciation without being dramatic |
+| CFG Weight | `0.6` | Good consistency across questions |
+| Language | `en` | English (supports 23 languages) |
+
+**Profile Configuration:**
+```json
+{
+  "name": "KB Question Reader",
+  "provider": "chatterbox",
+  "voice_id": "default",
+  "use_case": "questions",
+  "settings": {
+    "speed": 0.95,
+    "exaggeration": 0.35,
+    "cfg_weight": 0.6,
+    "language": "en"
+  }
+}
+```
+
+#### Alternative Providers
+
+| Provider | Quality | Cost | Best For |
+|----------|---------|------|----------|
+| **Chatterbox** | Excellent | Free (self-hosted) | Bulk generation, offline |
+| **VibeVoice** | Very Good | Free (self-hosted) | Fast generation |
+| **Piper** | Good | Free (self-hosted) | Low-resource environments |
+| **ElevenLabs** | Premium | $0.30/1K chars | Voice cloning, premium feel |
+| **Deepgram** | Very Good | $0.015/1K chars | Cloud-based, reliable |
+
+#### Voice Selection Criteria
+
+For Knowledge Bowl question audio, prioritize:
+
+1. **Clarity**: Academic terms, proper nouns, scientific names must be clearly pronounced
+2. **Authority**: Moderator-like delivery, confident but not overbearing
+3. **Consistency**: Same voice across all questions for immersion
+4. **Neutrality**: No emotional bias that could hint at answers
+5. **Pacing**: Allow time for comprehension, especially for complex questions
+
+#### Domain-Specific Pronunciation
+
+Some domains require special attention:
+
+| Domain | Pronunciation Challenges | Solution |
+|--------|-------------------------|----------|
+| Science | Latin species names, chemical formulas | Pronunciation lexicon |
+| Literature | Author names, foreign titles | Per-question overrides |
+| History | Historical figure names, place names | Pronunciation processor |
+| Math | Equations read as words | LaTeX-to-speech preprocessing |
+
+#### Generating Audio
+
+Use the management API to generate audio for a question set:
+
+```bash
+# Start generation job
+curl -X POST http://localhost:8766/api/kb/audio/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "module_id": "knowledge-bowl",
+    "voice_id": "default",
+    "provider": "chatterbox",
+    "speed": 0.95
+  }'
+
+# Check progress
+curl http://localhost:8766/api/kb/audio/jobs/{job_id}
+
+# Get coverage status
+curl http://localhost:8766/api/kb/audio/coverage/knowledge-bowl
+```
+
+---
+
 ## Success Metrics
 
 | Metric | Target | Measurement |

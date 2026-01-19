@@ -686,13 +686,40 @@ Comprehensive adaptive learning for the Digital SAT (2024+ format):
 
 ### Knowledge Bowl Module
 
-Multi-subject mastery for academic quiz bowl competitions:
+**Status:** Phase 1 Complete, Phase 2 In Progress
 
-- **12+ Subject Domains** (Science, Math, Literature, History, Arts, Current Events)
-- **Speed-Based Recall Training** (sub-3-second response targets)
-- **Dynamic Content Pipeline** for yearly topic updates
-- **Competition Simulation** with buzzer mechanics
-- **Team Coordination Training** for collaborative answering
+Multi-subject mastery for academic quiz bowl competitions with **on-device first architecture**:
+
+**Core Features (Implemented):**
+- **12+ Subject Domains** (Science, Math, Literature, History, Arts, Current Events, Pop Culture)
+- **Written Round Practice** with MCQ training and instant feedback
+- **Oral Round Practice** with on-device TTS/STT and conference timer simulation
+- **Regional Compliance** (Colorado, Minnesota, Washington) with rule-specific validation
+- **50+ Sample Questions** bundled, with expandable question bank architecture
+
+**Advanced Answer Validation (3-Tier System):**
+- **Tier 1 (All devices, 85-90% accuracy):** Enhanced algorithms including:
+  - Levenshtein fuzzy matching
+  - Double Metaphone phonetic matching
+  - N-gram similarity (character + word)
+  - Token-based similarity (Jaccard + Dice)
+  - Domain-specific synonyms (~650 entries)
+  - Linguistic matching (Apple NL framework)
+- **Tier 2 (iPhone XS+, 92-95% accuracy):** Semantic embeddings via all-MiniLM-L6-v2 (80MB optional)
+- **Tier 3 (iPhone 12+, 95-98% accuracy):** Open-source LLM (Llama 3.2 1B, 1.5GB, admin-controlled)
+
+**Architecture Highlights:**
+- **On-device:** All practice sessions, answer validation, progress tracking, audio playback
+- **Server role:** Question delivery, team coordination, statistics aggregation, configuration
+- **Offline capable:** Full practice sessions work without internet
+- **Storage optimization:** Smart content unloading based on mastery (105MB per 1,000 questions)
+
+**In Progress:**
+- Team coordination for geographically distributed practice
+- WebSocket-based real-time session synchronization
+- Team statistics and leaderboards
+
+See [KNOWLEDGE_BOWL_ARCHITECTURE.md](../modules/KNOWLEDGE_BOWL_ARCHITECTURE.md) for complete architecture details.
 
 ### Future Module Candidates
 

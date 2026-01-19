@@ -45,7 +45,7 @@ pub trait ProcessMonitor: Send + Sync {
         &self,
         command: &str,
         working_dir: Option<&Path>,
-        port: Option<u16>,
+        _port: Option<u16>,
     ) -> Result<u32> {
         // Default implementation just calls start_process
         self.start_process(command, working_dir)

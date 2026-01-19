@@ -41,7 +41,12 @@ pub trait ProcessMonitor: Send + Sync {
     ///
     /// For services managed by system tools (brew services, systemd, etc.),
     /// the port is used to find the PID after starting if the wrapper fails.
-    fn start_process_with_port(&self, command: &str, working_dir: Option<&Path>, port: Option<u16>) -> Result<u32> {
+    fn start_process_with_port(
+        &self,
+        command: &str,
+        working_dir: Option<&Path>,
+        port: Option<u16>,
+    ) -> Result<u32> {
         // Default implementation just calls start_process
         self.start_process(command, working_dir)
     }

@@ -111,7 +111,12 @@ impl ProcessMonitor for MacOSMonitor {
     /// For services managed by system tools (brew services, systemd, etc.) or
     /// already-running services, we can't capture the PID via wrapper script.
     /// If a port is provided, we'll try to find the PID by port after starting.
-    fn start_process_with_port(&self, command: &str, working_dir: Option<&Path>, port: Option<u16>) -> Result<u32> {
+    fn start_process_with_port(
+        &self,
+        command: &str,
+        working_dir: Option<&Path>,
+        port: Option<u16>,
+    ) -> Result<u32> {
         debug!(command = %command, working_dir = ?working_dir, port = ?port, "Starting process");
 
         // Create temp file to capture the actual service PID
@@ -136,14 +141,23 @@ impl ProcessMonitor for MacOSMonitor {
 
         // Set PATH to include Homebrew binaries and user local bin (for node, pnpm, uv, etc.)
         let home = std::env::var("HOME").unwrap_or_else(|_| "/Users/ramerman".to_string());
-        let path = format!("{}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin", home);
+        let path = format!(
+            "{}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+            home
+        );
         cmd.env("PATH", &path);
 
         // Capture stdout/stderr to temp files for debugging
-        let stdout_file = std::env::temp_dir().join(format!("usm-{}-stdout.log", std::process::id()));
-        let stderr_file = std::env::temp_dir().join(format!("usm-{}-stderr.log", std::process::id()));
-        cmd.stdout(std::process::Stdio::from(std::fs::File::create(&stdout_file)?));
-        cmd.stderr(std::process::Stdio::from(std::fs::File::create(&stderr_file)?));
+        let stdout_file =
+            std::env::temp_dir().join(format!("usm-{}-stdout.log", std::process::id()));
+        let stderr_file =
+            std::env::temp_dir().join(format!("usm-{}-stderr.log", std::process::id()));
+        cmd.stdout(std::process::Stdio::from(std::fs::File::create(
+            &stdout_file,
+        )?));
+        cmd.stderr(std::process::Stdio::from(std::fs::File::create(
+            &stderr_file,
+        )?));
 
         // Spawn the wrapper (it will wait in background)
         let mut _child = cmd.spawn()?;
@@ -161,7 +175,7 @@ impl ProcessMonitor for MacOSMonitor {
                         Err(e) => {
                             warn!("Failed to parse PID: {}", e);
                             0 // Will trigger fallback
-                        }
+                        },
                     }
                 },
                 Err(e) => {
@@ -187,10 +201,17 @@ impl ProcessMonitor for MacOSMonitor {
         // Fallback: If we have a port and the PID didn't work, try to find by port
         // This handles brew services, systemd, and already-running services
         if let Some(port) = port {
-            debug!(port = port, "PID tracking failed, trying to find process by port");
+            debug!(
+                port = port,
+                "PID tracking failed, trying to find process by port"
+            );
             if let Some(pid) = self.find_pid_by_port(port) {
                 if self.is_running(pid) {
-                    info!(pid = pid, port = port, "Found already-running service by port");
+                    info!(
+                        pid = pid,
+                        port = port,
+                        "Found already-running service by port"
+                    );
                     return Ok(pid);
                 }
             }

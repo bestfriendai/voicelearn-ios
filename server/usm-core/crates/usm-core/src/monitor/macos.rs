@@ -158,7 +158,9 @@ impl ProcessMonitor for MacOSMonitor {
         };
 
         // Verify process is actually running
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        // Wait 3 seconds to allow services like pnpm/node to fully initialize
+        // (measured at ~921ms for pnpm dev, so 3s provides safe margin)
+        std::thread::sleep(std::time::Duration::from_millis(3000));
         if !self.is_running(pid) {
             anyhow::bail!("Process {} started but immediately died", pid);
         }

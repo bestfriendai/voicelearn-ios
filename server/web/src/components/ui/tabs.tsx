@@ -1,25 +1,39 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TabsContextValue {
   value: string;
-  onValueChange?: (value: string) => void;
+  onValueChange: (value: string) => void;
 }
 
-const TabsContext = createContext<TabsContextValue>({ value: '' });
+const TabsContext = createContext<TabsContextValue>({ value: '', onValueChange: () => {} });
 
 interface TabsProps {
-  value: string;
+  value?: string;
+  defaultValue?: string;
   onValueChange?: (value: string) => void;
   children: React.ReactNode;
   className?: string;
 }
 
-export function Tabs({ value, onValueChange, children, className }: TabsProps) {
+export function Tabs({ value, defaultValue, onValueChange, children, className }: TabsProps) {
+  // Support both controlled (value/onValueChange) and uncontrolled (defaultValue) modes
+  const [internalValue, setInternalValue] = useState(defaultValue || '');
+
+  const isControlled = value !== undefined;
+  const currentValue = isControlled ? value : internalValue;
+
+  const handleValueChange = (newValue: string) => {
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
+    onValueChange?.(newValue);
+  };
+
   return (
-    <TabsContext.Provider value={{ value, onValueChange }}>
+    <TabsContext.Provider value={{ value: currentValue, onValueChange: handleValueChange }}>
       <div className={className}>{children}</div>
     </TabsContext.Provider>
   );

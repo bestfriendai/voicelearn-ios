@@ -1,6 +1,6 @@
 //! Complete Pocket TTS Model
 //!
-//! Combines FlowLM transformer, MLP sampler, and Mimi decoder
+//! Combines FlowLM transformer (with FlowNet) and Mimi decoder
 //! into a complete text-to-speech pipeline.
 //!
 //! Portions of this file derived from:
@@ -16,14 +16,12 @@ use super::flowlm::{FlowLM, FlowLMConfig};
 use super::mimi::{MimiConfig, MimiDecoder};
 use crate::config::TTSConfig;
 use crate::modules::embeddings::{VoiceBank, VoiceEmbedding};
-use crate::modules::mlp::MLPSampler;
 use crate::tokenizer::PocketTokenizer;
 use crate::error::PocketTTSError;
 
 /// Complete Pocket TTS Model
 pub struct PocketTTSModel {
     flowlm: FlowLM,
-    sampler: MLPSampler,
     mimi: MimiDecoder,
     tokenizer: PocketTokenizer,
     voice_bank: VoiceBank,
@@ -46,8 +44,8 @@ impl PocketTTSModel {
                 .map_err(|e| PocketTTSError::ModelLoadFailed(e.to_string()))?
         };
 
-        // Load tokenizer (JSON vocab format)
-        let tokenizer_path = model_dir.join("tokenizer.json");
+        // Load tokenizer (SentencePiece .model format)
+        let tokenizer_path = model_dir.join("tokenizer.model");
         let tokenizer = PocketTokenizer::from_file(&tokenizer_path)?;
 
         // Load voice embeddings
@@ -57,16 +55,8 @@ impl PocketTTSModel {
 
         // Initialize model components
         let flowlm_config = FlowLMConfig::default();
-        let flowlm = FlowLM::new(flowlm_config.clone(), vb.pp("flowlm"), device)
+        let flowlm = FlowLM::new(flowlm_config.clone(), vb.pp("flow_lm"), device)
             .map_err(|e| PocketTTSError::ModelLoadFailed(format!("FlowLM: {}", e)))?;
-
-        let sampler = MLPSampler::new(
-            flowlm_config.latent_dim,
-            512,
-            flowlm_config.latent_dim,
-            4,
-            vb.pp("sampler"),
-        ).map_err(|e| PocketTTSError::ModelLoadFailed(format!("Sampler: {}", e)))?;
 
         let mimi_config = MimiConfig {
             latent_dim: flowlm_config.latent_dim,
@@ -77,7 +67,6 @@ impl PocketTTSModel {
 
         Ok(Self {
             flowlm,
-            sampler,
             mimi,
             tokenizer,
             voice_bank,
@@ -106,8 +95,11 @@ impl PocketTTSModel {
 
     /// Synthesize text to audio
     pub fn synthesize(&mut self, text: &str) -> std::result::Result<Vec<f32>, PocketTTSError> {
+        eprintln!("[PocketTTS] synthesize called with text len: {}", text.len());
+
         // Tokenize text
         let token_ids = self.tokenizer.encode(text)?;
+        eprintln!("[PocketTTS] tokenized to {} tokens: {:?}", token_ids.len(), token_ids);
 
         // Create tensor
         let token_tensor = Tensor::from_vec(
@@ -115,6 +107,7 @@ impl PocketTTSModel {
             (1, token_ids.len()),
             &self.device,
         ).map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?;
+        eprintln!("[PocketTTS] token tensor shape: {:?}", token_tensor.dims());
 
         // Get voice embedding
         let voice = if let Some(ref custom) = self.custom_voice {
@@ -122,30 +115,53 @@ impl PocketTTSModel {
         } else {
             self.voice_bank.get(self.config.voice_index as usize)
         };
+        eprintln!("[PocketTTS] voice embedding loaded: {}", voice.is_some());
 
         // Reset caches for new sequence
         self.flowlm.reset_cache();
 
-        // Generate latents with FlowLM
-        let latents = self.flowlm.forward(&token_tensor, voice, false)
-            .map_err(|e| PocketTTSError::InferenceFailed(format!("FlowLM: {}", e)))?;
-
-        // Apply consistency sampling
-        let sampled = self.sampler.sample(
-            &latents,
+        // Generate latents with FlowLM + FlowNet
+        // Reference implementation uses lsd_decode_steps = 1 (consistency model)
+        // Single step is sufficient as the model is trained with consistency distillation
+        let num_flow_steps = 1;
+        eprintln!("[PocketTTS] generating latents with {} flow step (consistency model)", num_flow_steps);
+        let latents = self.flowlm.generate_latents(
+            &token_tensor,
+            voice,
+            num_flow_steps,
             self.config.temperature,
-            self.config.top_p,
-        ).map_err(|e| PocketTTSError::InferenceFailed(format!("Sampler: {}", e)))?;
+        ).map_err(|e| PocketTTSError::InferenceFailed(format!("FlowLM: {}", e)))?;
+        eprintln!("[PocketTTS] latents shape: {:?}", latents.dims());
+
+        // DIAGNOSTIC: Log latent statistics to verify FlowLM output quality
+        let latents_flat: Vec<f32> = latents.flatten_all()
+            .map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?
+            .to_vec1()
+            .map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?;
+        let lat_mean = latents_flat.iter().sum::<f32>() / latents_flat.len() as f32;
+        let lat_max = latents_flat.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+        let lat_min = latents_flat.iter().cloned().fold(f32::INFINITY, f32::min);
+        let lat_std = (latents_flat.iter().map(|x| (x - lat_mean).powi(2)).sum::<f32>() / latents_flat.len() as f32).sqrt();
+        eprintln!("[PocketTTS] latent stats: mean={:.4}, std={:.4}, min={:.4}, max={:.4}", lat_mean, lat_std, lat_min, lat_max);
 
         // Decode to audio
-        let audio = self.mimi.forward(&sampled)
+        eprintln!("[PocketTTS] decoding with Mimi...");
+        let audio = self.mimi.forward(&latents)
             .map_err(|e| PocketTTSError::InferenceFailed(format!("Mimi: {}", e)))?;
+        eprintln!("[PocketTTS] audio tensor shape: {:?}", audio.dims());
 
         // Convert to Vec<f32>
         let audio = audio.squeeze(0)
             .map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?;
         let audio_vec: Vec<f32> = audio.to_vec1()
             .map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?;
+
+        // Debug: check amplitude to verify audio has signal
+        let audio_max = audio_vec.iter().map(|s| s.abs()).fold(0.0f32, f32::max);
+        let audio_mean = audio_vec.iter().map(|s| s.abs()).sum::<f32>() / audio_vec.len() as f32;
+        eprintln!("[PocketTTS] final audio samples: {} (expect ~78720 for test phrase)", audio_vec.len());
+        eprintln!("[PocketTTS] audio max amplitude: {:.4} (expect > 0.01)", audio_max);
+        eprintln!("[PocketTTS] audio mean amplitude: {:.4}", audio_mean);
 
         Ok(audio_vec)
     }
@@ -176,6 +192,7 @@ impl PocketTTSModel {
         let chunk_size = 32; // tokens per chunk
         let overlap_samples = (self.mimi.sample_rate() as f32 * 0.05) as usize; // 50ms overlap
         let mut previous_tail: Option<Tensor> = None;
+        let num_flow_steps = self.config.consistency_steps.max(1) as usize;
 
         for (i, chunk) in token_ids.chunks(chunk_size).enumerate() {
             let is_last = i == (token_ids.len() / chunk_size);
@@ -187,20 +204,17 @@ impl PocketTTSModel {
                 &self.device,
             ).map_err(|e| PocketTTSError::InferenceFailed(e.to_string()))?;
 
-            // Generate latents (use cache for efficiency)
-            let latents = self.flowlm.forward(&token_tensor, voice, true)
-                .map_err(|e| PocketTTSError::InferenceFailed(format!("FlowLM: {}", e)))?;
-
-            // Sample
-            let sampled = self.sampler.sample(
-                &latents,
+            // Generate latents with FlowLM + FlowNet
+            let latents = self.flowlm.generate_latents(
+                &token_tensor,
+                voice,
+                num_flow_steps,
                 self.config.temperature,
-                self.config.top_p,
-            ).map_err(|e| PocketTTSError::InferenceFailed(format!("Sampler: {}", e)))?;
+            ).map_err(|e| PocketTTSError::InferenceFailed(format!("FlowLM: {}", e)))?;
 
             // Decode with overlap-add
             let (audio, tail) = self.mimi.decode_streaming(
-                &sampled,
+                &latents,
                 overlap_samples,
                 previous_tail.as_ref(),
             ).map_err(|e| PocketTTSError::InferenceFailed(format!("Mimi: {}", e)))?;

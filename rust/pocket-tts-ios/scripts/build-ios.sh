@@ -55,6 +55,11 @@ framework module PocketTTS {
     export *
     module * { export * }
 }
+
+module pocket_tts_iosFFI {
+    header "pocket_tts_iosFFI.h"
+    export *
+}
 EOF
 
 # Create umbrella header

@@ -7,6 +7,15 @@
 use candle_core::{Result, Tensor};
 use candle_nn::{Conv1d as CandleConv1d, Conv1dConfig, ConvTranspose1d as CandleConvTranspose1d, ConvTranspose1dConfig, Module, VarBuilder};
 
+/// Apply ELU activation function with alpha=1.0
+/// ELU(x) = x if x > 0 else alpha * (exp(x) - 1)
+/// Python SEANet uses nn.ELU(alpha=1.0), NOT GELU
+fn elu(x: &Tensor) -> Result<Tensor> {
+    // Use candle's elu method if available, otherwise implement manually
+    // Candle's elu takes (tensor, alpha) - we use alpha=1.0 to match Python
+    x.elu(1.0)
+}
+
 /// 1D Convolution wrapper
 #[derive(Debug)]
 pub struct Conv1d {
@@ -196,8 +205,8 @@ impl Module for SEANetDecoderBlock {
     fn forward(&self, x: &Tensor) -> Result<Tensor> {
         let h = self.upsample.forward(x)?;
         let h = self.conv1.forward(&h)?;
-        let h = h.gelu_erf()?;
+        let h = elu(&h)?;  // Python SEANet uses ELU, not GELU
         let h = self.conv2.forward(&h)?;
-        h.gelu_erf()
+        elu(&h)  // Python SEANet uses ELU, not GELU
     }
 }

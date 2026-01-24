@@ -508,9 +508,9 @@ export default function ModelsPage() {
 
         <TabsContent value="server-llm" className="space-y-6">
           <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Use Case: AI Tutoring & Instruction Following</h3>
+            <h3 className="font-semibold mb-2">Use Case: AI Learning & Instruction Following</h3>
             <p className="text-sm text-muted-foreground">
-              Large language model for interactive tutoring sessions. Must excel at instruction
+              Large language model for interactive learning sessions. Must excel at instruction
               following, reasoning, and domain knowledge (math, science, history, literature).
               Deployed on GPU servers.
             </p>
@@ -524,9 +524,9 @@ export default function ModelsPage() {
 
         <TabsContent value="server-tts" className="space-y-6">
           <div className="bg-muted p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Use Case: Pre-generated Tutoring Audio</h3>
+            <h3 className="font-semibold mb-2">Use Case: Pre-generated Learning Audio</h3>
             <p className="text-sm text-muted-foreground">
-              High-quality text-to-speech for pre-generating tutoring content. Prioritizes
+              High-quality text-to-speech for pre-generating learning content. Prioritizes
               naturalness, expressiveness, and multilingual support. Deployed on GPU servers for
               batch processing.
             </p>

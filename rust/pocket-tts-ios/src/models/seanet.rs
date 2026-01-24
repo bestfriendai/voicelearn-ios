@@ -94,7 +94,7 @@ impl SEANetDecoder {
 
         // Input projection
         let mut x = self.input_conv.forward(&x)?;
-        x = x.gelu_erf()?;
+        x = x.elu(1.0)?;  // Python SEANet uses ELU(alpha=1.0), not GELU
 
         // Upsample through blocks
         for block in &self.blocks {

@@ -527,9 +527,9 @@ export function ModelSelectionPanel() {
 
         <TabsContent value="server-tts" className="space-y-6">
           <div className="bg-slate-800/50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Use Case: Pre-generated Tutoring Audio</h3>
+            <h3 className="font-semibold mb-2">Use Case: Pre-generated Learning Audio</h3>
             <p className="text-sm text-slate-400">
-              High-quality text-to-speech for pre-generating tutoring content. Prioritizes
+              High-quality text-to-speech for pre-generating learning content. Prioritizes
               naturalness, expressiveness, and multilingual support. Deployed on GPU servers for
               batch processing.
             </p>

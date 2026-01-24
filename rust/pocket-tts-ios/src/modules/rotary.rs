@@ -76,22 +76,34 @@ impl RotaryEmbedding {
     }
 
     fn apply_rotary(&self, x: &Tensor, cos: &Tensor, sin: &Tensor) -> Result<Tensor> {
-        let half_dim = self.dim / 2;
-
         // x has shape [batch, seq, heads, head_dim]
-        // Split into two halves along last dimension
-        let x1 = x.narrow(candle_core::D::Minus1, 0, half_dim)?;
-        let x2 = x.narrow(candle_core::D::Minus1, half_dim, half_dim)?;
+        let (batch, seq, heads, head_dim) = x.dims4()?;
+        let half_dim = head_dim / 2;
+
+        // Kyutai Pocket uses INTERLEAVED real/imaginary pairs:
+        // [x0, x1, x2, x3, ...] -> [(x0,x1), (x2,x3), ...] where first is real, second is imaginary
+        // Reshape to [batch, seq, heads, half_dim, 2] to access pairs
+        let x = x.reshape((batch, seq, heads, half_dim, 2))?;
+
+        // Extract real (even indices) and imaginary (odd indices) components
+        let xr = x.narrow(4, 0, 1)?.squeeze(4)?;  // [batch, seq, heads, half_dim]
+        let xi = x.narrow(4, 1, 1)?.squeeze(4)?;  // [batch, seq, heads, half_dim]
 
         // cos/sin have shape [seq, half_dim]
         // Reshape to [1, seq, 1, half_dim] for broadcasting with [batch, seq, heads, half_dim]
         let cos = cos.unsqueeze(0)?.unsqueeze(2)?;
         let sin = sin.unsqueeze(0)?.unsqueeze(2)?;
 
-        // Rotate: [x1, x2] -> [x1*cos - x2*sin, x1*sin + x2*cos]
-        let rotated_x1 = (x1.broadcast_mul(&cos)? - x2.broadcast_mul(&sin)?)?;
-        let rotated_x2 = (x1.broadcast_mul(&sin)? + x2.broadcast_mul(&cos)?)?;
+        // Complex rotation: (xr + i*xi) * (cos + i*sin) = (xr*cos - xi*sin) + i*(xr*sin + xi*cos)
+        let rotated_r = (xr.broadcast_mul(&cos)? - xi.broadcast_mul(&sin)?)?;
+        let rotated_i = (xr.broadcast_mul(&sin)? + xi.broadcast_mul(&cos)?)?;
 
-        Tensor::cat(&[&rotated_x1, &rotated_x2], candle_core::D::Minus1)
+        // Stack back to interleaved format: [(r0,i0), (r1,i1), ...]
+        let rotated_r = rotated_r.unsqueeze(4)?;  // [batch, seq, heads, half_dim, 1]
+        let rotated_i = rotated_i.unsqueeze(4)?;  // [batch, seq, heads, half_dim, 1]
+        let stacked = Tensor::cat(&[&rotated_r, &rotated_i], 4)?;  // [batch, seq, heads, half_dim, 2]
+
+        // Reshape back to [batch, seq, heads, head_dim]
+        stacked.reshape((batch, seq, heads, head_dim))
     }
 }

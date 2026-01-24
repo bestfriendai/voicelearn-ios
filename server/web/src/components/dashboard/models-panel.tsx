@@ -450,7 +450,7 @@ export function ModelsPanel() {
                       <Badge variant="success">Recommended</Badge>
                     </div>
                     <p className="text-sm text-slate-400 mb-3">
-                      Best balance of quality and performance for tutoring. Excellent reasoning and
+                      Best balance of quality and performance for learning. Excellent reasoning and
                       educational capabilities.
                     </p>
                     <div className="flex flex-wrap gap-2 text-xs">
@@ -469,7 +469,7 @@ export function ModelsPanel() {
                       <Badge variant="default">Fast</Badge>
                     </div>
                     <p className="text-sm text-slate-400 mb-3">
-                      Lightweight option for quick responses. Good for simpler tutoring tasks and
+                      Lightweight option for quick responses. Good for simpler learning tasks and
                       lower-end hardware.
                     </p>
                     <div className="flex flex-wrap gap-2 text-xs">
@@ -593,7 +593,7 @@ export function ModelsPanel() {
                     </div>
                     <p className="text-sm text-slate-400 mb-3">
                       Optimized for Apple Silicon. Fast inference with good quality for basic
-                      tutoring and quick responses.
+                      learning and quick responses.
                     </p>
                     <div className="flex flex-wrap gap-2 text-xs">
                       <span className="flex items-center gap-1 px-2 py-1 rounded bg-slate-700/50 text-slate-300">

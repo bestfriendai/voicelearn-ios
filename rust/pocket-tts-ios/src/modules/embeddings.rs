@@ -21,7 +21,20 @@ impl TextEmbedding {
     }
 
     pub fn forward(&self, token_ids: &Tensor) -> Result<Tensor> {
-        self.embedding.forward(token_ids)
+        let result = self.embedding.forward(token_ids)?;
+
+        // Debug: print first few embedding values
+        if let Ok(flat) = result.flatten_all() {
+            if let Ok(vals) = flat.to_vec1::<f32>() {
+                let first8: Vec<f32> = vals.iter().take(8).cloned().collect();
+                let mean: f32 = vals.iter().sum::<f32>() / vals.len() as f32;
+                let std: f32 = (vals.iter().map(|v| (v - mean).powi(2)).sum::<f32>() / vals.len() as f32).sqrt();
+                eprintln!("[TextEmbed] first 8: {:?}", first8);
+                eprintln!("[TextEmbed] mean: {:.6}, std: {:.4}", mean, std);
+            }
+        }
+
+        Ok(result)
     }
 
     pub fn hidden_size(&self) -> usize {
@@ -100,18 +113,18 @@ impl VoiceEmbedding {
         self.voice_dim
     }
 
-    /// Expand embedding to match batch size
-    /// The embedding is [prompt_seq, dim], we need [batch, prompt_seq, dim]
-    pub fn expand_to_seq(&self, batch_size: usize, _seq_len: usize) -> Result<Tensor> {
-        // Voice embedding is [prompt_seq, dim], add batch dimension
-        let expanded = self.embedding.unsqueeze(0)?;
+    /// Expand embedding to match batch size and text sequence length
+    /// The voice embedding is [prompt_seq, dim], we mean-pool it and expand to [batch, text_seq, dim]
+    /// This allows the voice embedding to condition all positions in the text sequence
+    pub fn expand_to_seq(&self, batch_size: usize, seq_len: usize) -> Result<Tensor> {
+        // Mean-pool across the prompt sequence dimension: [prompt_seq, dim] -> [dim]
+        let pooled = self.embedding.mean(0)?;
 
-        // Repeat along batch dimension: [1, prompt_seq, dim] -> [batch, prompt_seq, dim]
-        if batch_size > 1 {
-            expanded.repeat(&[batch_size, 1, 1])
-        } else {
-            Ok(expanded)
-        }
+        // Add batch and sequence dimensions: [dim] -> [1, 1, dim]
+        let expanded = pooled.unsqueeze(0)?.unsqueeze(0)?;
+
+        // Expand to [batch, seq_len, dim] to match text embeddings
+        expanded.expand(&[batch_size, seq_len, self.voice_dim])
     }
 
     /// Get the prompt sequence length (number of audio prompt frames)

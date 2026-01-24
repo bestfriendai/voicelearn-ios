@@ -31,6 +31,32 @@ impl Module for MLP {
     }
 }
 
+/// Simple 2-layer MLP (Kyutai Pocket style)
+/// Uses linear1/linear2 naming with GELU activation
+#[derive(Debug)]
+pub struct SimpleMLP {
+    linear1: Linear,
+    linear2: Linear,
+}
+
+impl SimpleMLP {
+    pub fn new(hidden_size: usize, intermediate_size: usize, vb: VarBuilder) -> Result<Self> {
+        // Kyutai Pocket uses linear1 (up) and linear2 (down) naming - NO BIAS
+        let linear1 = candle_nn::linear_no_bias(hidden_size, intermediate_size, vb.pp("linear1"))?;
+        let linear2 = candle_nn::linear_no_bias(intermediate_size, hidden_size, vb.pp("linear2"))?;
+
+        Ok(Self { linear1, linear2 })
+    }
+}
+
+impl Module for SimpleMLP {
+    fn forward(&self, x: &Tensor) -> Result<Tensor> {
+        let x = self.linear1.forward(x)?;
+        let x = x.gelu_erf()?;
+        self.linear2.forward(&x)
+    }
+}
+
 /// Gated MLP (SwiGLU variant used in modern transformers)
 #[derive(Debug)]
 pub struct GatedMLP {

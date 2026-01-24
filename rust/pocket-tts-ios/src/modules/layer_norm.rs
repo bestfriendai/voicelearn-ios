@@ -50,9 +50,17 @@ pub struct LayerNorm {
 }
 
 impl LayerNorm {
-    pub fn new(hidden_size: usize, eps: f64, bias: bool, vb: VarBuilder) -> Result<Self> {
+    /// Create a LayerNorm with bias (Kyutai Pocket style)
+    pub fn new(hidden_size: usize, eps: f64, vb: VarBuilder) -> Result<Self> {
         let weight = vb.get((hidden_size,), "weight")?;
-        let bias = if bias {
+        let bias = Some(vb.get((hidden_size,), "bias")?);
+        Ok(Self { weight, bias, eps })
+    }
+
+    /// Create a LayerNorm with configurable bias
+    pub fn new_with_bias(hidden_size: usize, eps: f64, has_bias: bool, vb: VarBuilder) -> Result<Self> {
+        let weight = vb.get((hidden_size,), "weight")?;
+        let bias = if has_bias {
             Some(vb.get((hidden_size,), "bias")?)
         } else {
             None

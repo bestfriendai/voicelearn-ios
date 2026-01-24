@@ -9,7 +9,7 @@ repository = "https://github.com/babybirdprd/pocket-tts"
 
 [lib]
 name = "pocket_tts_ios"
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
 # Candle ML framework
@@ -22,6 +22,9 @@ safetensors = "0.4"
 
 # Regex for tokenization (pure Rust, no C deps)
 regex = "1.10"
+
+# SentencePiece tokenization (required for proper subword tokens)
+sentencepiece = "0.12"
 
 # Audio processing
 hound = "3.5"
@@ -56,6 +59,10 @@ streaming = ["tokio"]
 [[bin]]
 name = "uniffi-bindgen"
 path = "src/bin/uniffi_bindgen.rs"
+
+[[bin]]
+name = "test-tts"
+path = "src/bin/test_tts.rs"
 
 [profile.release]
 opt-level = 3

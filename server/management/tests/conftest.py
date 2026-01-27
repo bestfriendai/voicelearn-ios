@@ -33,6 +33,7 @@ IS_CI = os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "t
 # REAL FIXTURES - NO MOCKS ALLOWED
 # =============================================================================
 
+
 @pytest.fixture
 async def real_tts_cache(tmp_path):
     """Real TTSCache with temporary directory.
@@ -91,6 +92,7 @@ async def in_memory_db():
     async with aiosqlite.connect(":memory:") as db:
         db.row_factory = aiosqlite.Row
         yield db
+
 
 # Configure Hypothesis profiles
 settings.register_profile(

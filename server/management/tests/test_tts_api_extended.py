@@ -14,6 +14,7 @@ by test_tts_api.py, specifically targeting:
 - Lines 426-428: Float conversion of exaggeration/cfg_weight in get cache entry
 - Lines 517-556: Prefetch topic with curriculum parsing and segment extraction
 """
+
 import base64
 import pytest
 from unittest.mock import patch  # Only for external services
@@ -34,6 +35,7 @@ import tts_api
 # =============================================================================
 # REAL FIXTURES - NO MOCKS
 # =============================================================================
+
 
 @pytest.fixture
 async def real_tts_cache(tmp_path):
@@ -81,6 +83,7 @@ async def real_app(real_tts_cache, real_resource_pool, real_prefetcher):
 @pytest.fixture
 def make_request(real_app):
     """Create test requests with real app context."""
+
     def _make_request(method="POST", json_data=None, query=None, match_info=None):
         request = make_mocked_request(
             method,
@@ -96,12 +99,16 @@ def make_request(real_app):
 
         # Set JSON body
         if json_data is not None:
+
             async def _json():
                 return json_data
+
             request.json = _json
         else:
+
             async def _json():
                 raise ValueError("No JSON body")
+
             request.json = _json
 
         return request
@@ -123,11 +130,11 @@ def tts_server_responses():
         + b"WAVE"
         + b"fmt "
         + (16).to_bytes(4, "little")  # Subchunk1 size
-        + (1).to_bytes(2, "little")   # Audio format (PCM)
-        + (1).to_bytes(2, "little")   # Num channels
+        + (1).to_bytes(2, "little")  # Audio format (PCM)
+        + (1).to_bytes(2, "little")  # Num channels
         + (24000).to_bytes(4, "little")  # Sample rate
         + (48000).to_bytes(4, "little")  # Byte rate
-        + (2).to_bytes(2, "little")   # Block align
+        + (2).to_bytes(2, "little")  # Block align
         + (16).to_bytes(2, "little")  # Bits per sample
         + b"data"
         + (56).to_bytes(4, "little")  # Subchunk2 size
@@ -151,6 +158,7 @@ mock_request = make_request
 # Tests for Lines 217-220: Resource Pool Stats in Cache Stats Response
 # =============================================================================
 
+
 class TestCacheStatsWithResourcePool:
     """Tests for resource pool statistics in cache stats endpoint."""
 
@@ -162,6 +170,7 @@ class TestCacheStatsWithResourcePool:
 
         assert response.status == 200
         import json
+
         body = json.loads(response.body.decode())
         # Real TTSResourcePool returns different stats structure
         assert "resource_pool" in body
@@ -178,6 +187,7 @@ class TestCacheStatsWithResourcePool:
 
         assert response.status == 200
         import json
+
         body = json.loads(response.body.decode())
         # Should not include resource_pool key when pool is None
         assert "resource_pool" not in body
@@ -189,6 +199,7 @@ class TestCacheStatsWithResourcePool:
         # Add some data to cache to have non-zero stats
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="stats test",
             voice_id="nova",
@@ -202,6 +213,7 @@ class TestCacheStatsWithResourcePool:
 
         assert response.status == 200
         import json
+
         body = json.loads(response.body.decode())
         assert "cache" in body
         # Real cache has these keys
@@ -213,6 +225,7 @@ class TestCacheStatsWithResourcePool:
 # Tests for Lines 426-428: Float Conversion in Get Cache Entry
 # =============================================================================
 
+
 class TestGetCacheEntryFloatConversion:
     """Tests for float parameter conversion in get cache entry endpoint."""
 
@@ -222,6 +235,7 @@ class TestGetCacheEntryFloatConversion:
         # Pre-populate cache with chatterbox entry
         cache = mock_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test chatterbox",
             voice_id="chatterbox_voice",
@@ -234,13 +248,16 @@ class TestGetCacheEntryFloatConversion:
         await cache.put(key, b"chatterbox audio", 24000, 3.0)
 
         # Request with exaggeration as string (from query param)
-        request = mock_request(method="GET", query={
-            "text": "test chatterbox",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "speed": "1.0",
-            "exaggeration": "0.75",
-        })
+        request = mock_request(
+            method="GET",
+            query={
+                "text": "test chatterbox",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "speed": "1.0",
+                "exaggeration": "0.75",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -252,6 +269,7 @@ class TestGetCacheEntryFloatConversion:
         """Test that cfg_weight string is converted to float."""
         cache = mock_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test cfg weight",
             voice_id="chatterbox_voice",
@@ -263,13 +281,16 @@ class TestGetCacheEntryFloatConversion:
         )
         await cache.put(key, b"cfg audio", 24000, 2.0)
 
-        request = mock_request(method="GET", query={
-            "text": "test cfg weight",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "speed": "1.0",
-            "cfg_weight": "0.6",
-        })
+        request = mock_request(
+            method="GET",
+            query={
+                "text": "test cfg weight",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "speed": "1.0",
+                "cfg_weight": "0.6",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -277,10 +298,13 @@ class TestGetCacheEntryFloatConversion:
         assert response.content_type == "audio/wav"
 
     @pytest.mark.asyncio
-    async def test_both_exaggeration_and_cfg_weight_conversion(self, mock_request, mock_app):
+    async def test_both_exaggeration_and_cfg_weight_conversion(
+        self, mock_request, mock_app
+    ):
         """Test both parameters converted to float together."""
         cache = mock_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test both params",
             voice_id="chatterbox_voice",
@@ -292,14 +316,17 @@ class TestGetCacheEntryFloatConversion:
         )
         await cache.put(key, b"both params audio", 24000, 2.5)
 
-        request = mock_request(method="GET", query={
-            "text": "test both params",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "speed": "1.0",
-            "exaggeration": "0.8",
-            "cfg_weight": "0.4",
-        })
+        request = mock_request(
+            method="GET",
+            query={
+                "text": "test both params",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "speed": "1.0",
+                "exaggeration": "0.8",
+                "cfg_weight": "0.4",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -310,6 +337,7 @@ class TestGetCacheEntryFloatConversion:
         """Test that None exaggeration skips conversion."""
         cache = mock_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test no exag",
             voice_id="nova",
@@ -319,12 +347,15 @@ class TestGetCacheEntryFloatConversion:
         await cache.put(key, b"no exag audio", 24000, 2.0)
 
         # No exaggeration or cfg_weight in query
-        request = mock_request(method="GET", query={
-            "text": "test no exag",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": "1.0",
-        })
+        request = mock_request(
+            method="GET",
+            query={
+                "text": "test no exag",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": "1.0",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -335,6 +366,7 @@ class TestGetCacheEntryFloatConversion:
         """Test that language parameter is passed correctly."""
         cache = mock_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test language",
             voice_id="chatterbox_voice",
@@ -346,15 +378,18 @@ class TestGetCacheEntryFloatConversion:
         )
         await cache.put(key, b"spanish audio", 24000, 2.0)
 
-        request = mock_request(method="GET", query={
-            "text": "test language",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "speed": "1.0",
-            "exaggeration": "0.5",
-            "cfg_weight": "0.5",
-            "language": "es",
-        })
+        request = mock_request(
+            method="GET",
+            query={
+                "text": "test language",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "speed": "1.0",
+                "exaggeration": "0.5",
+                "cfg_weight": "0.5",
+                "language": "es",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -365,6 +400,7 @@ class TestGetCacheEntryFloatConversion:
 # Tests for Lines 517-556: Prefetch Topic with Curriculum Parsing
 # =============================================================================
 
+
 class TestPrefetchTopicCurriculum:
     """Tests for prefetch topic with curriculum parsing and segment extraction."""
 
@@ -374,12 +410,14 @@ class TestPrefetchTopicCurriculum:
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {}  # Empty curriculum store
 
-            request = mock_request(json_data={
-                "curriculum_id": "nonexistent-curriculum",
-                "topic_id": "topic1",
-                "voice_id": "nova",
-                "tts_provider": "vibevoice",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "nonexistent-curriculum",
+                    "topic_id": "topic1",
+                    "voice_id": "nova",
+                    "tts_provider": "vibevoice",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -392,20 +430,24 @@ class TestPrefetchTopicCurriculum:
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {
                 "test-curriculum": {
-                    "content": [{
-                        "children": [
-                            {"id": "other-topic", "transcript": {"segments": []}}
-                        ]
-                    }]
+                    "content": [
+                        {
+                            "children": [
+                                {"id": "other-topic", "transcript": {"segments": []}}
+                            ]
+                        }
+                    ]
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "test-curriculum",
-                "topic_id": "missing-topic",
-                "voice_id": "nova",
-                "tts_provider": "vibevoice",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "test-curriculum",
+                    "topic_id": "missing-topic",
+                    "voice_id": "nova",
+                    "tts_provider": "vibevoice",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -418,20 +460,24 @@ class TestPrefetchTopicCurriculum:
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {
                 "test-curriculum": {
-                    "content": [{
-                        "children": [
-                            {"id": "empty-topic", "transcript": {"segments": []}}
-                        ]
-                    }]
+                    "content": [
+                        {
+                            "children": [
+                                {"id": "empty-topic", "transcript": {"segments": []}}
+                            ]
+                        }
+                    ]
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "test-curriculum",
-                "topic_id": "empty-topic",
-                "voice_id": "nova",
-                "tts_provider": "vibevoice",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "test-curriculum",
+                    "topic_id": "empty-topic",
+                    "voice_id": "nova",
+                    "tts_provider": "vibevoice",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -444,62 +490,75 @@ class TestPrefetchTopicCurriculum:
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {
                 "physics-101": {
-                    "content": [{
-                        "children": [
-                            {
-                                "id": "intro-quantum",
-                                "transcript": {
-                                    "segments": [
-                                        {"content": "Welcome to quantum physics."},
-                                        {"content": "In this lesson, we will explore wave-particle duality."},
-                                        {"content": "Let's start with the basics."},
-                                    ]
+                    "content": [
+                        {
+                            "children": [
+                                {
+                                    "id": "intro-quantum",
+                                    "transcript": {
+                                        "segments": [
+                                            {"content": "Welcome to quantum physics."},
+                                            {
+                                                "content": "In this lesson, we will explore wave-particle duality."
+                                            },
+                                            {"content": "Let's start with the basics."},
+                                        ]
+                                    },
                                 }
-                            }
-                        ]
-                    }]
+                            ]
+                        }
+                    ]
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "physics-101",
-                "topic_id": "intro-quantum",
-                "voice_id": "nova",
-                "tts_provider": "vibevoice",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "physics-101",
+                    "topic_id": "intro-quantum",
+                    "voice_id": "nova",
+                    "tts_provider": "vibevoice",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
             assert response.status == 200
             import json
+
             body = json.loads(response.body.decode())
             assert body["status"] == "started"
             assert body["total_segments"] == 3
 
     @pytest.mark.asyncio
-    async def test_prefetch_uses_default_voice_and_provider(self, mock_request, mock_app):
+    async def test_prefetch_uses_default_voice_and_provider(
+        self, mock_request, mock_app
+    ):
         """Test prefetch uses default voice_id and provider when not specified."""
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {
                 "test-curriculum": {
-                    "content": [{
-                        "children": [
-                            {
-                                "id": "topic1",
-                                "transcript": {
-                                    "segments": [{"content": "Test segment"}]
+                    "content": [
+                        {
+                            "children": [
+                                {
+                                    "id": "topic1",
+                                    "transcript": {
+                                        "segments": [{"content": "Test segment"}]
+                                    },
                                 }
-                            }
-                        ]
-                    }]
+                            ]
+                        }
+                    ]
                 }
             }
 
             # Only provide required fields, not voice_id or provider
-            request = mock_request(json_data={
-                "curriculum_id": "test-curriculum",
-                "topic_id": "topic1",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "test-curriculum",
+                    "topic_id": "topic1",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -511,33 +570,38 @@ class TestPrefetchTopicCurriculum:
         with patch("server.state") as mock_state:
             mock_state.curriculum_raw = {
                 "test-curriculum": {
-                    "content": [{
-                        "children": [
-                            {
-                                "id": "mixed-topic",
-                                "transcript": {
-                                    "segments": [
-                                        {"content": "Valid segment"},
-                                        {"content": ""},  # Empty
-                                        {},  # No content key
-                                        {"content": "Another valid segment"},
-                                    ]
+                    "content": [
+                        {
+                            "children": [
+                                {
+                                    "id": "mixed-topic",
+                                    "transcript": {
+                                        "segments": [
+                                            {"content": "Valid segment"},
+                                            {"content": ""},  # Empty
+                                            {},  # No content key
+                                            {"content": "Another valid segment"},
+                                        ]
+                                    },
                                 }
-                            }
-                        ]
-                    }]
+                            ]
+                        }
+                    ]
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "test-curriculum",
-                "topic_id": "mixed-topic",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "test-curriculum",
+                    "topic_id": "mixed-topic",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
             assert response.status == 200
             import json
+
             body = json.loads(response.body.decode())
             # Should only count segments with content
             assert body["total_segments"] == 2
@@ -552,10 +616,12 @@ class TestPrefetchTopicCurriculum:
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "empty-curriculum",
-                "topic_id": "any-topic",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "empty-curriculum",
+                    "topic_id": "any-topic",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -572,10 +638,12 @@ class TestPrefetchTopicCurriculum:
                 }
             }
 
-            request = mock_request(json_data={
-                "curriculum_id": "no-children-curriculum",
-                "topic_id": "any-topic",
-            })
+            request = mock_request(
+                json_data={
+                    "curriculum_id": "no-children-curriculum",
+                    "topic_id": "any-topic",
+                }
+            )
 
             response = await tts_api.handle_prefetch_topic(request)
 
@@ -586,18 +654,21 @@ class TestPrefetchTopicCurriculum:
 # Additional Edge Case Tests
 # =============================================================================
 
+
 class TestTTSRequestEdgeCases:
     """Additional edge case tests for TTS request handling."""
 
     @pytest.mark.asyncio
     async def test_tts_request_with_piper_provider(self, mock_request, mock_app):
         """Test TTS request with piper provider."""
-        request = mock_request(json_data={
-            "text": "Hello with piper",
-            "voice_id": "piper_voice",
-            "tts_provider": "piper",
-            "speed": 1.2,
-        })
+        request = mock_request(
+            json_data={
+                "text": "Hello with piper",
+                "voice_id": "piper_voice",
+                "tts_provider": "piper",
+                "speed": 1.2,
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -605,19 +676,23 @@ class TestTTSRequestEdgeCases:
         assert response.content_type == "audio/wav"
 
     @pytest.mark.asyncio
-    async def test_tts_request_with_chatterbox_provider(self, make_request, tts_server_responses):
+    async def test_tts_request_with_chatterbox_provider(
+        self, make_request, tts_server_responses
+    ):
         """Test TTS request with chatterbox provider."""
-        request = make_request(json_data={
-            "text": "Hello with chatterbox",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "speed": 0.9,
-            "chatterbox_config": {
-                "exaggeration": 0.3,
-                "cfg_weight": 0.7,
-                "language": "en",
-            },
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello with chatterbox",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "speed": 0.9,
+                "chatterbox_config": {
+                    "exaggeration": 0.3,
+                    "cfg_weight": 0.7,
+                    "language": "en",
+                },
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -629,6 +704,7 @@ class TestTTSRequestEdgeCases:
         """Test cache hit returns cached audio."""
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test cache entry",
             voice_id="nova",
@@ -638,12 +714,14 @@ class TestTTSRequestEdgeCases:
         # Add properly to cache using real API
         await cache.put(key, b"cached audio", 24000, 2.5)
 
-        request = make_request(json_data={
-            "text": "test cache entry",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": 1.0,
-        })
+        request = make_request(
+            json_data={
+                "text": "test cache entry",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": 1.0,
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -655,6 +733,7 @@ class TestTTSRequestEdgeCases:
         """Test get cache entry returns cached audio."""
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="entry for get",
             voice_id="nova",
@@ -664,12 +743,15 @@ class TestTTSRequestEdgeCases:
         # Add properly to cache
         await cache.put(key, b"audio data for get", 24000, 2.5)
 
-        request = make_request(method="GET", query={
-            "text": "entry for get",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": "1.0",
-        })
+        request = make_request(
+            method="GET",
+            query={
+                "text": "entry for get",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": "1.0",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -684,22 +766,25 @@ class TestCacheEntryWithChatterboxConfig:
     async def test_put_cache_entry_with_chatterbox_config(self, mock_request):
         """Test putting cache entry with full chatterbox config."""
         audio_data = base64.b64encode(b"chatterbox audio data").decode()
-        request = mock_request(json_data={
-            "text": "Hello chatterbox world",
-            "audio_base64": audio_data,
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "sample_rate": 24000,
-            "duration_seconds": 3.0,
-            "exaggeration": 0.6,
-            "cfg_weight": 0.4,
-            "language": "en",
-        })
+        request = mock_request(
+            json_data={
+                "text": "Hello chatterbox world",
+                "audio_base64": audio_data,
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "sample_rate": 24000,
+                "duration_seconds": 3.0,
+                "exaggeration": 0.6,
+                "cfg_weight": 0.4,
+                "language": "en",
+            }
+        )
 
         response = await tts_api.handle_put_cache_entry(request)
 
         assert response.status == 200
         import json
+
         body = json.loads(response.body.decode())
         assert body["status"] == "ok"
         assert "hash" in body
@@ -708,10 +793,12 @@ class TestCacheEntryWithChatterboxConfig:
     async def test_put_cache_entry_with_defaults(self, mock_request):
         """Test putting cache entry using all defaults."""
         audio_data = base64.b64encode(b"default audio").decode()
-        request = mock_request(json_data={
-            "text": "Minimal entry",
-            "audio_base64": audio_data,
-        })
+        request = mock_request(
+            json_data={
+                "text": "Minimal entry",
+                "audio_base64": audio_data,
+            }
+        )
 
         response = await tts_api.handle_put_cache_entry(request)
 
@@ -721,15 +808,17 @@ class TestCacheEntryWithChatterboxConfig:
     async def test_put_cache_entry_with_speed(self, mock_request):
         """Test putting cache entry with custom speed."""
         audio_data = base64.b64encode(b"fast audio").decode()
-        request = mock_request(json_data={
-            "text": "Fast speech",
-            "audio_base64": audio_data,
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": 1.5,
-            "sample_rate": 24000,
-            "duration_seconds": 1.5,
-        })
+        request = mock_request(
+            json_data={
+                "text": "Fast speech",
+                "audio_base64": audio_data,
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": 1.5,
+                "sample_rate": 24000,
+                "duration_seconds": 1.5,
+            }
+        )
 
         response = await tts_api.handle_put_cache_entry(request)
 
@@ -756,6 +845,7 @@ class TestSampleRateFallbacks:
         """Test that cache hit uses stored sample rate from cache entry."""
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="piper test cached",
             voice_id="piper_voice",
@@ -765,12 +855,14 @@ class TestSampleRateFallbacks:
         # Store with piper sample rate (22050)
         await cache.put(key, b"piper audio", 22050, 2.5)
 
-        request = make_request(json_data={
-            "text": "piper test cached",
-            "voice_id": "piper_voice",
-            "tts_provider": "piper",
-            "speed": 1.0,
-        })
+        request = make_request(
+            json_data={
+                "text": "piper test cached",
+                "voice_id": "piper_voice",
+                "tts_provider": "piper",
+                "speed": 1.0,
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -853,13 +945,17 @@ class TestValidProviders:
     """Tests for valid provider validation."""
 
     @pytest.mark.asyncio
-    async def test_all_valid_providers_accepted(self, make_request, tts_server_responses):
+    async def test_all_valid_providers_accepted(
+        self, make_request, tts_server_responses
+    ):
         """Test that all valid providers are accepted."""
         for provider in ["vibevoice", "piper", "chatterbox"]:
-            request = make_request(json_data={
-                "text": f"Test {provider}",
-                "tts_provider": provider,
-            })
+            request = make_request(
+                json_data={
+                    "text": f"Test {provider}",
+                    "tts_provider": provider,
+                }
+            )
             response = await tts_api.handle_tts_request(request)
             assert response.status == 200, f"Provider {provider} should be accepted"
 
@@ -867,9 +963,11 @@ class TestValidProviders:
     async def test_invalid_provider_rejected(self, make_request):
         """Test that invalid providers are rejected."""
         for provider in ["openai", "elevenlabs", "azure", "VIBEVOICE", ""]:
-            request = make_request(json_data={
-                "text": "Test invalid",
-                "tts_provider": provider,
-            })
+            request = make_request(
+                json_data={
+                    "text": "Test invalid",
+                    "tts_provider": provider,
+                }
+            )
             response = await tts_api.handle_tts_request(request)
             assert response.status == 400, f"Provider {provider} should be rejected"

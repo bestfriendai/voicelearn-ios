@@ -8,6 +8,7 @@ TESTING PHILOSOPHY: Real Over Mock
 - Uses aiohttp test utilities for proper request testing
 - NO MOCK CLASSES ALLOWED
 """
+
 import base64
 import pytest
 from aiohttp import web
@@ -25,6 +26,7 @@ import tts_api
 # =============================================================================
 # REAL FIXTURES - NO MOCKS
 # =============================================================================
+
 
 @pytest.fixture
 async def real_tts_cache(tmp_path):
@@ -53,6 +55,7 @@ def real_resource_pool():
 async def real_prefetcher(real_tts_cache, real_resource_pool):
     """Real CurriculumPrefetcher for testing prefetch endpoints."""
     from tts_cache.prefetcher import CurriculumPrefetcher
+
     return CurriculumPrefetcher(
         cache=real_tts_cache,
         resource_pool=real_resource_pool,
@@ -73,6 +76,7 @@ async def real_app(real_tts_cache, real_resource_pool, real_prefetcher):
 @pytest.fixture
 def make_request(real_app):
     """Create test requests with real app context."""
+
     def _make_request(method="POST", json_data=None, query=None, match_info=None):
         request = make_mocked_request(
             method,
@@ -85,17 +89,22 @@ def make_request(real_app):
         if query:
             # aiohttp stores query in _rel_url
             from yarl import URL
+
             request._rel_url = URL("/api/tts").with_query(query)
             request._cache["query"] = query
 
         # Set JSON body
         if json_data is not None:
+
             async def _json():
                 return json_data
+
             request.json = _json
         else:
+
             async def _json():
                 raise ValueError("No JSON body")
+
             request.json = _json
 
         return request
@@ -117,11 +126,11 @@ def tts_server_responses():
         + b"WAVE"
         + b"fmt "
         + (16).to_bytes(4, "little")  # Subchunk1 size
-        + (1).to_bytes(2, "little")   # Audio format (PCM)
-        + (1).to_bytes(2, "little")   # Num channels
+        + (1).to_bytes(2, "little")  # Audio format (PCM)
+        + (1).to_bytes(2, "little")  # Num channels
         + (24000).to_bytes(4, "little")  # Sample rate
         + (48000).to_bytes(4, "little")  # Byte rate
-        + (2).to_bytes(2, "little")   # Block align
+        + (2).to_bytes(2, "little")  # Block align
         + (16).to_bytes(2, "little")  # Bits per sample
         + b"data"
         + (56).to_bytes(4, "little")  # Subchunk2 size
@@ -139,6 +148,7 @@ def tts_server_responses():
 # =============================================================================
 # TTS Request Handler Tests
 # =============================================================================
+
 
 class TestHandleTtsRequest:
     """Tests for handle_tts_request endpoint."""
@@ -173,10 +183,9 @@ class TestHandleTtsRequest:
     @pytest.mark.asyncio
     async def test_invalid_provider(self, make_request):
         """Test handling of invalid TTS provider."""
-        request = make_request(json_data={
-            "text": "Hello world",
-            "tts_provider": "invalid_provider"
-        })
+        request = make_request(
+            json_data={"text": "Hello world", "tts_provider": "invalid_provider"}
+        )
         response = await tts_api.handle_tts_request(request)
 
         assert response.status == 400
@@ -194,14 +203,18 @@ class TestHandleTtsRequest:
         assert b"resource pool not initialized" in response.body
 
     @pytest.mark.asyncio
-    async def test_no_cache_direct_generation(self, make_request, real_app, tts_server_responses):
+    async def test_no_cache_direct_generation(
+        self, make_request, real_app, tts_server_responses
+    ):
         """Test direct generation when cache is not available."""
         real_app["tts_cache"] = None
-        request = make_request(json_data={
-            "text": "Hello world",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice"
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello world",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -215,6 +228,7 @@ class TestHandleTtsRequest:
         # Pre-populate cache
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="Hello world",
             voice_id="nova",
@@ -223,12 +237,14 @@ class TestHandleTtsRequest:
         )
         await cache.put(key, b"cached_audio", 24000, 2.5)
 
-        request = make_request(json_data={
-            "text": "Hello world",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": 1.0,
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello world",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": 1.0,
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -238,11 +254,13 @@ class TestHandleTtsRequest:
     @pytest.mark.asyncio
     async def test_cache_miss_generates_audio(self, make_request, tts_server_responses):
         """Test cache miss triggers audio generation."""
-        request = make_request(json_data={
-            "text": "Hello world new text",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello world new text",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -256,6 +274,7 @@ class TestHandleTtsRequest:
         # Pre-populate cache
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="Hello world skip",
             voice_id="nova",
@@ -264,13 +283,15 @@ class TestHandleTtsRequest:
         )
         await cache.put(key, b"cached_audio", 24000, 2.5)
 
-        request = make_request(json_data={
-            "text": "Hello world skip",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": 1.0,
-            "skip_cache": True,
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello world skip",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": 1.0,
+                "skip_cache": True,
+            }
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -286,16 +307,18 @@ class TestHandleTtsRequest:
         The real TTSResourcePool handles passing config to the HTTP request.
         Testing config propagation is the resource pool's unit test responsibility.
         """
-        request = make_request(json_data={
-            "text": "Hello world chatterbox test",
-            "voice_id": "chatterbox_voice",
-            "tts_provider": "chatterbox",
-            "chatterbox_config": {
-                "exaggeration": 0.7,
-                "cfg_weight": 0.5,
-                "language": "en"
+        request = make_request(
+            json_data={
+                "text": "Hello world chatterbox test",
+                "voice_id": "chatterbox_voice",
+                "tts_provider": "chatterbox",
+                "chatterbox_config": {
+                    "exaggeration": 0.7,
+                    "cfg_weight": 0.5,
+                    "language": "en",
+                },
             }
-        })
+        )
 
         response = await tts_api.handle_tts_request(request)
 
@@ -315,10 +338,9 @@ class TestHandleTtsRequest:
             m.post("http://localhost:8880/v1/audio/speech", status=500, repeat=True)
             m.post("http://localhost:8004/v1/audio/speech", status=500, repeat=True)
 
-            request = make_request(json_data={
-                "text": "Hello world",
-                "tts_provider": "vibevoice"
-            })
+            request = make_request(
+                json_data={"text": "Hello world", "tts_provider": "vibevoice"}
+            )
 
             response = await tts_api.handle_tts_request(request)
 
@@ -335,10 +357,12 @@ class TestHandleTtsRequest:
             m.post("http://localhost:8880/v1/audio/speech", status=500, repeat=True)
             m.post("http://localhost:8004/v1/audio/speech", status=500, repeat=True)
 
-            request = make_request(json_data={
-                "text": "Hello world unique text for error test",
-                "tts_provider": "vibevoice"
-            })
+            request = make_request(
+                json_data={
+                    "text": "Hello world unique text for error test",
+                    "tts_provider": "vibevoice",
+                }
+            )
 
             response = await tts_api.handle_tts_request(request)
 
@@ -349,6 +373,7 @@ class TestHandleTtsRequest:
 # =============================================================================
 # Cache Stats Handler Tests
 # =============================================================================
+
 
 class TestHandleGetCacheStats:
     """Tests for handle_get_cache_stats endpoint."""
@@ -386,6 +411,7 @@ class TestHandleGetCacheStats:
 # Cache Clear Handler Tests
 # =============================================================================
 
+
 class TestHandleClearCache:
     """Tests for handle_clear_cache endpoint."""
 
@@ -412,6 +438,7 @@ class TestHandleClearCache:
         # Add some data using proper cache API
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key1 = TTSCacheKey.from_request(
             text="Test text 1",
             voice_id="nova",
@@ -451,6 +478,7 @@ class TestHandleClearCache:
 # Evict Expired Handler Tests
 # =============================================================================
 
+
 class TestHandleEvictExpired:
     """Tests for handle_evict_expired endpoint."""
 
@@ -476,6 +504,7 @@ class TestHandleEvictExpired:
 # =============================================================================
 # Evict LRU Handler Tests
 # =============================================================================
+
 
 class TestHandleEvictLru:
     """Tests for handle_evict_lru endpoint."""
@@ -529,6 +558,7 @@ class TestHandleEvictLru:
 # Put Cache Entry Handler Tests
 # =============================================================================
 
+
 class TestHandlePutCacheEntry:
     """Tests for handle_put_cache_entry endpoint."""
 
@@ -561,10 +591,9 @@ class TestHandlePutCacheEntry:
     @pytest.mark.asyncio
     async def test_put_invalid_base64(self, make_request):
         """Test putting entry with invalid base64."""
-        request = make_request(json_data={
-            "text": "Hello",
-            "audio_base64": "not valid base64!!!"
-        })
+        request = make_request(
+            json_data={"text": "Hello", "audio_base64": "not valid base64!!!"}
+        )
         response = await tts_api.handle_put_cache_entry(request)
 
         assert response.status == 400
@@ -574,14 +603,16 @@ class TestHandlePutCacheEntry:
     async def test_put_success(self, make_request):
         """Test successful cache entry creation."""
         audio_data = base64.b64encode(b"fake audio data").decode()
-        request = make_request(json_data={
-            "text": "Hello world",
-            "audio_base64": audio_data,
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "sample_rate": 24000,
-            "duration_seconds": 2.5,
-        })
+        request = make_request(
+            json_data={
+                "text": "Hello world",
+                "audio_base64": audio_data,
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "sample_rate": 24000,
+                "duration_seconds": 2.5,
+            }
+        )
 
         response = await tts_api.handle_put_cache_entry(request)
 
@@ -592,10 +623,7 @@ class TestHandlePutCacheEntry:
         """Test putting entry when cache not initialized."""
         real_app["tts_cache"] = None
         audio_data = base64.b64encode(b"fake audio data").decode()
-        request = make_request(json_data={
-            "text": "Hello",
-            "audio_base64": audio_data
-        })
+        request = make_request(json_data={"text": "Hello", "audio_base64": audio_data})
 
         response = await tts_api.handle_put_cache_entry(request)
 
@@ -605,6 +633,7 @@ class TestHandlePutCacheEntry:
 # =============================================================================
 # Get Cache Entry Handler Tests
 # =============================================================================
+
 
 class TestHandleGetCacheEntry:
     """Tests for handle_get_cache_entry endpoint."""
@@ -633,6 +662,7 @@ class TestHandleGetCacheEntry:
         # Pre-populate cache
         cache = real_app["tts_cache"]
         from tts_cache import TTSCacheKey
+
         key = TTSCacheKey.from_request(
             text="test text",
             voice_id="nova",
@@ -641,12 +671,15 @@ class TestHandleGetCacheEntry:
         )
         await cache.put(key, b"cached audio data", 24000, 2.5)
 
-        request = make_request(method="GET", query={
-            "text": "test text",
-            "voice_id": "nova",
-            "tts_provider": "vibevoice",
-            "speed": "1.0",
-        })
+        request = make_request(
+            method="GET",
+            query={
+                "text": "test text",
+                "voice_id": "nova",
+                "tts_provider": "vibevoice",
+                "speed": "1.0",
+            },
+        )
 
         response = await tts_api.handle_get_cache_entry(request)
 
@@ -668,6 +701,7 @@ class TestHandleGetCacheEntry:
 # =============================================================================
 # Prefetch Handler Tests
 # =============================================================================
+
 
 class TestHandlePrefetchTopic:
     """Tests for handle_prefetch_topic endpoint."""
@@ -693,10 +727,9 @@ class TestHandlePrefetchTopic:
     async def test_prefetch_no_prefetcher(self, make_request, real_app):
         """Test prefetch when prefetcher not initialized."""
         real_app["tts_prefetcher"] = None
-        request = make_request(json_data={
-            "curriculum_id": "test",
-            "topic_id": "topic1"
-        })
+        request = make_request(
+            json_data={"curriculum_id": "test", "topic_id": "topic1"}
+        )
 
         response = await tts_api.handle_prefetch_topic(request)
 
@@ -804,6 +837,7 @@ class TestHandleCancelPrefetch:
 # Route Registration Tests
 # =============================================================================
 
+
 class TestRegisterRoutes:
     """Tests for route registration."""
 
@@ -827,6 +861,7 @@ class TestRegisterRoutes:
 # =============================================================================
 # Constants Tests
 # =============================================================================
+
 
 class TestConstants:
     """Tests for module constants."""

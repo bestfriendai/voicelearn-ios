@@ -32,6 +32,7 @@ This repository contains multiple components, each with its own CLAUDE.md:
 | Curriculum | `curriculum/` | UMCF format specification |
 | Latency Test Harness | `server/latency_harness/` | Automated latency testing CLI |
 | iOS Test Harness | `UnaMentis/Testing/LatencyHarness/` | High-precision iOS latency testing |
+| Demo Video Generator | `demo/` | Automated iOS demo video creation |
 
 See the CLAUDE.md in each directory for component-specific instructions.
 
@@ -539,6 +540,7 @@ Skills are focused workflows that provide consistency and predictability. Invoke
 | `/comms` | Post to Slack/Trello with natural language | Team communication |
 | `/worktree` | Manage git worktrees for parallel development | Parallel task isolation |
 | `/xcode-project` | Add files/frameworks to Xcode projects | After creating Swift files |
+| `/demo-video` | Generate iOS demo videos autonomously | Marketing, App Store previews |
 
 ### Key Skills
 
@@ -580,5 +582,15 @@ Skills are focused workflows that provide consistency and predictability. Invoke
 /worktree cleanup              # Clean DerivedData from inactive worktrees
 /worktree remove kb-feature    # Remove worktree (with safety checks)
 ```
+
+**`/demo-video`** - Automated iOS demo video generation
+```
+/demo-video                    # Show status and available configs
+/demo-video generate app_overview  # Full pipeline: capture → TTS → assemble
+/demo-video capture app_overview   # Capture only (test navigation)
+/demo-video script app_overview    # View narration script for editing
+```
+
+Prerequisites: `/service status` shows management-api running, `SHOTSTACK_API_KEY` set.
 
 See `.claude/skills/*/SKILL.md` for detailed documentation on each skill.

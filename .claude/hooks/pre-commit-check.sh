@@ -17,9 +17,13 @@ if echo "$COMMAND" | grep -q "git commit"; then
 
     echo "Running pre-commit checks before git commit..." >&2
 
+    # On non-macOS platforms, skip checks that require Xcode/SwiftLint
+    export SKIP_LINT_IF_UNAVAILABLE=true
+    export SKIP_TESTS_IF_UNAVAILABLE=true
+
     # Run lint check
     if ! ./scripts/lint.sh >/dev/null 2>&1; then
-        echo "BLOCKED: SwiftLint violations detected. Run ./scripts/lint.sh to see issues." >&2
+        echo "BLOCKED: Lint violations detected. Run ./scripts/lint.sh to see issues." >&2
         exit 2
     fi
 

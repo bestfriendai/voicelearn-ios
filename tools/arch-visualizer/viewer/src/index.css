@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+/* Custom theme for React Flow */
+:root {
+  --xy-background-color: transparent;
+  --xy-node-border-radius: 12px;
+}
+
+/* Smooth transitions */
+* {
+  @apply transition-colors duration-150;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-700 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-600;
+}
+
+/* Code preview styling */
+.code-preview {
+  font-family: "SF Mono", "Fira Code", "JetBrains Mono", "Cascadia Code", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  tab-size: 4;
+}
+
+/* React Flow customizations */
+.react-flow__node {
+  cursor: pointer !important;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2;
+}
+
+.react-flow__controls {
+  @apply bg-zinc-800/90 border-zinc-700 rounded-xl overflow-hidden shadow-xl backdrop-blur-sm;
+}
+
+.react-flow__controls button {
+  @apply bg-transparent border-zinc-700 text-zinc-300 hover:bg-zinc-700;
+}
+
+.react-flow__controls button svg {
+  fill: currentColor;
+}
+
+.react-flow__minimap {
+  @apply bg-zinc-900/80 border-zinc-700 rounded-xl overflow-hidden shadow-xl backdrop-blur-sm;
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+/* Glow effect for selected nodes */
+.node-selected {
+  box-shadow: 0 0 0 2px theme("colors.blue.500"),
+    0 0 20px theme("colors.blue.500/30");
+}
+
+/* Pulse animation for active connections */
+@keyframes pulse-edge {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .react-flow__controls {
+    @apply scale-90 origin-bottom-left;
+  }
+}
+
+/* Light mode overrides */
+.light {
+  --xy-background-color: transparent;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  @apply bg-zinc-300;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-400;
+}
+
+.light .react-flow__controls {
+  @apply bg-white/90 border-zinc-200;
+}
+
+.light .react-flow__controls button {
+  @apply bg-transparent border-zinc-200 text-zinc-700 hover:bg-zinc-100;
+}
+
+.light .react-flow__minimap {
+  @apply bg-white/80 border-zinc-200;
+}

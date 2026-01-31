@@ -124,6 +124,7 @@ class Symbol:
     docstring: Optional[str] = None
     parent: Optional[str] = None  # parent symbol id
     dependencies: list = field(default_factory=list)
+    annotations: list = field(default_factory=list)  # @attributes, decorators
 
 
 @dataclass
@@ -135,6 +136,23 @@ class FileInfo:
     symbols: list = field(default_factory=list)  # list of symbol ids
     imports: list = field(default_factory=list)
     exports: list = field(default_factory=list)
+    module_doc: Optional[str] = None  # file-level docstring / header comment
+
+
+@dataclass
+class ComponentDoc:
+    """Rich documentation extracted for a component."""
+    readme: Optional[str] = None          # README.md content (markdown)
+    claude_md: Optional[str] = None       # CLAUDE.md content (AI instructions)
+    changelog: Optional[str] = None       # CHANGELOG.md content
+    api_docs: Optional[str] = None        # API documentation if found
+    architecture_notes: Optional[str] = None  # extracted from docs/ or inline
+    purpose: Optional[str] = None         # one-line purpose from package metadata
+    key_decisions: list = field(default_factory=list)  # architectural decisions
+    patterns: list = field(default_factory=list)        # detected patterns
+    tech_stack: list = field(default_factory=list)      # technologies used
+    env_vars: list = field(default_factory=list)        # environment variables
+    api_endpoints: list = field(default_factory=list)   # detected API routes
 
 
 @dataclass
@@ -152,6 +170,7 @@ class Component:
     entry_points: list = field(default_factory=list)
     config_files: list = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
+    docs: dict = field(default_factory=dict)  # ComponentDoc as dict
 
 
 @dataclass
@@ -197,6 +216,22 @@ class BaseParser:
     def detect_framework(self, content: str) -> Optional[str]:
         return None
 
+    def extract_file_doc(self, content: str) -> Optional[str]:
+        """Extract file-level documentation comment."""
+        return None
+
+    def extract_env_vars(self, content: str) -> list[str]:
+        """Extract environment variable references."""
+        env_vars = set()
+        # os.environ / os.getenv / process.env / std::env
+        for m in re.finditer(r'(?:environ|getenv|env)\[?\(?\s*["\'](\w+)["\']', content):
+            env_vars.add(m.group(1))
+        for m in re.finditer(r'process\.env\.(\w+)', content):
+            env_vars.add(m.group(1))
+        for m in re.finditer(r'env::var\(\s*"(\w+)"', content):
+            env_vars.add(m.group(1))
+        return sorted(env_vars)
+
     def detect_ports(self, content: str) -> list[int]:
         """Extract port numbers from code."""
         ports = set()
@@ -218,6 +253,71 @@ class BaseParser:
     def detect_api_endpoints(self, content: str) -> list[dict]:
         """Extract API route definitions."""
         return []
+
+    def _extract_docstring_before(self, lines: list[str], line_idx: int) -> Optional[str]:
+        """Extract documentation comment immediately before a line."""
+        if line_idx <= 0:
+            return None
+
+        doc_lines = []
+        i = line_idx - 1
+
+        # Swift/Rust/TS/JS: /// or /** */ block comments
+        # Check for /** ... */ block
+        if i >= 0 and lines[i].strip().endswith("*/"):
+            end = i
+            while i >= 0 and "/*" not in lines[i]:
+                i -= 1
+            if i >= 0:
+                block = lines[i:end + 1]
+                cleaned = []
+                for bl in block:
+                    bl = bl.strip()
+                    bl = re.sub(r'^/\*\*?\s?', '', bl)
+                    bl = re.sub(r'\s?\*/$', '', bl)
+                    bl = re.sub(r'^\*\s?', '', bl)
+                    if bl:
+                        cleaned.append(bl)
+                if cleaned:
+                    return "\n".join(cleaned)
+
+        # /// single-line doc comments
+        while i >= 0 and lines[i].strip().startswith("///"):
+            doc_lines.insert(0, lines[i].strip().lstrip("/").strip())
+            i -= 1
+        if doc_lines:
+            return "\n".join(doc_lines)
+
+        # # Python-style comments above a def/class
+        while i >= 0 and lines[i].strip().startswith("#") and not lines[i].strip().startswith("#!"):
+            doc_lines.insert(0, lines[i].strip().lstrip("#").strip())
+            i -= 1
+        if doc_lines:
+            return "\n".join(doc_lines)
+
+        return None
+
+    def _extract_python_docstring(self, lines: list[str], start_line: int) -> Optional[str]:
+        """Extract Python docstring from the line after a def/class declaration."""
+        # Look for triple-quoted string on the next non-empty line
+        for i in range(start_line + 1, min(start_line + 5, len(lines))):
+            stripped = lines[i].strip()
+            if not stripped:
+                continue
+            if stripped.startswith('"""') or stripped.startswith("'''"):
+                quote = stripped[:3]
+                if stripped.count(quote) >= 2 and stripped.endswith(quote) and len(stripped) > 6:
+                    return stripped[3:-3].strip()
+                # Multi-line docstring
+                doc_lines = [stripped[3:]]
+                for j in range(i + 1, min(i + 30, len(lines))):
+                    if quote in lines[j]:
+                        doc_lines.append(lines[j].strip().replace(quote, ""))
+                        return "\n".join(l.strip() for l in doc_lines if l.strip())
+                    doc_lines.append(lines[j].strip())
+                return "\n".join(l.strip() for l in doc_lines if l.strip())
+            break
+        return None
 
     def _make_symbol_id(self, file_path: str, name: str, line: int) -> str:
         return f"{file_path}:{name}:{line}"
@@ -257,6 +357,7 @@ class SwiftParser(BaseParser):
                 kind = m.group(3)
                 name = m.group(4)
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name,
@@ -266,6 +367,7 @@ class SwiftParser(BaseParser):
                     end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
                     visibility=vis,
+                    docstring=doc,
                 ))
                 continue
 
@@ -282,6 +384,7 @@ class SwiftParser(BaseParser):
                     vis = m.group(2) or "internal"
                     name = m.group(3)
                     end = self._find_closing_brace(lines, i)
+                    doc = self._extract_docstring_before(lines, i)
                     symbols.append(Symbol(
                         id=self._make_symbol_id(file_path, name, i + 1),
                         name=name,
@@ -291,6 +394,7 @@ class SwiftParser(BaseParser):
                         end_line=end + 1,
                         code_preview=self._get_code_preview(lines, i),
                         visibility=vis,
+                        docstring=doc,
                     ))
 
             # Extensions
@@ -298,6 +402,7 @@ class SwiftParser(BaseParser):
             if m:
                 name = m.group(1)
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, f"ext_{name}", i + 1),
                     name=f"extension {name}",
@@ -306,8 +411,28 @@ class SwiftParser(BaseParser):
                     line=i + 1,
                     end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
+                    docstring=doc,
                 ))
         return symbols
+
+    def extract_file_doc(self, content: str) -> Optional[str]:
+        """Extract Swift file header comment."""
+        lines = content.split("\n")
+        doc_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("//"):
+                text = stripped.lstrip("/").strip()
+                # Skip file-name-only headers and copyright
+                if text and not re.match(r'^[\w]+\.swift$', text):
+                    doc_lines.append(text)
+            elif stripped.startswith("import") or stripped == "":
+                if doc_lines:
+                    break
+                continue
+            else:
+                break
+        return "\n".join(doc_lines) if doc_lines else None
 
     def extract_imports(self, content: str) -> list[str]:
         return [m.group(1) for m in self.IMPORT_PATTERN.finditer(content)]
@@ -350,6 +475,7 @@ class PythonParser(BaseParser):
             if m:
                 name = m.group(1)
                 end = self._find_python_block_end(lines, i)
+                doc = self._extract_python_docstring(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name,
@@ -359,6 +485,7 @@ class PythonParser(BaseParser):
                     end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
                     visibility="public" if not name.startswith("_") else "private",
+                    docstring=doc,
                 ))
                 continue
 
@@ -367,6 +494,7 @@ class PythonParser(BaseParser):
             if m:
                 name = m.group(2)
                 end = self._find_python_block_end(lines, i)
+                doc = self._extract_python_docstring(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name,
@@ -376,8 +504,22 @@ class PythonParser(BaseParser):
                     end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
                     visibility="public" if not name.startswith("_") else "private",
+                    docstring=doc,
                 ))
         return symbols
+
+    def extract_file_doc(self, content: str) -> Optional[str]:
+        """Extract Python module-level docstring."""
+        lines = content.split("\n")
+        # Look for module docstring at the top
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if stripped.startswith('"""') or stripped.startswith("'''"):
+                return self._extract_python_docstring(lines, i - 1)
+            break
+        return None
 
     def extract_imports(self, content: str) -> list[str]:
         imports = []
@@ -451,12 +593,13 @@ class RustParser(BaseParser):
                 kind = m.group(2)
                 name = m.group(3)
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name, kind=kind, file=file_path,
                     line=i + 1, end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
-                    visibility=vis,
+                    visibility=vis, docstring=doc,
                 ))
                 continue
 
@@ -465,11 +608,13 @@ class RustParser(BaseParser):
             if m:
                 name = m.group(1)
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, f"impl_{name}", i + 1),
                     name=f"impl {name}", kind="impl", file=file_path,
                     line=i + 1, end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
+                    docstring=doc,
                 ))
                 continue
 
@@ -484,14 +629,29 @@ class RustParser(BaseParser):
                     vis = "public" if m.group(2) and "pub" in m.group(2) else "private"
                     name = m.group(4)
                     end = self._find_closing_brace(lines, i)
+                    doc = self._extract_docstring_before(lines, i)
                     symbols.append(Symbol(
                         id=self._make_symbol_id(file_path, name, i + 1),
                         name=name, kind="function", file=file_path,
                         line=i + 1, end_line=end + 1,
                         code_preview=self._get_code_preview(lines, i),
-                        visibility=vis,
+                        visibility=vis, docstring=doc,
                     ))
         return symbols
+
+    def extract_file_doc(self, content: str) -> Optional[str]:
+        """Extract Rust file-level //! documentation."""
+        lines = content.split("\n")
+        doc_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("//!"):
+                doc_lines.append(stripped[3:].strip())
+            elif stripped.startswith("//") or not stripped:
+                continue
+            else:
+                break
+        return "\n".join(doc_lines) if doc_lines else None
 
     def extract_imports(self, content: str) -> list[str]:
         imports = []
@@ -560,12 +720,13 @@ class TypeScriptParser(BaseParser):
                 kind = m.group(4)
                 name = m.group(5)
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name, kind=kind, file=file_path,
                     line=i + 1, end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
-                    visibility=vis,
+                    visibility=vis, docstring=doc,
                 ))
                 continue
 
@@ -574,12 +735,13 @@ class TypeScriptParser(BaseParser):
             if m:
                 vis = "public" if m.group(1) else "internal"
                 name = m.group(2)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name, kind="type", file=file_path,
                     line=i + 1, end_line=i + 1,
                     code_preview=self._get_code_preview(lines, i, 3),
-                    visibility=vis,
+                    visibility=vis, docstring=doc,
                 ))
                 continue
 
@@ -597,14 +759,58 @@ class TypeScriptParser(BaseParser):
                     "React" in content[:500] or "jsx" in file_path or "tsx" in file_path
                 ) else "function"
                 end = self._find_closing_brace(lines, i)
+                doc = self._extract_docstring_before(lines, i)
                 symbols.append(Symbol(
                     id=self._make_symbol_id(file_path, name, i + 1),
                     name=name, kind=kind, file=file_path,
                     line=i + 1, end_line=end + 1,
                     code_preview=self._get_code_preview(lines, i),
-                    visibility=vis,
+                    visibility=vis, docstring=doc,
                 ))
         return symbols
+
+    def extract_file_doc(self, content: str) -> Optional[str]:
+        """Extract TS/JS file-level JSDoc or header comment."""
+        lines = content.split("\n")
+        doc_lines = []
+        in_block = False
+        for line in lines:
+            stripped = line.strip()
+            # JSDoc block at top of file
+            if stripped.startswith("/**") and not in_block:
+                in_block = True
+                text = re.sub(r'^/\*\*\s?', '', stripped)
+                text = re.sub(r'\s?\*/$', '', text)
+                if text.strip():
+                    doc_lines.append(text.strip())
+                if stripped.endswith("*/"):
+                    in_block = False
+                continue
+            if in_block:
+                if stripped.endswith("*/"):
+                    text = re.sub(r'\s?\*/$', '', stripped)
+                    text = re.sub(r'^\*\s?', '', text)
+                    if text.strip():
+                        doc_lines.append(text.strip())
+                    break
+                text = re.sub(r'^\*\s?', '', stripped)
+                if text.strip():
+                    doc_lines.append(text.strip())
+                continue
+            # Single-line // comments at top
+            if stripped.startswith("//") and not stripped.startswith("///"):
+                text = stripped[2:].strip()
+                if text and not text.startswith("@ts-") and not text.startswith("eslint"):
+                    doc_lines.append(text)
+                continue
+            if stripped == "" or stripped.startswith("'use ") or stripped.startswith('"use '):
+                if doc_lines:
+                    break
+                continue
+            if stripped.startswith("import") or stripped.startswith("export"):
+                break
+            break
+        return "\n".join(doc_lines) if doc_lines else None
 
     def extract_imports(self, content: str) -> list[str]:
         imports = set()
@@ -893,6 +1099,9 @@ class ArchitectureScanner:
         # Phase 5: Detect project-level info
         self._detect_project_info()
 
+        # Phase 6: Extract documentation for every component
+        self._extract_component_docs()
+
         # Assemble
         self.architecture.components = self._build_component_tree()
         self.architecture.files = [asdict(f) for f in self._all_files]
@@ -1068,6 +1277,11 @@ class ArchitectureScanner:
                         if comp and not comp.port:
                             comp.port = ports[0]
 
+                # Extract file-level documentation
+                module_doc = None
+                if parser:
+                    module_doc = parser.extract_file_doc(content)
+
                 file_info = FileInfo(
                     path=rel,
                     language=lang,
@@ -1075,6 +1289,7 @@ class ArchitectureScanner:
                     size_bytes=stat.st_size,
                     symbols=[s.id for s in symbols],
                     imports=imports,
+                    module_doc=module_doc,
                 )
 
                 self._all_files.append(file_info)
@@ -1200,6 +1415,222 @@ class ArchitectureScanner:
             # Determine primary language
             if lang_counts and not comp.language:
                 comp.language = max(lang_counts, key=lang_counts.get)
+
+    def _extract_component_docs(self):
+        """Extract rich documentation for every component."""
+        for rel_path, comp in self._component_map.items():
+            comp_dir = self.root / rel_path if rel_path else self.root
+            if not comp_dir.is_dir():
+                continue
+
+            doc = ComponentDoc()
+
+            # --- Read documentation files ---
+            doc_file_map = {
+                "readme": ("README.md", "README.rst", "README.txt", "README"),
+                "claude_md": ("CLAUDE.md",),
+                "changelog": ("CHANGELOG.md", "CHANGES.md", "HISTORY.md"),
+            }
+            for field_name, candidates in doc_file_map.items():
+                for fname in candidates:
+                    fpath = comp_dir / fname
+                    if fpath.exists():
+                        try:
+                            content = fpath.read_text(encoding="utf-8", errors="replace")
+                            # Truncate very large docs to keep JSON manageable
+                            if len(content) > 8000:
+                                content = content[:8000] + "\n\n... (truncated)"
+                            setattr(doc, field_name, content)
+                        except OSError:
+                            pass
+                        break
+
+            # --- Scan docs/ directory for architecture notes ---
+            docs_dir = comp_dir / "docs"
+            if not docs_dir.is_dir():
+                docs_dir = comp_dir / "doc"
+            if docs_dir.is_dir():
+                arch_notes = []
+                for fname in sorted(os.listdir(docs_dir)):
+                    if not fname.endswith((".md", ".txt", ".rst")):
+                        continue
+                    fpath = docs_dir / fname
+                    if not fpath.is_file():
+                        continue
+                    try:
+                        content = fpath.read_text(encoding="utf-8", errors="replace")
+                        # Extract first heading and first paragraph as summary
+                        heading = ""
+                        summary_lines = []
+                        for line in content.split("\n"):
+                            stripped = line.strip()
+                            if stripped.startswith("#") and not heading:
+                                heading = stripped.lstrip("#").strip()
+                            elif heading and stripped:
+                                summary_lines.append(stripped)
+                                if len(summary_lines) >= 3:
+                                    break
+                            elif heading and not stripped and summary_lines:
+                                break
+                        if heading:
+                            arch_notes.append(f"**{heading}** ({fname}): {' '.join(summary_lines)}")
+                    except OSError:
+                        pass
+                if arch_notes:
+                    doc.architecture_notes = "\n\n".join(arch_notes[:20])
+
+            # --- Extract purpose from package metadata ---
+            for cfg in comp.config_files:
+                cfg_path = cfg.get("path", "") if isinstance(cfg, dict) else ""
+                if not cfg_path:
+                    continue
+                full_path = self.root / cfg_path
+                if not full_path.exists():
+                    continue
+                try:
+                    cfg_content = full_path.read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+
+                basename = os.path.basename(cfg_path)
+                if basename == "package.json":
+                    try:
+                        data = json.loads(cfg_content)
+                        desc = data.get("description", "")
+                        if desc:
+                            doc.purpose = desc
+                    except json.JSONDecodeError:
+                        pass
+                elif basename == "Cargo.toml":
+                    m = re.search(r'description\s*=\s*"([^"]+)"', cfg_content)
+                    if m:
+                        doc.purpose = m.group(1)
+                elif basename in ("pyproject.toml", "setup.cfg"):
+                    m = re.search(r'description\s*=\s*"([^"]+)"', cfg_content)
+                    if m:
+                        doc.purpose = m.group(1)
+
+            # --- Collect env vars and API endpoints from files ---
+            for file_path in comp.files[:100]:  # limit to prevent slowdown
+                full_path = self.root / file_path
+                if not full_path.exists():
+                    continue
+                ext = full_path.suffix.lower()
+                lang = LANGUAGE_MAP.get(ext)
+                parser = PARSERS.get(lang) if lang else None
+                if not parser:
+                    continue
+                try:
+                    content = full_path.read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+                env_vars = parser.extract_env_vars(content)
+                doc.env_vars.extend(v for v in env_vars if v not in doc.env_vars)
+
+                if hasattr(parser, 'detect_api_endpoints'):
+                    endpoints = parser.detect_api_endpoints(content)
+                    for ep in endpoints:
+                        ep_str = f"{ep['method']} {ep['path']}"
+                        if ep_str not in [f"{e['method']} {e['path']}" for e in doc.api_endpoints]:
+                            doc.api_endpoints.append(ep)
+
+            # --- Detect architectural patterns ---
+            patterns = self._detect_patterns(comp)
+            doc.patterns = patterns
+
+            # --- Determine tech stack ---
+            tech = []
+            if comp.framework:
+                tech.append(comp.framework)
+            if comp.language:
+                tech.append(comp.language.capitalize())
+            # Check config for additional tech
+            for file_path in comp.files[:50]:
+                basename = os.path.basename(file_path).lower()
+                if basename == "tailwind.config.js" or basename == "tailwind.config.ts":
+                    tech.append("TailwindCSS")
+                elif basename == "tsconfig.json":
+                    tech.append("TypeScript")
+                elif basename == ".eslintrc" or basename == "eslint.config.js":
+                    tech.append("ESLint")
+                elif basename == "jest.config.js" or basename == "jest.config.ts":
+                    tech.append("Jest")
+                elif basename == "vitest.config.ts":
+                    tech.append("Vitest")
+                elif basename == "webpack.config.js":
+                    tech.append("Webpack")
+                elif basename == "vite.config.ts" or basename == "vite.config.js":
+                    tech.append("Vite")
+            doc.tech_stack = sorted(set(tech))
+
+            comp.docs = asdict(doc)
+
+    def _detect_patterns(self, comp: Component) -> list[str]:
+        """Detect architectural patterns in a component."""
+        patterns = []
+        file_names = [os.path.basename(f).lower() for f in comp.files]
+        file_paths = [f.lower() for f in comp.files]
+        all_names = " ".join(file_names)
+
+        # MVC / MVVM / MVP
+        has_view = any("view" in f for f in file_names)
+        has_model = any("model" in f for f in file_names)
+        has_controller = any("controller" in f for f in file_names)
+        has_viewmodel = any("viewmodel" in f or "view_model" in f for f in file_names)
+        has_presenter = any("presenter" in f for f in file_names)
+
+        if has_view and has_model and has_viewmodel:
+            patterns.append("MVVM")
+        elif has_view and has_model and has_controller:
+            patterns.append("MVC")
+        elif has_view and has_model and has_presenter:
+            patterns.append("MVP")
+
+        # Repository pattern
+        if any("repository" in f or "repo" in f for f in file_names):
+            patterns.append("Repository Pattern")
+
+        # Service layer
+        if any("service" in f for f in file_names) and comp.type != "service":
+            patterns.append("Service Layer")
+
+        # Observer / Pub-Sub
+        if any("observer" in f or "subscriber" in f or "publisher" in f for f in file_names):
+            patterns.append("Observer/Pub-Sub")
+
+        # Store / State Management
+        if any("store" in f or "reducer" in f or "slice" in f for f in file_names):
+            patterns.append("State Management")
+
+        # Middleware
+        if any("middleware" in f for f in file_names):
+            patterns.append("Middleware")
+
+        # Plugin/Extension
+        if any("plugin" in f or "extension" in f for f in file_names):
+            patterns.append("Plugin Architecture")
+
+        # Factory
+        if any("factory" in f for f in file_names):
+            patterns.append("Factory Pattern")
+
+        # Dependency Injection
+        if any("container" in f or "injector" in f or "provider" in f for f in file_names):
+            patterns.append("Dependency Injection")
+
+        # API layer
+        if any("api" in f or "endpoint" in f or "route" in f for f in file_names):
+            patterns.append("API Layer")
+
+        # Test structure
+        test_files = [f for f in file_names if "test" in f or "spec" in f]
+        if test_files:
+            ratio = len(test_files) / max(len(file_names), 1)
+            if ratio > 0.3:
+                patterns.append("Well-Tested")
+            patterns.append(f"Tests ({len(test_files)} files)")
+
+        return patterns
 
     def _detect_project_info(self):
         """Detect project-level information."""

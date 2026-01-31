@@ -22,6 +22,7 @@ export interface FileInfo {
   symbols: string[];
   imports: string[];
   exports: string[];
+  module_doc: string | null;
 }
 
 export interface ComponentConfig {
@@ -38,6 +39,25 @@ export interface ComponentMetrics {
   languages: Record<string, number>;
 }
 
+export interface ApiEndpoint {
+  method: string;
+  path: string;
+}
+
+export interface ComponentDoc {
+  readme: string | null;
+  claude_md: string | null;
+  changelog: string | null;
+  api_docs: string | null;
+  architecture_notes: string | null;
+  purpose: string | null;
+  key_decisions: string[];
+  patterns: string[];
+  tech_stack: string[];
+  env_vars: string[];
+  api_endpoints: ApiEndpoint[];
+}
+
 export interface Component {
   id: string;
   name: string;
@@ -52,6 +72,7 @@ export interface Component {
   entry_points: string[];
   config_files: ComponentConfig[];
   metrics: ComponentMetrics;
+  docs: ComponentDoc;
 }
 
 export interface Relationship {

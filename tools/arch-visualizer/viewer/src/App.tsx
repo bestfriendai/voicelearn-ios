@@ -5,6 +5,7 @@ import { ArchitectureGraph } from "./components/ArchitectureGraph";
 import { TreeNavigator } from "./components/TreeNavigator";
 import { DetailPanel } from "./components/DetailPanel";
 import { SearchOverlay } from "./components/SearchOverlay";
+import { HelpSystem } from "./components/HelpSystem";
 import { initializeSearch } from "./utils/search";
 import { formatNumber, formatBytes } from "./utils/layout";
 import type { Architecture } from "./types";
@@ -250,6 +251,9 @@ export function App() {
 
       {/* Search overlay */}
       <SearchOverlay />
+
+      {/* Help system */}
+      <HelpSystem />
 
       {/* Footer timestamp */}
       {architecture.generated_at && (

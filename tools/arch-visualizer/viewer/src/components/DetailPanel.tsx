@@ -8,8 +8,9 @@ import {
   formatNumber,
 } from "../utils/layout";
 import { CodePreview } from "./CodePreview";
+import { MarkdownRenderer } from "./MarkdownRenderer";
 
-type Tab = "overview" | "files" | "symbols" | "relationships";
+type Tab = "overview" | "docs" | "files" | "symbols" | "relationships";
 
 export function DetailPanel() {
   const {
@@ -93,8 +94,14 @@ function ComponentDetail({
     [architecture, component.id],
   );
 
+  const docs = component.docs;
+  const hasDocContent = docs && (docs.readme || docs.claude_md || docs.changelog ||
+    docs.architecture_notes || docs.api_docs || docs.api_endpoints?.length ||
+    docs.env_vars?.length || docs.patterns?.length);
+
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: "overview", label: "Overview" },
+    ...(hasDocContent ? [{ key: "docs" as Tab, label: "Docs" }] : []),
     { key: "files", label: "Files", count: files.length },
     { key: "symbols", label: "Symbols", count: symbols.length },
     { key: "relationships", label: "Links", count: relationships.length },
@@ -109,7 +116,7 @@ function ComponentDetail({
             <h2 className={`font-bold text-lg ${darkMode ? "text-zinc-100" : "text-zinc-900"}`}>
               {component.name}
             </h2>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className={`text-xs px-2 py-0.5 rounded-full ${colors.badge}`}>
                 {component.type}
               </span>
@@ -139,10 +146,32 @@ function ComponentDetail({
           </p>
         )}
 
-        {component.description && (
+        {(docs?.purpose || component.description) && (
           <p className={`text-sm mt-2 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
-            {component.description}
+            {docs?.purpose || component.description}
           </p>
+        )}
+
+        {/* Tech stack + patterns quick badges */}
+        {docs && (docs.tech_stack?.length > 0 || docs.patterns?.length > 0) && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {docs.tech_stack?.map((t, i) => (
+              <span key={`t-${i}`} className={`
+                text-[10px] px-1.5 py-0.5 rounded
+                ${darkMode ? "bg-cyan-900/30 text-cyan-400" : "bg-cyan-50 text-cyan-700"}
+              `}>
+                {t}
+              </span>
+            ))}
+            {docs.patterns?.map((p, i) => (
+              <span key={`p-${i}`} className={`
+                text-[10px] px-1.5 py-0.5 rounded
+                ${darkMode ? "bg-violet-900/30 text-violet-400" : "bg-violet-50 text-violet-700"}
+              `}>
+                {p}
+              </span>
+            ))}
+          </div>
         )}
       </div>
 
@@ -178,6 +207,9 @@ function ComponentDetail({
       <div className="flex-1 overflow-y-auto">
         {activeTab === "overview" && (
           <OverviewTab component={component} files={files} symbols={symbols} />
+        )}
+        {activeTab === "docs" && (
+          <DocsTab component={component} />
         )}
         {activeTab === "files" && (
           <FilesTab files={files} />
@@ -226,12 +258,16 @@ function OverviewTab({
 }) {
   const { darkMode } = useArchStore();
   const metrics = component.metrics;
+  const docs = component.docs;
 
   // Language breakdown
   const langBreakdown = Object.entries(metrics?.languages || {}).sort(
     ([, a], [, b]) => b - a,
   );
   const totalLines = metrics?.lines || 0;
+
+  // Symbols with docstrings (documented)
+  const documentedSymbols = symbols.filter(s => s.docstring);
 
   return (
     <div className="p-4 space-y-4">
@@ -242,6 +278,75 @@ function OverviewTab({
         <StatCard label="Symbols" value={formatNumber(metrics?.symbols || 0)} darkMode={darkMode} />
         <StatCard label="Size" value={formatBytes(metrics?.size_bytes || 0)} darkMode={darkMode} />
       </div>
+
+      {/* API Endpoints */}
+      {docs?.api_endpoints && docs.api_endpoints.length > 0 && (
+        <div>
+          <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+            API Endpoints ({docs.api_endpoints.length})
+          </h4>
+          <div className="space-y-1">
+            {docs.api_endpoints.map((ep, i) => (
+              <div key={i} className={`
+                flex items-center gap-2 px-2 py-1.5 rounded-md font-mono text-xs
+                ${darkMode ? "bg-zinc-800/50" : "bg-zinc-50"}
+              `}>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold
+                  ${ep.method === "GET" ? (darkMode ? "bg-green-900/40 text-green-400" : "bg-green-100 text-green-700") :
+                    ep.method === "POST" ? (darkMode ? "bg-blue-900/40 text-blue-400" : "bg-blue-100 text-blue-700") :
+                    ep.method === "DELETE" ? (darkMode ? "bg-red-900/40 text-red-400" : "bg-red-100 text-red-700") :
+                    (darkMode ? "bg-yellow-900/40 text-yellow-400" : "bg-yellow-100 text-yellow-700")}
+                `}>
+                  {ep.method}
+                </span>
+                <span className={darkMode ? "text-zinc-300" : "text-zinc-600"}>{ep.path}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Environment Variables */}
+      {docs?.env_vars && docs.env_vars.length > 0 && (
+        <div>
+          <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+            Environment Variables ({docs.env_vars.length})
+          </h4>
+          <div className="flex flex-wrap gap-1">
+            {docs.env_vars.map((v, i) => (
+              <span key={i} className={`
+                font-mono text-[10px] px-1.5 py-0.5 rounded
+                ${darkMode ? "bg-amber-900/30 text-amber-300" : "bg-amber-50 text-amber-700"}
+              `}>
+                {v}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Documented symbols preview */}
+      {documentedSymbols.length > 0 && (
+        <div>
+          <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+            Documented Symbols ({documentedSymbols.length})
+          </h4>
+          <div className="space-y-1">
+            {documentedSymbols.slice(0, 8).map((sym) => (
+              <div key={sym.id} className={`px-2 py-1.5 rounded-md ${darkMode ? "bg-zinc-800/50" : "bg-zinc-50"}`}>
+                <div className={`text-xs font-mono ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                  <span className={`${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>{sym.kind}</span> {sym.name}
+                </div>
+                {sym.docstring && (
+                  <p className={`text-[10px] mt-0.5 leading-snug ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                    {sym.docstring.split("\n")[0]}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Language breakdown */}
       {langBreakdown.length > 0 && (
@@ -294,6 +399,72 @@ function OverviewTab({
   );
 }
 
+function DocsTab({ component }: { component: Component }) {
+  const { darkMode } = useArchStore();
+  const docs = component.docs;
+  const [docSection, setDocSection] = useState<string>("readme");
+
+  if (!docs) {
+    return (
+      <div className={`text-center py-8 text-sm ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
+        No documentation found for this component
+      </div>
+    );
+  }
+
+  // Build sections from available docs
+  const sections: { key: string; label: string; content: string }[] = [];
+  if (docs.readme) sections.push({ key: "readme", label: "README", content: docs.readme });
+  if (docs.claude_md) sections.push({ key: "claude_md", label: "CLAUDE.md", content: docs.claude_md });
+  if (docs.architecture_notes) sections.push({ key: "arch", label: "Architecture", content: docs.architecture_notes });
+  if (docs.api_docs) sections.push({ key: "api", label: "API Docs", content: docs.api_docs });
+  if (docs.changelog) sections.push({ key: "changelog", label: "Changelog", content: docs.changelog });
+
+  if (sections.length === 0) {
+    return (
+      <div className={`text-center py-8 text-sm ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
+        No documentation files found
+      </div>
+    );
+  }
+
+  const activeSection = sections.find(s => s.key === docSection) || sections[0];
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Doc section tabs */}
+      {sections.length > 1 && (
+        <div className={`flex gap-1 px-3 pt-2 pb-1 flex-wrap ${darkMode ? "border-b border-zinc-800" : "border-b border-zinc-100"}`}>
+          {sections.map((sec) => (
+            <button
+              key={sec.key}
+              onClick={() => setDocSection(sec.key)}
+              className={`
+                px-2 py-1 rounded text-[10px] font-medium transition-colors
+                ${sec.key === activeSection.key
+                  ? darkMode
+                    ? "bg-blue-900/40 text-blue-300"
+                    : "bg-blue-100 text-blue-700"
+                  : darkMode
+                    ? "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+                    : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                }
+              `}
+            >
+              {sec.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Doc content */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <MarkdownRenderer content={activeSection.content} darkMode={darkMode} />
+      </div>
+    </div>
+  );
+}
+
 function StatCard({ label, value, darkMode }: { label: string; value: string; darkMode: boolean }) {
   return (
     <div className={`px-3 py-2 rounded-lg ${darkMode ? "bg-zinc-800/50" : "bg-zinc-50"}`}>
@@ -322,9 +493,14 @@ function ChildRow({ component }: { component: Component }) {
         {component.type.slice(0, 3)}
       </span>
       <span className="truncate flex-1">{component.name}</span>
+      {component.docs?.purpose && (
+        <span className={`text-[10px] truncate max-w-[120px] ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
+          {component.docs.purpose}
+        </span>
+      )}
       {component.metrics?.files > 0 && (
-        <span className={`text-xs ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
-          {component.metrics.files} files
+        <span className={`text-xs shrink-0 ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
+          {component.metrics.files}f
         </span>
       )}
     </button>
@@ -390,6 +566,11 @@ function FilesTab({ files }: { files: FileInfo[] }) {
                   <span className={`truncate flex-1 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                     {name}
                   </span>
+                  {f.module_doc && (
+                    <span className={`text-[9px] ${darkMode ? "text-green-600" : "text-green-500"}`} title={f.module_doc.split("\n")[0]}>
+                      doc
+                    </span>
+                  )}
                   <span className={`text-[10px] tabular-nums ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
                     {f.lines}
                   </span>
@@ -502,12 +683,23 @@ function SymbolsTab({
               <span className={`truncate flex-1 font-mono ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                 {sym.name}
               </span>
+              {sym.docstring && (
+                <span className={`text-[9px] ${darkMode ? "text-green-600" : "text-green-500"}`}>doc</span>
+              )}
               <span className={`text-[10px] ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
                 L{sym.line}
               </span>
             </button>
             {expandedSymbol === sym.id && (
               <div className="ml-7 mt-1 mb-2">
+                {sym.docstring && (
+                  <div className={`
+                    text-xs mb-2 px-2 py-1.5 rounded border-l-2
+                    ${darkMode ? "border-blue-700 bg-blue-900/10 text-zinc-400" : "border-blue-300 bg-blue-50 text-zinc-600"}
+                  `}>
+                    {sym.docstring}
+                  </div>
+                )}
                 <CodePreview code={sym.code_preview} language={sym.file.split(".").pop() || ""} />
                 <div className={`text-[10px] mt-1 font-mono ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>
                   {sym.file}:{sym.line}
@@ -645,7 +837,22 @@ function FileDetail({ file }: { file: FileInfo }) {
           <span className={`text-sm ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>{formatBytes(file.size_bytes)}</span>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* File-level documentation */}
+        {file.module_doc && (
+          <div>
+            <h4 className={`text-xs font-semibold uppercase mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+              File Documentation
+            </h4>
+            <div className={`
+              text-xs px-3 py-2 rounded-lg border-l-2
+              ${darkMode ? "border-blue-700 bg-blue-900/10 text-zinc-400" : "border-blue-300 bg-blue-50 text-zinc-600"}
+            `}>
+              {file.module_doc}
+            </div>
+          </div>
+        )}
+
         {symbols.length > 0 && (
           <div>
             <h4 className={`text-xs font-semibold uppercase mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
@@ -658,13 +865,21 @@ function FileDetail({ file }: { file: FileInfo }) {
                   {sym.name}
                   <span className={`ml-2 text-xs ${darkMode ? "text-zinc-600" : "text-zinc-400"}`}>L{sym.line}</span>
                 </div>
+                {sym.docstring && (
+                  <div className={`
+                    text-xs mb-1.5 px-2 py-1 rounded border-l-2
+                    ${darkMode ? "border-green-700 bg-green-900/10 text-zinc-400" : "border-green-300 bg-green-50 text-zinc-600"}
+                  `}>
+                    {sym.docstring}
+                  </div>
+                )}
                 <CodePreview code={sym.code_preview} language={file.language} />
               </div>
             ))}
           </div>
         )}
         {file.imports.length > 0 && (
-          <div className="mt-4">
+          <div>
             <h4 className={`text-xs font-semibold uppercase mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
               Imports ({file.imports.length})
             </h4>
@@ -717,6 +932,14 @@ function SymbolDetail({ symbol }: { symbol: ArchSymbol }) {
         </p>
       </div>
       <div className="flex-1 overflow-y-auto p-4">
+        {symbol.docstring && (
+          <div className={`
+            text-sm mb-3 px-3 py-2 rounded-lg border-l-2
+            ${darkMode ? "border-blue-700 bg-blue-900/10 text-zinc-300" : "border-blue-300 bg-blue-50 text-zinc-700"}
+          `}>
+            {symbol.docstring}
+          </div>
+        )}
         <CodePreview code={symbol.code_preview} language={symbol.file.split(".").pop() || ""} />
       </div>
     </div>

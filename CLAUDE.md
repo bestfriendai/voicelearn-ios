@@ -90,6 +90,22 @@ When debugging UI issues:
 
 This workflow allows autonomous debugging without manual user intervention.
 
+## Xcode Project Generation
+
+The Xcode project is generated from `project.yml` using XcodeGen. The `project.pbxproj` file is NOT committed to git.
+
+**First-time setup after cloning:**
+```bash
+xcodegen generate
+```
+
+**After modifying project.yml:**
+```bash
+xcodegen generate
+```
+
+This keeps the project configuration human-readable and avoids merge conflicts.
+
 ## Quick Commands
 
 ```bash

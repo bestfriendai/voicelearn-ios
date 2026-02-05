@@ -118,6 +118,23 @@ The wiki is the primary resource for contributors and maintainers.
 - [Testing Guide](docs/testing/TESTING.md)
 - [Debug & Testing UI](docs/testing/DEBUG_TESTING_UI.md) - Built-in troubleshooting tools
 
+### iOS Project Setup
+
+The Xcode project is generated from `project.yml` using [XcodeGen](https://github.com/yonaskolb/XcodeGen). After cloning:
+
+```bash
+# Install XcodeGen (if not already installed)
+brew install xcodegen
+
+# Generate the Xcode project
+xcodegen generate
+
+# Open in Xcode
+open UnaMentis.xcodeproj
+```
+
+This keeps the project configuration human-readable and avoids merge conflicts in `project.pbxproj`.
+
 ### Curriculum Format (UMCF)
 - [Curriculum Overview](curriculum/README.md) - **Comprehensive guide to UMCF**
 - [UMCF Specification](curriculum/spec/UMCF_SPECIFICATION.md) - Format specification

@@ -1,6 +1,7 @@
 # Xcode
+# Note: project.pbxproj is generated from project.yml via XcodeGen
+# Run `xcodegen generate` after cloning to create the Xcode project
 *.xcodeproj/*
-!*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcworkspace/contents.xcworkspacedata
 *.xcworkspace/*
@@ -32,6 +33,7 @@ fastlane/test_output
 # Code coverage
 *.gcda
 *.gcno
+*.profraw
 .coverage
 htmlcov/
 

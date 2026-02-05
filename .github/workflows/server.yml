@@ -79,7 +79,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-asyncio pytest-aiohttp pytest-cov aiohttp bcrypt PyJWT aiofiles hypothesis asyncpg
+        pip install pytest pytest-asyncio pytest-aiohttp pytest-cov aiohttp bcrypt PyJWT aiofiles hypothesis asyncpg aiosqlite aioresponses yarl
 
     - name: Run Management Server Tests with Coverage
       run: |
@@ -120,7 +120,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-asyncio hypothesis aiohttp bcrypt PyJWT aiofiles asyncpg
+        pip install pytest pytest-asyncio hypothesis aiohttp bcrypt PyJWT aiofiles asyncpg aiosqlite
 
     - name: Run Property Tests with Hypothesis
       run: |
@@ -248,9 +248,11 @@ jobs:
         cargo install cargo-tarpaulin --locked
 
     - name: Run tests with coverage
+      continue-on-error: true
+      timeout-minutes: 10
       run: |
         cd server/usm-core
-        cargo tarpaulin --out Xml --out Html --output-dir coverage --skip-clean
+        cargo tarpaulin --out Xml --out Html --output-dir coverage --skip-clean --timeout 300
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

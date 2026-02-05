@@ -86,8 +86,8 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
 
-    - name: Install xcbeautify
-      run: brew install xcbeautify
+    - name: Install xcbeautify and XcodeGen
+      run: brew install xcbeautify xcodegen
 
     - name: Cache SPM packages
       uses: actions/cache@v4
@@ -120,6 +120,9 @@ jobs:
         touch models/Models/voices/javert.safetensors
         touch models/Models/voices/azelma.safetensors
         echo "Created placeholder model files for CI build"
+
+    - name: Generate Xcode project
+      run: xcodegen generate
 
     - name: Build
       run: |
@@ -217,8 +220,8 @@ jobs:
     - name: Select Xcode 16.2
       run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
-    - name: Install xcbeautify
-      run: brew install xcbeautify
+    - name: Install xcbeautify and XcodeGen
+      run: brew install xcbeautify xcodegen
 
     - name: Cache SPM packages
       uses: actions/cache@v4
@@ -251,6 +254,9 @@ jobs:
         touch models/Models/voices/javert.safetensors
         touch models/Models/voices/azelma.safetensors
         echo "Created placeholder model files for CI build"
+
+    - name: Generate Xcode project
+      run: xcodegen generate
 
     - name: Build
       run: |

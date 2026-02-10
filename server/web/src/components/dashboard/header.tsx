@@ -5,6 +5,7 @@ import { FileText, Users } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { isUsingMockData } from '@/lib/api-client';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface HeaderProps {
   stats?: {
@@ -99,6 +100,9 @@ export function Header({ stats, connected = false }: HeaderProps) {
                 </span>
               </div>
             </div>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Time - always visible but smaller on mobile */}
             <div className="text-xs sm:text-sm text-slate-400 font-mono tabular-nums">

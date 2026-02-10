@@ -5,6 +5,7 @@ import { WebSocketProvider } from '@/lib/websocket-provider';
 import { FeatureFlagProvider } from '@/lib/feature-flags/context';
 import type { FeatureFlagConfig } from '@/lib/feature-flags/types';
 import { ToastProvider } from '@/components/ui/toast';
+import { ThemeProvider } from '@/components/theme-provider';
 import { initializeTestHooks } from '@/lib/test-hooks';
 
 interface ProvidersProps {
@@ -30,10 +31,12 @@ export function Providers({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <FeatureFlagProvider config={featureFlagConfig}>
-      <WebSocketProvider>
-        <ToastProvider>{children}</ToastProvider>
-      </WebSocketProvider>
-    </FeatureFlagProvider>
+    <ThemeProvider>
+      <FeatureFlagProvider config={featureFlagConfig}>
+        <WebSocketProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </WebSocketProvider>
+      </FeatureFlagProvider>
+    </ThemeProvider>
   );
 }

@@ -84,15 +84,21 @@ interface Course {
 }
 
 interface ImportJob {
-  jobId: string;
+  id: string;
+  config: {
+    sourceId: string;
+    courseId: string;
+    outputName: string;
+  };
   status: string;
-  sourceId: string;
-  courseId: string;
-  courseName: string;
   currentStage: string;
-  stageProgress: number;
+  currentActivity: string;
   overallProgress: number;
+  stages: { id: string; name: string; status: string; progress: number }[];
+  result?: { title: string; topicCount: number } | null;
   error?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface CourseImportStatus {
@@ -672,10 +678,10 @@ export function SourceBrowserPanel() {
             Active Imports
           </h4>
           {importJobs.map((job) => (
-            <Card key={job.jobId} className="bg-slate-800/50">
+            <Card key={job.id} className="bg-slate-800/50">
               <CardContent className="py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {job.status === 'completed' ? (
+                  {job.status === 'complete' ? (
                     <CheckCircle className="w-5 h-5 text-emerald-400" />
                   ) : job.status === 'failed' ? (
                     <XCircle className="w-5 h-5 text-red-400" />
@@ -683,7 +689,7 @@ export function SourceBrowserPanel() {
                     <Loader2 className="w-5 h-5 text-orange-400 animate-spin" />
                   )}
                   <div>
-                    <p className="font-medium text-slate-100">{job.courseName}</p>
+                    <p className="font-medium text-slate-100">{job.config.courseId}</p>
                     <p className="text-sm text-slate-400">{job.currentStage}</p>
                   </div>
                 </div>
@@ -692,7 +698,7 @@ export function SourceBrowserPanel() {
                     <div
                       className={cn(
                         'h-full transition-all',
-                        job.status === 'completed'
+                        job.status === 'complete'
                           ? 'bg-emerald-500'
                           : job.status === 'failed'
                             ? 'bg-red-500'
@@ -702,9 +708,9 @@ export function SourceBrowserPanel() {
                     />
                   </div>
                   <span className="text-sm text-slate-400 w-12">{job.overallProgress}%</span>
-                  {job.status !== 'completed' && job.status !== 'failed' && (
+                  {job.status !== 'complete' && job.status !== 'failed' && (
                     <button
-                      onClick={() => handleCancelImport(job.jobId)}
+                      onClick={() => handleCancelImport(job.id)}
                       className="p-1 text-slate-400 hover:text-red-400"
                       title="Cancel import"
                     >

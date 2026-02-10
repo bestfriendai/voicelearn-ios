@@ -1,0 +1,816 @@
+{
+  "umcf": "1.0.0",
+  "id": {
+    "catalog": "UnaMentis",
+    "value": "24-09-minds-and-machines-fall-2011"
+  },
+  "title": "Minds and Machines",
+  "description": "Introduction to philosophy of mind: consciousness, mental representation, personal identity, and artificial intelligence.",
+  "version": {
+    "number": "1.0.0",
+    "date": "2026-02-10"
+  },
+  "lifecycle": {
+    "status": "draft",
+    "contributors": [
+      {
+        "role": "publisher",
+        "name": "UnaMentis Importer"
+      },
+      {
+        "role": "instructor",
+        "name": "Alex Byrne"
+      }
+    ]
+  },
+  "metadata": {
+    "language": "en-US",
+    "keywords": [],
+    "department": "Linguistics and Philosophy"
+  },
+  "educational": {
+    "audience": {
+      "type": "learner",
+      "educationalLevel": "collegiate"
+    }
+  },
+  "rights": {
+    "type": "CC-BY-NC-SA-4.0",
+    "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "permissions": [
+      "share",
+      "adapt"
+    ],
+    "conditions": [
+      "attribution",
+      "noncommercial",
+      "sharealike"
+    ],
+    "attributionRequired": true,
+    "attributionFormat": "Content from MIT OpenCourseWare (ocw.mit.edu), licensed under CC-BY-NC-SA 4.0.",
+    "holder": {
+      "name": "Massachusetts Institute of Technology",
+      "url": "https://ocw.mit.edu/"
+    },
+    "restrictions": []
+  },
+  "content": [
+    {
+      "id": {
+        "value": "lectures"
+      },
+      "title": "Lectures",
+      "type": "module",
+      "orderIndex": 0,
+      "children": [
+        {
+          "id": {
+            "value": "lecture-1"
+          },
+          "title": "Introduction",
+          "type": "topic",
+          "orderIndex": 0,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-2"
+          },
+          "title": "Searle against artificial intelligence (AI): The Chinese room argument",
+          "type": "topic",
+          "orderIndex": 1,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-3"
+          },
+          "title": "The Chinese room argument (cont.)",
+          "type": "topic",
+          "orderIndex": 2,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-4"
+          },
+          "title": "The Chinese room argument (cont.), and the Turing test",
+          "type": "topic",
+          "orderIndex": 3,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-5"
+          },
+          "title": "The Turing test (cont.)",
+          "type": "topic",
+          "orderIndex": 4,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-6"
+          },
+          "title": "Computational complexity (guest lecture by Scott Aaronson)",
+          "type": "topic",
+          "orderIndex": 5,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-7"
+          },
+          "title": "Dualism",
+          "type": "topic",
+          "orderIndex": 6,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-8"
+          },
+          "title": "Dualism (cont.)",
+          "type": "topic",
+          "orderIndex": 7,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-9"
+          },
+          "title": "From dualism to behaviorism",
+          "type": "topic",
+          "orderIndex": 8,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-10"
+          },
+          "title": "From behaviorism to the identity theory",
+          "type": "topic",
+          "orderIndex": 9,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-11"
+          },
+          "title": "The identity theory (cont.)",
+          "type": "topic",
+          "orderIndex": 10,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-12"
+          },
+          "title": "Kripke\u2019s Objection",
+          "type": "topic",
+          "orderIndex": 11,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-13"
+          },
+          "title": "Functionalism",
+          "type": "topic",
+          "orderIndex": 12,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-14"
+          },
+          "title": "Review session",
+          "type": "topic",
+          "orderIndex": 13,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-15"
+          },
+          "title": "From functionalism to externalism",
+          "type": "topic",
+          "orderIndex": 14,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-16"
+          },
+          "title": "Externalism",
+          "type": "topic",
+          "orderIndex": 15,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-17"
+          },
+          "title": "From externalism to perception",
+          "type": "topic",
+          "orderIndex": 16,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-18"
+          },
+          "title": "Perception: Valberg\u2019s puzzle of experience",
+          "type": "topic",
+          "orderIndex": 17,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-19"
+          },
+          "title": "Perception, consciousness, and intentionality",
+          "type": "topic",
+          "orderIndex": 18,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-20"
+          },
+          "title": "Perception, consciousness, and intentionality (cont.)",
+          "type": "topic",
+          "orderIndex": 19,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-21"
+          },
+          "title": "Jackson\u2019s knowledge argument",
+          "type": "topic",
+          "orderIndex": 20,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-22"
+          },
+          "title": "Nagel on bats",
+          "type": "topic",
+          "orderIndex": 21,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-23"
+          },
+          "title": "Consciousness and its place in nature",
+          "type": "topic",
+          "orderIndex": 22,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-24"
+          },
+          "title": "Consciousness and its place in nature (cont.)",
+          "type": "topic",
+          "orderIndex": 23,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-25"
+          },
+          "title": "Free will",
+          "type": "topic",
+          "orderIndex": 24,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": "resources"
+      },
+      "title": "Additional Resources",
+      "type": "module",
+      "orderIndex": 3,
+      "children": [
+        {
+          "id": {
+            "value": "resource-1"
+          },
+          "title": "6a442487831773cee2574fc1b3c36356_MIT24_09F11_lec20",
+          "type": "resource",
+          "orderIndex": 0,
+          "content": {
+            "sourceFile": "static_resources/6a442487831773cee2574fc1b3c36356_MIT24_09F11_lec20.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-2"
+          },
+          "title": "044a492c469fe90185ceada3ccaa41c7_MIT24_09F11_lec16",
+          "type": "resource",
+          "orderIndex": 1,
+          "content": {
+            "sourceFile": "static_resources/044a492c469fe90185ceada3ccaa41c7_MIT24_09F11_lec16.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-3"
+          },
+          "title": "61d30a9a655c7a965ff8e1733cacaae9_MIT24_09F11_lec23",
+          "type": "resource",
+          "orderIndex": 2,
+          "content": {
+            "sourceFile": "static_resources/61d30a9a655c7a965ff8e1733cacaae9_MIT24_09F11_lec23.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-4"
+          },
+          "title": "97b58398414ae9a18a6e2d7168ec5fac_MIT24_09F11_dualism",
+          "type": "resource",
+          "orderIndex": 3,
+          "content": {
+            "sourceFile": "static_resources/97b58398414ae9a18a6e2d7168ec5fac_MIT24_09F11_dualism.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-5"
+          },
+          "title": "50c6799385933c73756cb0a8ec1a54f5_MIT24_09F11_lec24",
+          "type": "resource",
+          "orderIndex": 4,
+          "content": {
+            "sourceFile": "static_resources/50c6799385933c73756cb0a8ec1a54f5_MIT24_09F11_lec24.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-6"
+          },
+          "title": "ac541f71b8cf62127cbe990dcf2ab9cd_MIT24_09F11_prop_partic",
+          "type": "resource",
+          "orderIndex": 5,
+          "content": {
+            "sourceFile": "static_resources/ac541f71b8cf62127cbe990dcf2ab9cd_MIT24_09F11_prop_partic.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-7"
+          },
+          "title": "3f468ddda0d0c3ab5ae91fbcd9e17894_MIT24_09F11_chinese_room",
+          "type": "resource",
+          "orderIndex": 6,
+          "content": {
+            "sourceFile": "static_resources/3f468ddda0d0c3ab5ae91fbcd9e17894_MIT24_09F11_chinese_room.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-8"
+          },
+          "title": "19194eff1bdbe7986418b653c9e56a67_MIT24_09F11_lec09",
+          "type": "resource",
+          "orderIndex": 7,
+          "content": {
+            "sourceFile": "static_resources/19194eff1bdbe7986418b653c9e56a67_MIT24_09F11_lec09.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-9"
+          },
+          "title": "e3f5b03e2b3bd5b6c1b8629da538a443_MIT24_09F11_lec03",
+          "type": "resource",
+          "orderIndex": 8,
+          "content": {
+            "sourceFile": "static_resources/e3f5b03e2b3bd5b6c1b8629da538a443_MIT24_09F11_lec03.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-10"
+          },
+          "title": "2394af31aedcf72d2e52d2848a972001_MIT24_09F11_lec08",
+          "type": "resource",
+          "orderIndex": 9,
+          "content": {
+            "sourceFile": "static_resources/2394af31aedcf72d2e52d2848a972001_MIT24_09F11_lec08.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-11"
+          },
+          "title": "4027d8e5ded99c3e3817705ad8e47271_MIT24_09F11_functionalism",
+          "type": "resource",
+          "orderIndex": 10,
+          "content": {
+            "sourceFile": "static_resources/4027d8e5ded99c3e3817705ad8e47271_MIT24_09F11_functionalism.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-12"
+          },
+          "title": "a7b8cc80986f214a81645abc222e8ddb_MIT24_09F11_knowledge",
+          "type": "resource",
+          "orderIndex": 11,
+          "content": {
+            "sourceFile": "static_resources/a7b8cc80986f214a81645abc222e8ddb_MIT24_09F11_knowledge.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-13"
+          },
+          "title": "5e28329ceb698910103789ef99bc74b1_MIT24_09F11_lec07",
+          "type": "resource",
+          "orderIndex": 12,
+          "content": {
+            "sourceFile": "static_resources/5e28329ceb698910103789ef99bc74b1_MIT24_09F11_lec07.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-14"
+          },
+          "title": "942275d2743a70503d6501fb18a346f4_MIT24_09F11_lec22",
+          "type": "resource",
+          "orderIndex": 13,
+          "content": {
+            "sourceFile": "static_resources/942275d2743a70503d6501fb18a346f4_MIT24_09F11_lec22.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-15"
+          },
+          "title": "313bc8d9e565da574c0fe21a122ca6ea_MIT24_09F11_lec26",
+          "type": "resource",
+          "orderIndex": 14,
+          "content": {
+            "sourceFile": "static_resources/313bc8d9e565da574c0fe21a122ca6ea_MIT24_09F11_lec26.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-16"
+          },
+          "title": "90e66cbf8c3ed8ab24d21587dcbf92bd_MIT24_09F11_lec17",
+          "type": "resource",
+          "orderIndex": 15,
+          "content": {
+            "sourceFile": "static_resources/90e66cbf8c3ed8ab24d21587dcbf92bd_MIT24_09F11_lec17.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-17"
+          },
+          "title": "f23849d56a8fd647140a73fe09940056_MIT24_09F11_lec13",
+          "type": "resource",
+          "orderIndex": 16,
+          "content": {
+            "sourceFile": "static_resources/f23849d56a8fd647140a73fe09940056_MIT24_09F11_lec13.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-18"
+          },
+          "title": "4434931ff4a080af95e94bfe542a32cd_MIT24_09F11_argument",
+          "type": "resource",
+          "orderIndex": 17,
+          "content": {
+            "sourceFile": "static_resources/4434931ff4a080af95e94bfe542a32cd_MIT24_09F11_argument.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-19"
+          },
+          "title": "95ca948d7e8f84757e420e9df68d853f_MIT24_09F11_lec25",
+          "type": "resource",
+          "orderIndex": 18,
+          "content": {
+            "sourceFile": "static_resources/95ca948d7e8f84757e420e9df68d853f_MIT24_09F11_lec25.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-20"
+          },
+          "title": "a3c9f64e821d01ceea1adc084631ab42_MIT24_09F11_behaviorism",
+          "type": "resource",
+          "orderIndex": 19,
+          "content": {
+            "sourceFile": "static_resources/a3c9f64e821d01ceea1adc084631ab42_MIT24_09F11_behaviorism.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-21"
+          },
+          "title": "707dda87f7295c11549114471cf3d8e3_MIT24_09F11_lec19",
+          "type": "resource",
+          "orderIndex": 20,
+          "content": {
+            "sourceFile": "static_resources/707dda87f7295c11549114471cf3d8e3_MIT24_09F11_lec19.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-22"
+          },
+          "title": "ad0cbb53f573c353b322de02ec440c1d_MIT24_09F11_lec05",
+          "type": "resource",
+          "orderIndex": 21,
+          "content": {
+            "sourceFile": "static_resources/ad0cbb53f573c353b322de02ec440c1d_MIT24_09F11_lec05.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-23"
+          },
+          "title": "564d79e714127da2a442d0e3801ea4a9_MIT24_09F11_lec15",
+          "type": "resource",
+          "orderIndex": 22,
+          "content": {
+            "sourceFile": "static_resources/564d79e714127da2a442d0e3801ea4a9_MIT24_09F11_lec15.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-24"
+          },
+          "title": "88e3f30e32a5598c45f86edc463bcf12_MIT24_09F11_lec21",
+          "type": "resource",
+          "orderIndex": 23,
+          "content": {
+            "sourceFile": "static_resources/88e3f30e32a5598c45f86edc463bcf12_MIT24_09F11_lec21.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-25"
+          },
+          "title": "c18da76ad49ddcb85ffc1a1e84648376_MIT24_09F11_lec11",
+          "type": "resource",
+          "orderIndex": 24,
+          "content": {
+            "sourceFile": "static_resources/c18da76ad49ddcb85ffc1a1e84648376_MIT24_09F11_lec11.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-26"
+          },
+          "title": "11f2c71a0601923662f50031fc17c22b_MIT24_09F11_lec14",
+          "type": "resource",
+          "orderIndex": 25,
+          "content": {
+            "sourceFile": "static_resources/11f2c71a0601923662f50031fc17c22b_MIT24_09F11_lec14.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-27"
+          },
+          "title": "51a9ee4368e2646369f982b61919b766_MIT24_09F11_lec02",
+          "type": "resource",
+          "orderIndex": 26,
+          "content": {
+            "sourceFile": "static_resources/51a9ee4368e2646369f982b61919b766_MIT24_09F11_lec02.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-28"
+          },
+          "title": "31a6452f2f461eb72a4138d2165d41be_MIT24_09F11_lec18",
+          "type": "resource",
+          "orderIndex": 27,
+          "content": {
+            "sourceFile": "static_resources/31a6452f2f461eb72a4138d2165d41be_MIT24_09F11_lec18.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-29"
+          },
+          "title": "a385f30f349df62a262b73a862f046fd_MIT24_09F11_lec01",
+          "type": "resource",
+          "orderIndex": 28,
+          "content": {
+            "sourceFile": "static_resources/a385f30f349df62a262b73a862f046fd_MIT24_09F11_lec01.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-30"
+          },
+          "title": "320bbd3f6439e7f7799117285e1b36e6_MIT24_09F11_lec04",
+          "type": "resource",
+          "orderIndex": 29,
+          "content": {
+            "sourceFile": "static_resources/320bbd3f6439e7f7799117285e1b36e6_MIT24_09F11_lec04.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-31"
+          },
+          "title": "b49434ce44b077b3861171519a6b7ee9_MIT24_09F11_identity",
+          "type": "resource",
+          "orderIndex": 30,
+          "content": {
+            "sourceFile": "static_resources/b49434ce44b077b3861171519a6b7ee9_MIT24_09F11_identity.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-32"
+          },
+          "title": "f92a8efb9f0aceb7395925139786e84b_MIT24_09F11_poss_nec",
+          "type": "resource",
+          "orderIndex": 31,
+          "content": {
+            "sourceFile": "static_resources/f92a8efb9f0aceb7395925139786e84b_MIT24_09F11_poss_nec.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-33"
+          },
+          "title": "dfad9b16fecdb05a0ee1d036381e85e2_MIT24_09F11_Guidelines",
+          "type": "resource",
+          "orderIndex": 32,
+          "content": {
+            "sourceFile": "static_resources/dfad9b16fecdb05a0ee1d036381e85e2_MIT24_09F11_Guidelines.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-34"
+          },
+          "title": "3be407fc6c2cbccd3fcbabbd929286a8_MIT24_09F11_lec10",
+          "type": "resource",
+          "orderIndex": 33,
+          "content": {
+            "sourceFile": "static_resources/3be407fc6c2cbccd3fcbabbd929286a8_MIT24_09F11_lec10.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-35"
+          },
+          "title": "a86355bec90b77246e868ec3fedaeb5e_MIT24_09F11_lec12",
+          "type": "resource",
+          "orderIndex": 34,
+          "content": {
+            "sourceFile": "static_resources/a86355bec90b77246e868ec3fedaeb5e_MIT24_09F11_lec12.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-36"
+          },
+          "title": "d3ab18618945e9c5bd409f47e7ef1d6b_MIT24_09F11_externalism",
+          "type": "resource",
+          "orderIndex": 35,
+          "content": {
+            "sourceFile": "static_resources/d3ab18618945e9c5bd409f47e7ef1d6b_MIT24_09F11_externalism.pdf"
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": {
+    "terms": []
+  },
+  "_import_metadata": {
+    "source": "mit_ocw",
+    "course_id": "24-09-minds-and-machines-fall-2011",
+    "imported_at": "2026-02-10T17:21:32.688774",
+    "attribution": "This content is derived from MIT OpenCourseWare (ocw.mit.edu). Original course: \"Minds and Machines\" (Course Number: 24). Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC-BY-NC-SA 4.0). Copyright Massachusetts Institute of Technology.",
+    "stats": {
+      "lectures": 25,
+      "assignments": 0,
+      "exams": 0,
+      "resources": 36
+    }
+  }
+}

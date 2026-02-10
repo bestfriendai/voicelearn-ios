@@ -29,6 +29,16 @@ async function cancelImportJob(jobId: string): Promise<void> {
   }
 }
 
+function getCurrentStageProgress(job: ImportProgress): number {
+  const running = job.stages.find((s) => s.status === 'running');
+  return running?.progress ?? 0;
+}
+
+function getJobDisplayName(job: ImportProgress): string {
+  if (job.result?.title) return job.result.title;
+  return job.config.courseId;
+}
+
 const statusConfig: Record<ImportStatus, { icon: typeof Clock; color: string; label: string }> = {
   queued: {
     icon: Clock,
@@ -60,12 +70,7 @@ const statusConfig: Record<ImportStatus, { icon: typeof Clock; color: string; la
     color: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
     label: 'Generating',
   },
-  storing: {
-    icon: Loader2,
-    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    label: 'Storing',
-  },
-  completed: {
+  complete: {
     icon: CheckCircle,
     color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     label: 'Completed',
@@ -122,7 +127,7 @@ export function ImportJobsPanel() {
     // Poll for updates every 5 seconds when there are active jobs
     const interval = setInterval(() => {
       const hasActiveJobs = jobs.some(
-        (job) => !['completed', 'failed', 'cancelled'].includes(job.status)
+        (job) => !['complete', 'failed', 'cancelled'].includes(job.status)
       );
       if (hasActiveJobs) {
         fetchJobs();
@@ -144,8 +149,8 @@ export function ImportJobsPanel() {
     }
   };
 
-  const activeJobs = jobs.filter((j) => !['completed', 'failed', 'cancelled'].includes(j.status));
-  const completedJobs = jobs.filter((j) => ['completed', 'failed', 'cancelled'].includes(j.status));
+  const activeJobs = jobs.filter((j) => !['complete', 'failed', 'cancelled'].includes(j.status));
+  const completedJobs = jobs.filter((j) => ['complete', 'failed', 'cancelled'].includes(j.status));
 
   return (
     <div className="space-y-6">
@@ -168,7 +173,7 @@ export function ImportJobsPanel() {
             <option value="all">All Jobs</option>
             <option value="queued">Queued</option>
             <option value="downloading">In Progress</option>
-            <option value="completed">Completed</option>
+            <option value="complete">Completed</option>
             <option value="failed">Failed</option>
           </select>
 
@@ -220,12 +225,14 @@ export function ImportJobsPanel() {
                   const StatusIcon = config.icon;
 
                   return (
-                    <Card key={job.jobId} className="bg-slate-900/50 border-slate-800">
+                    <Card key={job.id} className="bg-slate-900/50 border-slate-800">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-medium text-slate-100">{job.courseName}</h4>
+                              <h4 className="font-medium text-slate-100">
+                                {getJobDisplayName(job)}
+                              </h4>
                               <Badge className={config.color}>
                                 <StatusIcon className="w-3 h-3 mr-1 animate-spin" />
                                 {config.label}
@@ -237,7 +244,7 @@ export function ImportJobsPanel() {
                             {/* Progress Bar */}
                             <div className="space-y-2">
                               <div className="flex justify-between text-xs text-slate-500">
-                                <span>Stage: {Math.round(job.stageProgress)}%</span>
+                                <span>Stage: {Math.round(getCurrentStageProgress(job))}%</span>
                                 <span>Overall: {Math.round(job.overallProgress)}%</span>
                               </div>
                               <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -248,18 +255,16 @@ export function ImportJobsPanel() {
                               </div>
                             </div>
 
-                            {/* Stats */}
+                            {/* Activity Info */}
                             <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
-                              <span>
-                                Files: {job.stats.filesProcessed}/{job.stats.filesDownloaded}
-                              </span>
-                              <span>Topics: {job.stats.topicsCreated}</span>
-                              <span>Duration: {formatDuration(job.startedAt)}</span>
+                              <span>{job.currentStage || 'Pending'}</span>
+                              {job.currentActivity && <span>{job.currentActivity}</span>}
+                              <span>Duration: {formatDuration(job.createdAt)}</span>
                             </div>
                           </div>
 
                           <button
-                            onClick={() => handleCancel(job.jobId)}
+                            onClick={() => handleCancel(job.id)}
                             className="p-2 text-slate-400 hover:text-red-400 transition-colors"
                             title="Cancel"
                           >
@@ -288,12 +293,14 @@ export function ImportJobsPanel() {
                   const StatusIcon = config.icon;
 
                   return (
-                    <Card key={job.jobId} className="bg-slate-900/50 border-slate-800">
+                    <Card key={job.id} className="bg-slate-900/50 border-slate-800">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-slate-100">{job.courseName}</h4>
+                              <h4 className="font-medium text-slate-100">
+                                {getJobDisplayName(job)}
+                              </h4>
                               <Badge className={config.color}>
                                 <StatusIcon className="w-3 h-3 mr-1" />
                                 {config.label}
@@ -303,12 +310,16 @@ export function ImportJobsPanel() {
                             {job.error && <p className="text-sm text-red-400 mt-1">{job.error}</p>}
 
                             <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                              <span>Topics: {job.stats.topicsCreated}</span>
+                              {job.result && <span>Topics: {job.result.topicCount}</span>}
                               <span>
-                                Duration: {formatDuration(job.startedAt, job.completedAt)}
+                                Duration:{' '}
+                                {formatDuration(
+                                  job.createdAt,
+                                  job.status === 'complete' ? job.updatedAt : undefined
+                                )}
                               </span>
-                              {job.completedAt && (
-                                <span>Finished: {new Date(job.completedAt).toLocaleString()}</span>
+                              {job.status === 'complete' && (
+                                <span>Finished: {new Date(job.updatedAt).toLocaleString()}</span>
                               )}
                             </div>
                           </div>

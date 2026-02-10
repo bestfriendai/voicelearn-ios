@@ -814,6 +814,7 @@ export interface CurriculumSaveResponse {
 
 // =============================================================================
 // Curriculum Import System Types (Source Browser)
+// Aligned with backend models in server/importers/core/models.py
 // =============================================================================
 
 /** License information for a curriculum source */
@@ -821,10 +822,15 @@ export interface LicenseInfo {
   type: string;
   name: string;
   url?: string;
-  requiresAttribution: boolean;
-  allowsCommercialUse: boolean;
-  allowsDerivatives: boolean;
-  shareAlike: boolean;
+  attributionRequired: boolean;
+  attributionFormat?: string;
+  permissions: string[];
+  conditions: string[];
+  restrictions: string[];
+  holder?: {
+    name: string;
+    url?: string;
+  };
 }
 
 /** Curriculum source (e.g., MIT OCW, Stanford SEE) */
@@ -832,57 +838,94 @@ export interface CurriculumSource {
   id: string;
   name: string;
   description: string;
-  provider: string;
-  website: string;
-  logo?: string;
+  logoUrl?: string;
   license: LicenseInfo;
-  contentTypes: string[];
-  subjects: string[];
-  courseCount: number;
-  isActive: boolean;
-  lastUpdated?: string;
+  courseCount: string;
+  features: string[];
+  status: string;
+  baseUrl: string;
+}
+
+/** Course feature availability */
+export interface CourseFeature {
+  type: string;
+  count: number | null;
+  available: boolean;
 }
 
 /** Course catalog entry (summary for listing) */
 export interface CourseCatalogEntry {
   id: string;
+  sourceId: string;
   title: string;
+  instructors: string[];
   description: string;
-  instructor?: string;
-  institution: string;
-  subject: string;
   level: string;
-  language: string;
-  thumbnail?: string;
-  url: string;
+  department?: string;
+  semester?: string;
+  features: CourseFeature[];
   license: LicenseInfo;
-  contentTypes: string[];
-  estimatedDuration?: string;
-  lastUpdated?: string;
+  thumbnailUrl?: string;
+  keywords: string[];
 }
 
-/** Detailed course information */
+/** Content topic within a unit */
+export interface ContentTopic {
+  id: string;
+  title: string;
+  number: number;
+  duration?: string | null;
+  hasVideo: boolean;
+  hasTranscript: boolean;
+  hasPractice: boolean;
+  description?: string | null;
+}
+
+/** Content unit containing topics */
+export interface ContentUnit {
+  id: string;
+  title: string;
+  number: number;
+  description?: string | null;
+  topics: ContentTopic[];
+}
+
+/** Content structure describing course organization */
+export interface ContentStructure {
+  unitLabel: string;
+  topicLabel: string;
+  isFlat: boolean;
+  units: ContentUnit[];
+}
+
+/** Assignment information */
+export interface AssignmentInfo {
+  id: string;
+  title: string;
+  hasSolutions: boolean;
+  description?: string | null;
+}
+
+/** Exam information */
+export interface ExamInfo {
+  id: string;
+  title: string;
+  type: string;
+  hasSolutions: boolean;
+}
+
+/** Detailed course information (NormalizedCourseDetail from backend) */
 export interface CourseDetail extends CourseCatalogEntry {
-  longDescription?: string;
-  syllabus?: string;
-  prerequisites?: string[];
-  learningOutcomes?: string[];
-  topics?: string[];
-  contentSummary: {
-    lectureCount: number;
-    hasTranscripts: boolean;
-    hasLectureNotes: boolean;
-    hasAssignments: boolean;
-    hasExams: boolean;
-    hasVideos: boolean;
-    hasSolutions: boolean;
-  };
-  downloads?: {
-    type: string;
-    format: string;
-    size?: number;
-    url: string;
-  }[];
+  levelLabel?: string;
+  contentStructure?: ContentStructure | null;
+  assignments: AssignmentInfo[];
+  exams: ExamInfo[];
+  syllabus?: string | null;
+  prerequisites: string[];
+  estimatedImportTime: string;
+  estimatedOutputSize: string;
+  sourceUrl?: string | null;
+  downloadUrl?: string | null;
 }
 
 /** Import configuration options */
@@ -890,6 +933,7 @@ export interface ImportConfig {
   sourceId: string;
   courseId: string;
   outputName: string;
+  selectedLectures?: string[];
   includeTranscripts: boolean;
   includeLectureNotes: boolean;
   includeAssignments: boolean;
@@ -900,9 +944,10 @@ export interface ImportConfig {
   generateSpokenText: boolean;
   buildKnowledgeGraph: boolean;
   generatePracticeProblems: boolean;
+  generateMedia?: boolean;
 }
 
-/** Import job status */
+/** Import job status (matches backend ImportStatus enum) */
 export type ImportStatus =
   | 'queued'
   | 'downloading'
@@ -910,33 +955,52 @@ export type ImportStatus =
   | 'extracting'
   | 'enriching'
   | 'generating'
-  | 'storing'
-  | 'completed'
+  | 'complete'
   | 'failed'
   | 'cancelled';
 
-/** Import progress information */
+/** Import stage progress */
+export interface ImportStage {
+  id: string;
+  name: string;
+  status: string;
+  progress: number;
+  details?: string | null;
+  substages: ImportStage[];
+}
+
+/** Import log entry */
+export interface ImportLogEntry {
+  timestamp: string;
+  level: string;
+  message: string;
+}
+
+/** Import result (present when job completes successfully) */
+export interface ImportResult {
+  curriculumId: string;
+  title: string;
+  topicCount: number;
+  assessmentCount: number;
+  outputPath: string;
+  outputSize: string;
+  license: LicenseInfo;
+}
+
+/** Import progress information (matches backend ImportProgress.to_dict()) */
 export interface ImportProgress {
-  jobId: string;
+  id: string;
+  config: ImportConfig;
   status: ImportStatus;
-  sourceId: string;
-  courseId: string;
-  courseName: string;
-  currentStage: string;
-  stageProgress: number;
   overallProgress: number;
-  startedAt: string;
+  currentStage: string;
+  currentActivity: string;
+  stages: ImportStage[];
+  log: ImportLogEntry[];
+  result?: ImportResult | null;
+  error?: string | null;
+  createdAt: string;
   updatedAt: string;
-  completedAt?: string;
-  error?: string;
-  warnings: string[];
-  stats: {
-    filesDownloaded: number;
-    filesProcessed: number;
-    topicsCreated: number;
-    objectivesGenerated: number;
-    assessmentsGenerated: number;
-  };
 }
 
 /** API response for sources list */
@@ -956,10 +1020,9 @@ export interface CourseCatalogResponse {
     total: number;
     totalPages: number;
   };
-  filters?: {
+  filters: {
     subjects: string[];
     levels: string[];
-    features: string[];
   };
   error?: string;
 }
@@ -970,7 +1033,7 @@ export interface CourseDetailResponse {
   course: CourseDetail;
   canImport: boolean;
   licenseWarnings: string[];
-  attribution?: string;
+  attribution: string;
   error?: string;
 }
 
@@ -978,7 +1041,7 @@ export interface CourseDetailResponse {
 export interface StartImportResponse {
   success: boolean;
   jobId: string;
-  status: ImportStatus;
+  status: string;
   error?: string;
   licenseRestriction?: boolean;
 }

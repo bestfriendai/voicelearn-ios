@@ -1,0 +1,774 @@
+{
+  "umcf": "1.0.0",
+  "id": {
+    "catalog": "UnaMentis",
+    "value": "24-200-ancient-philosophy-fall-2004"
+  },
+  "title": "Ancient Philosophy",
+  "description": "Study of ancient Greek philosophy including Socrates, Plato, and Aristotle. Examines ethics, metaphysics, and epistemology.",
+  "version": {
+    "number": "1.0.0",
+    "date": "2026-02-10"
+  },
+  "lifecycle": {
+    "status": "draft",
+    "contributors": [
+      {
+        "role": "publisher",
+        "name": "UnaMentis Importer"
+      },
+      {
+        "role": "instructor",
+        "name": "Rae Langton"
+      }
+    ]
+  },
+  "metadata": {
+    "language": "en-US",
+    "keywords": [],
+    "department": "Linguistics and Philosophy"
+  },
+  "educational": {
+    "audience": {
+      "type": "learner",
+      "educationalLevel": "collegiate"
+    }
+  },
+  "rights": {
+    "type": "CC-BY-NC-SA-4.0",
+    "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "permissions": [
+      "share",
+      "adapt"
+    ],
+    "conditions": [
+      "attribution",
+      "noncommercial",
+      "sharealike"
+    ],
+    "attributionRequired": true,
+    "attributionFormat": "Content from MIT OpenCourseWare (ocw.mit.edu), licensed under CC-BY-NC-SA 4.0.",
+    "holder": {
+      "name": "Massachusetts Institute of Technology",
+      "url": "https://ocw.mit.edu/"
+    },
+    "restrictions": []
+  },
+  "content": [
+    {
+      "id": {
+        "value": "lectures"
+      },
+      "title": "Lectures",
+      "type": "module",
+      "orderIndex": 0,
+      "children": [
+        {
+          "id": {
+            "value": "lecture-1"
+          },
+          "title": "Introduction",
+          "type": "topic",
+          "orderIndex": 0,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-2"
+          },
+          "title": "Socrates and the Sophists",
+          "type": "topic",
+          "orderIndex": 1,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-3"
+          },
+          "title": "Socrates and the Law",
+          "type": "topic",
+          "orderIndex": 2,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-4"
+          },
+          "title": "Socratic Method",
+          "type": "topic",
+          "orderIndex": 3,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-5"
+          },
+          "title": "Knowledge and Learning",
+          "type": "topic",
+          "orderIndex": 4,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-6"
+          },
+          "title": "Prudential Paradox",
+          "type": "topic",
+          "orderIndex": 5,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-7"
+          },
+          "title": "Immortality and the Soul",
+          "type": "topic",
+          "orderIndex": 6,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-8"
+          },
+          "title": "Introduction of the Forms",
+          "type": "topic",
+          "orderIndex": 7,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-9"
+          },
+          "title": "Why Be Moral?",
+          "type": "topic",
+          "orderIndex": 8,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-10"
+          },
+          "title": "Justice in the City",
+          "type": "topic",
+          "orderIndex": 9,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-11"
+          },
+          "title": "Justice in the Soul",
+          "type": "topic",
+          "orderIndex": 10,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-12"
+          },
+          "title": "Theory of Forms",
+          "type": "topic",
+          "orderIndex": 11,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-13"
+          },
+          "title": "Happiness, Liberty, and Social Engineering",
+          "type": "topic",
+          "orderIndex": 12,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-14"
+          },
+          "title": "Aristotle on Plato",
+          "type": "topic",
+          "orderIndex": 13,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-15"
+          },
+          "title": "Matter and Form",
+          "type": "topic",
+          "orderIndex": 14,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-16"
+          },
+          "title": "Essence, God",
+          "type": "topic",
+          "orderIndex": 15,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-17"
+          },
+          "title": "On the Soul",
+          "type": "topic",
+          "orderIndex": 16,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-18"
+          },
+          "title": "Perception, Understanding",
+          "type": "topic",
+          "orderIndex": 17,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-19"
+          },
+          "title": "Happiness",
+          "type": "topic",
+          "orderIndex": 18,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-20"
+          },
+          "title": "Virtue",
+          "type": "topic",
+          "orderIndex": 19,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-21"
+          },
+          "title": "Weakness of Will",
+          "type": "topic",
+          "orderIndex": 20,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-22"
+          },
+          "title": "Friendship",
+          "type": "topic",
+          "orderIndex": 21,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-23"
+          },
+          "title": "Contemplation",
+          "type": "topic",
+          "orderIndex": 22,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-24"
+          },
+          "title": "Epicurean Atomism",
+          "type": "topic",
+          "orderIndex": 23,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-25"
+          },
+          "title": "Epicurean Morality",
+          "type": "topic",
+          "orderIndex": 24,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-26"
+          },
+          "title": "Death",
+          "type": "topic",
+          "orderIndex": 25,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": "resources"
+      },
+      "title": "Additional Resources",
+      "type": "module",
+      "orderIndex": 3,
+      "children": [
+        {
+          "id": {
+            "value": "resource-1"
+          },
+          "title": "f98a2982e6d0da95adfbf47eb6608f7c_akrasia",
+          "type": "resource",
+          "orderIndex": 0,
+          "content": {
+            "sourceFile": "static_resources/f98a2982e6d0da95adfbf47eb6608f7c_akrasia.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-2"
+          },
+          "title": "783850dacbf848bd5423a34e0212a6b0_knowl_forms",
+          "type": "resource",
+          "orderIndex": 1,
+          "content": {
+            "sourceFile": "static_resources/783850dacbf848bd5423a34e0212a6b0_knowl_forms.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-3"
+          },
+          "title": "7d96cd8c70990e1d36f79a80cf94e6f2_tapphaedo",
+          "type": "resource",
+          "orderIndex": 2,
+          "content": {
+            "sourceFile": "static_resources/7d96cd8c70990e1d36f79a80cf94e6f2_tapphaedo.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-4"
+          },
+          "title": "0244a15bf02da7e778eab8f0f6c72a18_tap_avirtue",
+          "type": "resource",
+          "orderIndex": 3,
+          "content": {
+            "sourceFile": "static_resources/0244a15bf02da7e778eab8f0f6c72a18_tap_avirtue.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-5"
+          },
+          "title": "bd347f1138c19d97979506a527e71e97_death04",
+          "type": "resource",
+          "orderIndex": 4,
+          "content": {
+            "sourceFile": "static_resources/bd347f1138c19d97979506a527e71e97_death04.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-6"
+          },
+          "title": "eff11036bbb7bb2b19278dfb6d74c8ec_tap_nefriend2",
+          "type": "resource",
+          "orderIndex": 5,
+          "content": {
+            "sourceFile": "static_resources/eff11036bbb7bb2b19278dfb6d74c8ec_tap_nefriend2.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-7"
+          },
+          "title": "aaea37e561fd39caa7a2ddf4d7788fa0_taprepwhymoral",
+          "type": "resource",
+          "orderIndex": 6,
+          "content": {
+            "sourceFile": "static_resources/aaea37e561fd39caa7a2ddf4d7788fa0_taprepwhymoral.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-8"
+          },
+          "title": "9512959a02ed7f81025b0a84449fd408_sunlinecave",
+          "type": "resource",
+          "orderIndex": 7,
+          "content": {
+            "sourceFile": "static_resources/9512959a02ed7f81025b0a84449fd408_sunlinecave.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-9"
+          },
+          "title": "5f13c16c47a58d84c0bec741edd8bbca_tapmetaphysics12",
+          "type": "resource",
+          "orderIndex": 8,
+          "content": {
+            "sourceFile": "static_resources/5f13c16c47a58d84c0bec741edd8bbca_tapmetaphysics12.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-10"
+          },
+          "title": "4fa344a3358118404862fafdadc627cc_avolunt",
+          "type": "resource",
+          "orderIndex": 9,
+          "content": {
+            "sourceFile": "static_resources/4fa344a3358118404862fafdadc627cc_avolunt.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-11"
+          },
+          "title": "805c632a75277ba04ccec779f8889770_virtue",
+          "type": "resource",
+          "orderIndex": 10,
+          "content": {
+            "sourceFile": "static_resources/805c632a75277ba04ccec779f8889770_virtue.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-12"
+          },
+          "title": "880ed2368cb537f700611c8ea77b2717_acat",
+          "type": "resource",
+          "orderIndex": 11,
+          "content": {
+            "sourceFile": "static_resources/880ed2368cb537f700611c8ea77b2717_acat.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-13"
+          },
+          "title": "340916a74de1775088445f199f778388_greekvirtueshort",
+          "type": "resource",
+          "orderIndex": 12,
+          "content": {
+            "sourceFile": "static_resources/340916a74de1775088445f199f778388_greekvirtueshort.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-14"
+          },
+          "title": "76a62d9a1d03d49cdea8e12f3d9f7ebf_tapmenok_l",
+          "type": "resource",
+          "orderIndex": 13,
+          "content": {
+            "sourceFile": "static_resources/76a62d9a1d03d49cdea8e12f3d9f7ebf_tapmenok_l.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-15"
+          },
+          "title": "11bcd0dcba33f919cf49a88a1e19a2fd_tap_lucre2",
+          "type": "resource",
+          "orderIndex": 14,
+          "content": {
+            "sourceFile": "static_resources/11bcd0dcba33f919cf49a88a1e19a2fd_tap_lucre2.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-16"
+          },
+          "title": "ba11e96393169011ca3fb588a8cdcb60_forms",
+          "type": "resource",
+          "orderIndex": 15,
+          "content": {
+            "sourceFile": "static_resources/ba11e96393169011ca3fb588a8cdcb60_forms.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-17"
+          },
+          "title": "9f2211a1e85ce0c98d67959c059a2924_thirdman",
+          "type": "resource",
+          "orderIndex": 16,
+          "content": {
+            "sourceFile": "static_resources/9f2211a1e85ce0c98d67959c059a2924_thirdman.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-18"
+          },
+          "title": "be480b5545330e49c08192da208ee9a6_phaedo",
+          "type": "resource",
+          "orderIndex": 17,
+          "content": {
+            "sourceFile": "static_resources/be480b5545330e49c08192da208ee9a6_phaedo.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-19"
+          },
+          "title": "42c6a55d7d3206df1d27a066cf7420aa_eplucre04",
+          "type": "resource",
+          "orderIndex": 18,
+          "content": {
+            "sourceFile": "static_resources/42c6a55d7d3206df1d27a066cf7420aa_eplucre04.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-20"
+          },
+          "title": "42990f545337ffe493c69ddb86cbd7e2_menoinq",
+          "type": "resource",
+          "orderIndex": 19,
+          "content": {
+            "sourceFile": "static_resources/42990f545337ffe493c69ddb86cbd7e2_menoinq.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-21"
+          },
+          "title": "66565b93124b6b84b9a27c9561d85bb9_afunction",
+          "type": "resource",
+          "orderIndex": 20,
+          "content": {
+            "sourceFile": "static_resources/66565b93124b6b84b9a27c9561d85bb9_afunction.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-22"
+          },
+          "title": "4c708d22c19e1293be9ef9df11cf931a_socpsychjustice",
+          "type": "resource",
+          "orderIndex": 21,
+          "content": {
+            "sourceFile": "static_resources/4c708d22c19e1293be9ef9df11cf931a_socpsychjustice.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-23"
+          },
+          "title": "966b9b904ae6ae40dca146c2cf310cbe_asubsthdo",
+          "type": "resource",
+          "orderIndex": 22,
+          "content": {
+            "sourceFile": "static_resources/966b9b904ae6ae40dca146c2cf310cbe_asubsthdo.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-24"
+          },
+          "title": "a7ac3ced6a1ea1776cc14f10cf4c3d29_arsciencehdo",
+          "type": "resource",
+          "orderIndex": 23,
+          "content": {
+            "sourceFile": "static_resources/a7ac3ced6a1ea1776cc14f10cf4c3d29_arsciencehdo.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-25"
+          },
+          "title": "07f33db3454cbf7b4cb6fab350d917ef_repgoods",
+          "type": "resource",
+          "orderIndex": 24,
+          "content": {
+            "sourceFile": "static_resources/07f33db3454cbf7b4cb6fab350d917ef_repgoods.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-26"
+          },
+          "title": "7cb46bb68dadca192497b46e2c7c942f_tap_rep5",
+          "type": "resource",
+          "orderIndex": 25,
+          "content": {
+            "sourceFile": "static_resources/7cb46bb68dadca192497b46e2c7c942f_tap_rep5.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-27"
+          },
+          "title": "28b5e0ab52875961f22a8aa9770f9879_arist1",
+          "type": "resource",
+          "orderIndex": 26,
+          "content": {
+            "sourceFile": "static_resources/28b5e0ab52875961f22a8aa9770f9879_arist1.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-28"
+          },
+          "title": "81416a43ca11a619c8c44b87a63f38b7_repsum",
+          "type": "resource",
+          "orderIndex": 27,
+          "content": {
+            "sourceFile": "static_resources/81416a43ca11a619c8c44b87a63f38b7_repsum.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-29"
+          },
+          "title": "87212c12ea761b8a76ef12ae65f4fbb2_soctheses",
+          "type": "resource",
+          "orderIndex": 28,
+          "content": {
+            "sourceFile": "static_resources/87212c12ea761b8a76ef12ae65f4fbb2_soctheses.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-30"
+          },
+          "title": "3c14c6c6d7c7c9458fe71f8813dcbfc1_4causes",
+          "type": "resource",
+          "orderIndex": 29,
+          "content": {
+            "sourceFile": "static_resources/3c14c6c6d7c7c9458fe71f8813dcbfc1_4causes.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-31"
+          },
+          "title": "1772c321d915875bdb630a165988c3ac_euthyhdo",
+          "type": "resource",
+          "orderIndex": 30,
+          "content": {
+            "sourceFile": "static_resources/1772c321d915875bdb630a165988c3ac_euthyhdo.pdf"
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": {
+    "terms": []
+  },
+  "_import_metadata": {
+    "source": "mit_ocw",
+    "course_id": "24-200-ancient-philosophy-fall-2004",
+    "imported_at": "2026-02-10T17:20:58.179376",
+    "attribution": "This content is derived from MIT OpenCourseWare (ocw.mit.edu). Original course: \"Ancient Philosophy\" (Course Number: 24). Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC-BY-NC-SA 4.0). Copyright Massachusetts Institute of Technology.",
+    "stats": {
+      "lectures": 26,
+      "assignments": 0,
+      "exams": 0,
+      "resources": 31
+    }
+  }
+}

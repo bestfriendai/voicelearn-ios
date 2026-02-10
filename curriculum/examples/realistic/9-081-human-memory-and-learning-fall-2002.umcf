@@ -1,0 +1,551 @@
+{
+  "umcf": "1.0.0",
+  "id": {
+    "catalog": "UnaMentis",
+    "value": "9-081-human-memory-and-learning-fall-2002"
+  },
+  "title": "Human Memory and Learning",
+  "description": "Surveys cognitive and neural organization of human memory and learning: working memory, episodic and semantic memory, and implicit forms of memory.",
+  "version": {
+    "number": "1.0.0",
+    "date": "2026-02-10"
+  },
+  "lifecycle": {
+    "status": "draft",
+    "contributors": [
+      {
+        "role": "publisher",
+        "name": "UnaMentis Importer"
+      },
+      {
+        "role": "instructor",
+        "name": "John Gabrieli"
+      }
+    ]
+  },
+  "metadata": {
+    "language": "en-US",
+    "keywords": [],
+    "department": "Brain and Cognitive Sciences"
+  },
+  "educational": {
+    "audience": {
+      "type": "learner",
+      "educationalLevel": "collegiate"
+    }
+  },
+  "rights": {
+    "type": "CC-BY-NC-SA-4.0",
+    "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "permissions": [
+      "share",
+      "adapt"
+    ],
+    "conditions": [
+      "attribution",
+      "noncommercial",
+      "sharealike"
+    ],
+    "attributionRequired": true,
+    "attributionFormat": "Content from MIT OpenCourseWare (ocw.mit.edu), licensed under CC-BY-NC-SA 4.0.",
+    "holder": {
+      "name": "Massachusetts Institute of Technology",
+      "url": "https://ocw.mit.edu/"
+    },
+    "restrictions": []
+  },
+  "content": [
+    {
+      "id": {
+        "value": "lectures"
+      },
+      "title": "Lectures",
+      "type": "module",
+      "orderIndex": 0,
+      "children": [
+        {
+          "id": {
+            "value": "lecture-1"
+          },
+          "title": "Lecture 1",
+          "type": "topic",
+          "orderIndex": 0,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-2"
+          },
+          "title": "Lecture 2",
+          "type": "topic",
+          "orderIndex": 1,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-3"
+          },
+          "title": "Lecture 3",
+          "type": "topic",
+          "orderIndex": 2,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-4"
+          },
+          "title": "Lecture 4",
+          "type": "topic",
+          "orderIndex": 3,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-5"
+          },
+          "title": "Lecture 5",
+          "type": "topic",
+          "orderIndex": 4,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-6"
+          },
+          "title": "Lecture 6",
+          "type": "topic",
+          "orderIndex": 5,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-7"
+          },
+          "title": "Lecture 7",
+          "type": "topic",
+          "orderIndex": 6,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-8"
+          },
+          "title": "Lecture 8",
+          "type": "topic",
+          "orderIndex": 7,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-9"
+          },
+          "title": "Lecture 9",
+          "type": "topic",
+          "orderIndex": 8,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-10"
+          },
+          "title": "Lecture 10",
+          "type": "topic",
+          "orderIndex": 9,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-11"
+          },
+          "title": "Lecture 11",
+          "type": "topic",
+          "orderIndex": 10,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-12"
+          },
+          "title": "Lecture 12",
+          "type": "topic",
+          "orderIndex": 11,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-13"
+          },
+          "title": "Lecture 13",
+          "type": "topic",
+          "orderIndex": 12,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-14"
+          },
+          "title": "Lecture 14",
+          "type": "topic",
+          "orderIndex": 13,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-15"
+          },
+          "title": "Lecture 15",
+          "type": "topic",
+          "orderIndex": 14,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-16"
+          },
+          "title": "Lecture 16",
+          "type": "topic",
+          "orderIndex": 15,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-17"
+          },
+          "title": "Lecture 17",
+          "type": "topic",
+          "orderIndex": 16,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-18"
+          },
+          "title": "Lecture 18",
+          "type": "topic",
+          "orderIndex": 17,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-19"
+          },
+          "title": "Lecture 19",
+          "type": "topic",
+          "orderIndex": 18,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-20"
+          },
+          "title": "Lecture 20",
+          "type": "topic",
+          "orderIndex": 19,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-21"
+          },
+          "title": "Lecture 21",
+          "type": "topic",
+          "orderIndex": 20,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-22"
+          },
+          "title": "Lecture 22",
+          "type": "topic",
+          "orderIndex": 21,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-23"
+          },
+          "title": "Lecture 23",
+          "type": "topic",
+          "orderIndex": 22,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        },
+        {
+          "id": {
+            "value": "lecture-24"
+          },
+          "title": "Lecture 24",
+          "type": "topic",
+          "orderIndex": 23,
+          "content": {
+            "text": "",
+            "hasVideo": false,
+            "hasTranscript": false
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": "assignments"
+      },
+      "title": "Assignments",
+      "type": "module",
+      "orderIndex": 1,
+      "children": [
+        {
+          "id": {
+            "value": "assignment-1"
+          },
+          "title": "bd6a565d601ee99ea29e443730fa04fc_assignment2",
+          "type": "assessment",
+          "orderIndex": 0,
+          "content": {
+            "assessmentType": "assignment",
+            "sourceFile": "static_resources/bd6a565d601ee99ea29e443730fa04fc_assignment2.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "assignment-2"
+          },
+          "title": "b3b26a922751829538dff5c2475626a1_assignment1",
+          "type": "assessment",
+          "orderIndex": 1,
+          "content": {
+            "assessmentType": "assignment",
+            "sourceFile": "static_resources/b3b26a922751829538dff5c2475626a1_assignment1.pdf"
+          }
+        }
+      ]
+    },
+    {
+      "id": {
+        "value": "resources"
+      },
+      "title": "Additional Resources",
+      "type": "module",
+      "orderIndex": 3,
+      "children": [
+        {
+          "id": {
+            "value": "resource-1"
+          },
+          "title": "ad299279cdbf184fc09df31ef0d9eb9c_lecnote4",
+          "type": "resource",
+          "orderIndex": 0,
+          "content": {
+            "sourceFile": "static_resources/ad299279cdbf184fc09df31ef0d9eb9c_lecnote4.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-2"
+          },
+          "title": "62160c661b7518db7acd03a13f89761b_lecnote7",
+          "type": "resource",
+          "orderIndex": 1,
+          "content": {
+            "sourceFile": "static_resources/62160c661b7518db7acd03a13f89761b_lecnote7.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-3"
+          },
+          "title": "5a0a7c9b0509727e918396542a931eb8_lecnote1",
+          "type": "resource",
+          "orderIndex": 2,
+          "content": {
+            "sourceFile": "static_resources/5a0a7c9b0509727e918396542a931eb8_lecnote1.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-4"
+          },
+          "title": "f4447867c27ab7b30c8e9cf02c0bf254_lecnote5",
+          "type": "resource",
+          "orderIndex": 3,
+          "content": {
+            "sourceFile": "static_resources/f4447867c27ab7b30c8e9cf02c0bf254_lecnote5.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-5"
+          },
+          "title": "4d18f1419e17b7739f7e8ed32696e0ec_lecnote10",
+          "type": "resource",
+          "orderIndex": 4,
+          "content": {
+            "sourceFile": "static_resources/4d18f1419e17b7739f7e8ed32696e0ec_lecnote10.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-6"
+          },
+          "title": "7a71062c702146f91021898e5fb49e86_lecnote8",
+          "type": "resource",
+          "orderIndex": 5,
+          "content": {
+            "sourceFile": "static_resources/7a71062c702146f91021898e5fb49e86_lecnote8.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-7"
+          },
+          "title": "0e9fcc041f4cd8bf2d35763b0dd65cd8_lecnote9",
+          "type": "resource",
+          "orderIndex": 6,
+          "content": {
+            "sourceFile": "static_resources/0e9fcc041f4cd8bf2d35763b0dd65cd8_lecnote9.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-8"
+          },
+          "title": "8f620f425de83b90dafa781f85f45a09_lecnote6",
+          "type": "resource",
+          "orderIndex": 7,
+          "content": {
+            "sourceFile": "static_resources/8f620f425de83b90dafa781f85f45a09_lecnote6.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-9"
+          },
+          "title": "9927c760ca38db1e8ffb85003eda095a_lecnote3",
+          "type": "resource",
+          "orderIndex": 8,
+          "content": {
+            "sourceFile": "static_resources/9927c760ca38db1e8ffb85003eda095a_lecnote3.pdf"
+          }
+        },
+        {
+          "id": {
+            "value": "resource-10"
+          },
+          "title": "61546609b72dff2988acf7a3dd5b816b_lecnote2",
+          "type": "resource",
+          "orderIndex": 9,
+          "content": {
+            "sourceFile": "static_resources/61546609b72dff2988acf7a3dd5b816b_lecnote2.pdf"
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": {
+    "terms": []
+  },
+  "_import_metadata": {
+    "source": "mit_ocw",
+    "course_id": "9-081-human-memory-and-learning-fall-2002",
+    "imported_at": "2026-02-10T17:20:50.185543",
+    "attribution": "This content is derived from MIT OpenCourseWare (ocw.mit.edu). Original course: \"Human Memory and Learning\" (Course Number: 9). Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC-BY-NC-SA 4.0). Copyright Massachusetts Institute of Technology.",
+    "stats": {
+      "lectures": 24,
+      "assignments": 2,
+      "exams": 0,
+      "resources": 10
+    }
+  }
+}

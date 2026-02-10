@@ -928,58 +928,64 @@ import type {
   CourseCatalogEntry,
 } from '@/types';
 
-// Mock data for import sources
+// Mock data for import sources (matches backend CurriculumSource.to_dict())
 const mockSources: CurriculumSource[] = [
   {
     id: 'mit_ocw',
     name: 'MIT OpenCourseWare',
     description: 'Free lecture notes, exams, and videos from MIT. No registration required.',
-    provider: 'Massachusetts Institute of Technology',
-    website: 'https://ocw.mit.edu',
     license: {
       type: 'CC-BY-NC-SA-4.0',
       name: 'Creative Commons Attribution-NonCommercial-ShareAlike 4.0',
       url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-      requiresAttribution: true,
-      allowsCommercialUse: false,
-      allowsDerivatives: true,
-      shareAlike: true,
+      attributionRequired: true,
+      permissions: ['share', 'adapt'],
+      conditions: ['attribution', 'noncommercial', 'sharealike'],
+      restrictions: [],
     },
-    contentTypes: ['lectures', 'transcripts', 'notes', 'assignments', 'exams'],
-    subjects: ['Computer Science', 'Mathematics', 'Physics', 'Engineering'],
-    courseCount: 2500,
-    isActive: true,
+    courseCount: '2500',
+    features: ['lectures', 'transcripts', 'notes', 'assignments', 'exams'],
+    status: 'active',
+    baseUrl: 'https://ocw.mit.edu',
   },
 ];
 
+// Mock data for courses (matches backend CourseCatalogEntry.to_dict())
 const mockCourses: CourseCatalogEntry[] = [
   {
     id: '6-001-spring-2005',
+    sourceId: 'mit_ocw',
     title: 'Structure and Interpretation of Computer Programs',
     description: 'Introduction to programming using Scheme, from the legendary MIT course.',
-    instructor: 'Hal Abelson, Gerald Jay Sussman',
-    institution: 'MIT',
-    subject: 'Computer Science',
-    level: 'Undergraduate',
-    language: 'English',
-    url: 'https://ocw.mit.edu/courses/6-001-structure-and-interpretation-of-computer-programs-spring-2005/',
+    instructors: ['Hal Abelson', 'Gerald Jay Sussman'],
+    level: 'introductory',
+    department: 'Electrical Engineering and Computer Science',
+    semester: 'Spring 2005',
+    features: [
+      { type: 'transcript', count: 20, available: true },
+      { type: 'lecture_notes', count: 20, available: true },
+      { type: 'assignments', count: 8, available: true },
+    ],
     license: mockSources[0].license,
-    contentTypes: ['lectures', 'transcripts', 'notes', 'assignments'],
-    estimatedDuration: '40 hours',
+    keywords: ['programming', 'scheme', 'computer science'],
   },
   {
     id: '6-006-fall-2011',
+    sourceId: 'mit_ocw',
     title: 'Introduction to Algorithms',
     description: 'Techniques for the design and analysis of efficient algorithms.',
-    instructor: 'Erik Demaine, Srini Devadas',
-    institution: 'MIT',
-    subject: 'Computer Science',
-    level: 'Undergraduate',
-    language: 'English',
-    url: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/',
+    instructors: ['Erik Demaine', 'Srini Devadas'],
+    level: 'introductory',
+    department: 'Electrical Engineering and Computer Science',
+    semester: 'Fall 2011',
+    features: [
+      { type: 'transcript', count: 24, available: true },
+      { type: 'lecture_notes', count: 24, available: true },
+      { type: 'assignments', count: 10, available: true },
+      { type: 'exams', count: 3, available: true },
+    ],
     license: mockSources[0].license,
-    contentTypes: ['lectures', 'transcripts', 'notes', 'assignments', 'exams'],
-    estimatedDuration: '50 hours',
+    keywords: ['algorithms', 'data structures', 'computer science'],
   },
 ];
 
@@ -1030,7 +1036,7 @@ export async function getCourseCatalog(
     }
 
     if (params?.subject) {
-      filtered = filtered.filter((c) => c.subject === params.subject);
+      filtered = filtered.filter((c) => c.department === params.subject);
     }
 
     if (params?.level) {
@@ -1053,9 +1059,8 @@ export async function getCourseCatalog(
         totalPages: Math.ceil(total / pageSize),
       },
       filters: {
-        subjects: ['Computer Science', 'Mathematics', 'Physics', 'Engineering'],
-        levels: ['Undergraduate', 'Graduate'],
-        features: ['transcripts', 'notes', 'assignments', 'exams', 'videos'],
+        subjects: ['Electrical Engineering and Computer Science', 'Mathematics', 'Physics'],
+        levels: ['introductory', 'intermediate', 'advanced'],
       },
     };
   });
@@ -1076,6 +1081,7 @@ export async function getCourseDetail(
         course: null as unknown as CourseDetailResponse['course'],
         canImport: false,
         licenseWarnings: [],
+        attribution: '',
         error: `Course not found: ${courseId}`,
       };
     }
@@ -1084,26 +1090,19 @@ export async function getCourseDetail(
       success: true,
       course: {
         ...course,
-        longDescription: `${course.description}\n\nThis is a comprehensive course covering key topics in ${course.subject}.`,
-        prerequisites: ['Basic programming knowledge'],
-        learningOutcomes: [
-          'Understand fundamental concepts',
-          'Apply learned techniques to solve problems',
-        ],
-        topics: ['Introduction', 'Core Concepts', 'Advanced Topics'],
-        contentSummary: {
-          lectureCount: 24,
-          hasTranscripts: true,
-          hasLectureNotes: true,
-          hasAssignments: true,
-          hasExams: course.contentTypes.includes('exams'),
-          hasVideos: false,
-          hasSolutions: true,
-        },
+        contentStructure: null,
+        assignments: [],
+        exams: [],
+        syllabus: null,
+        prerequisites: [],
+        estimatedImportTime: '~30 minutes',
+        estimatedOutputSize: '~50 MB',
+        sourceUrl: null,
+        downloadUrl: null,
       },
       canImport: true,
       licenseWarnings: [],
-      attribution: `This content is from ${course.institution}, licensed under ${course.license.name}.`,
+      attribution: `Content from ${course.title}, MIT OpenCourseWare, licensed under ${course.license.name}.`,
     };
   });
 }

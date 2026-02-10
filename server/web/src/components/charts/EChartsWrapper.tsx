@@ -2,16 +2,17 @@
  * ECharts Wrapper Component
  * =========================
  *
- * Base wrapper component for Apache ECharts that applies the dark theme
- * and provides consistent configuration across all charts.
+ * Base wrapper component for Apache ECharts that applies the appropriate
+ * light/dark theme and provides consistent configuration across all charts.
  */
 
 'use client';
 
 import { useRef, useEffect, memo } from 'react';
+import { useTheme } from 'next-themes';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption, ECharts } from 'echarts';
-import { latencyDarkTheme, baseChartOptions } from './chart-theme';
+import { getChartTheme, baseChartOptions } from './chart-theme';
 
 interface EChartsWrapperProps {
   /** ECharts option configuration */
@@ -31,7 +32,7 @@ interface EChartsWrapperProps {
 }
 
 /**
- * Wrapper component for ECharts with dark theme and consistent styling.
+ * Wrapper component for ECharts with light/dark theme and consistent styling.
  *
  * @example
  * ```tsx
@@ -55,6 +56,8 @@ function EChartsWrapperComponent({
   mergeBaseOptions = true,
 }: EChartsWrapperProps) {
   const chartRef = useRef<ReactECharts>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   // Merge base options if enabled
   const mergedOption = mergeBaseOptions
@@ -92,14 +95,14 @@ function EChartsWrapperComponent({
     <ReactECharts
       ref={chartRef}
       option={mergedOption}
-      theme={latencyDarkTheme}
+      theme={getChartTheme(isDark)}
       style={{ height, width: '100%' }}
       showLoading={loading}
       loadingOption={{
         text: 'Loading...',
         color: '#6366f1',
         textColor: '#94a3b8',
-        maskColor: 'rgba(15, 23, 42, 0.8)',
+        maskColor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)',
       }}
       onEvents={onEvents}
       opts={{

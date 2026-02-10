@@ -2,11 +2,146 @@
  * ECharts Theme Configuration
  * ===========================
  *
- * Dark theme matching the slate-950 color palette used throughout
- * the UnaMentis web management interface.
+ * Light and dark theme definitions for the ECharts-based charts
+ * used throughout the UnaMentis web management interface.
  */
 
 import type { EChartsOption } from 'echarts';
+
+/**
+ * Light theme configuration for ECharts.
+ * Matches light mode with slate-based neutrals.
+ */
+export const latencyLightTheme = {
+  // Background is transparent to let Card handle it
+  backgroundColor: 'transparent',
+
+  // Text styling
+  textStyle: {
+    color: '#334155', // slate-700
+    fontFamily:
+      'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  },
+
+  // Title styling
+  title: {
+    textStyle: {
+      color: '#0f172a', // slate-900
+      fontSize: 16,
+      fontWeight: 600,
+    },
+    subtextStyle: {
+      color: '#64748b', // slate-500
+      fontSize: 12,
+    },
+  },
+
+  // Legend styling
+  legend: {
+    textStyle: {
+      color: '#64748b', // slate-500
+    },
+  },
+
+  // Tooltip styling
+  tooltip: {
+    backgroundColor: '#ffffff', // white
+    borderColor: '#e2e8f0', // slate-200
+    borderWidth: 1,
+    textStyle: {
+      color: '#334155', // slate-700
+    },
+    extraCssText: 'box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);',
+  },
+
+  // Axis styling
+  categoryAxis: {
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1', // slate-300
+      },
+    },
+    axisTick: {
+      lineStyle: {
+        color: '#cbd5e1',
+      },
+    },
+    axisLabel: {
+      color: '#64748b', // slate-500
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#e2e8f0', // slate-200
+      },
+    },
+  },
+
+  valueAxis: {
+    axisLine: {
+      lineStyle: {
+        color: '#cbd5e1',
+      },
+    },
+    axisTick: {
+      lineStyle: {
+        color: '#cbd5e1',
+      },
+    },
+    axisLabel: {
+      color: '#64748b',
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#e2e8f0',
+        type: 'dashed',
+      },
+    },
+  },
+
+  // Grid styling
+  grid: {
+    borderColor: '#e2e8f0',
+  },
+
+  // Data zoom styling
+  dataZoom: {
+    backgroundColor: '#f8fafc', // slate-50
+    dataBackgroundColor: '#e2e8f0', // slate-200
+    fillerColor: 'rgba(99, 102, 241, 0.2)', // indigo with opacity
+    handleColor: '#4f46e5', // indigo-600
+    textStyle: {
+      color: '#64748b',
+    },
+  },
+
+  // Visual map (for heatmaps)
+  visualMap: {
+    textStyle: {
+      color: '#64748b',
+    },
+  },
+
+  // Color palette matching project conventions (same as dark theme)
+  color: [
+    '#6366f1', // Indigo (primary)
+    '#8b5cf6', // Violet
+    '#10b981', // Emerald
+    '#f59e0b', // Amber
+    '#ef4444', // Red
+    '#3b82f6', // Blue
+    '#ec4899', // Pink
+    '#14b8a6', // Teal
+    '#f97316', // Orange
+    '#a855f7', // Purple
+  ],
+};
+
+/**
+ * Returns the appropriate ECharts theme based on the current color mode.
+ */
+export function getChartTheme(isDark: boolean) {
+  return isDark ? latencyDarkTheme : latencyLightTheme;
+}
 
 /**
  * Dark theme configuration for ECharts.

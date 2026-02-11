@@ -46,7 +46,7 @@ UnaMentis provides voice tutoring across multiple platforms:
 ```
 unamentis/
 ├── UnaMentis/                 # iOS App (Swift 6.0/SwiftUI)
-├── UnaMentisTests/            # iOS Test Suite (126+ tests)
+├── UnaMentisTests/            # iOS Test Suite (178+ tests)
 ├── server/                    # Backend Infrastructure
 │   ├── usm-core/              # Cross-Platform Service Manager (Rust, port 8787)
 │   ├── server-manager/        # Menu bar apps for service management
@@ -68,7 +68,7 @@ unamentis/
 | Component | Location | Technology | Purpose |
 |-----------|----------|------------|---------|
 | iOS App | `UnaMentis/` | Swift 6.0, SwiftUI | Voice tutoring client (primary) |
-| iOS Tests | `UnaMentisTests/` | XCTest | 126+ unit, 16+ integration tests |
+| iOS Tests | `UnaMentisTests/` | XCTest | 178+ unit, 16+ integration tests |
 | **USM Core** | `server/usm-core/` | Rust, Tokio, Axum | Cross-platform service manager (port 8787) |
 | **USM-FFI** | `server/server-manager/USMXcode-FFI/` | Swift 6.0, SwiftUI | macOS menu bar app (uses USM Core) |
 | Web Client | `server/web-client/` | Next.js 15+, React, TypeScript | Voice tutoring for browsers |
@@ -226,6 +226,7 @@ UnaMentis/
 │   ├── Curriculum/      # CurriculumEngine, ProgressTracker, UMCFParser
 │   ├── Logging/         # RemoteLogHandler
 │   ├── Persistence/     # PersistenceController, 7 Core Data entities
+│   ├── ReadingList/     # ReadingListManager, ReadingTextChunker, MarkdownStripper, HTMLArticleExtractor, WebArticleFetcher
 │   ├── Routing/         # PatchPanelService, LLMEndpoint, RoutingTable
 │   ├── Session/         # SessionManager (state machine, TTS config)
 │   └── Telemetry/       # TelemetryEngine (latency, cost, events)
@@ -260,7 +261,7 @@ UnaMentis/
 | **LLM Providers** | 5 | OpenAI, Anthropic, Self-Hosted, On-Device, Mock |
 | **UI Views** | 11+ | Session, Curriculum, History, Analytics, Settings, Debug, and supporting views |
 | **Swift Files** | 80+ | Source files across Core, Services, UI |
-| **Test Files** | 26 | Unit and integration tests |
+| **Test Files** | 29 | Unit and integration tests |
 
 ### Session Flow
 
@@ -330,7 +331,7 @@ A switchboard system for routing LLM calls to any endpoint:
 
 ### Data Persistence
 
-**Core Data entities (7 total):**
+**Core Data entities (11 total):**
 - `Curriculum` - Course containers
 - `Topic` - Hierarchical learning units
 - `Session` - Recorded conversations with transcripts
@@ -338,6 +339,10 @@ A switchboard system for routing LLM calls to any endpoint:
 - `TranscriptEntry` - Conversation history
 - `Document` - Imported curriculum documents
 - `VisualAsset` - Images, diagrams, equations linked to topics
+- `ReadingListItem` - Imported reading content (files, web articles, markdown)
+- `ReadingChunk` - TTS-ready text segments with character offsets and estimated duration
+- `ReadingBookmark` - User bookmarks within reading items
+- `ReadingVisualAsset` - Images extracted from PDFs
 
 ---
 
@@ -1043,7 +1048,7 @@ See [CODE_QUALITY_INITIATIVE.md](../quality/CODE_QUALITY_INITIATIVE.md) for comp
 - All iOS services implemented (STT, TTS, LLM, VAD, Embeddings)
 - Full UI (Session, Curriculum, History, Analytics, Settings, Debug)
 - UMCF 1.0 specification with JSON Schema (1,905 lines)
-- 126+ unit tests across 26 test files (including 23 App Intents tests)
+- 178+ unit tests across 29 test files (including 23 App Intents tests)
 - 16+ integration tests
 - Telemetry, cost tracking, thermal management
 - Self-hosted server discovery and health monitoring
@@ -1091,6 +1096,7 @@ See [CODE_QUALITY_INITIATIVE.md](../quality/CODE_QUALITY_INITIATIVE.md) for comp
 - **USM-FFI** macOS menu bar app (Swift, real-time WebSocket, 16 tests)
 - **Knowledge Bowl Question Pack API** (full CRUD for packs/questions, bundle creation with deduplication, module import)
 - **KB Pack Management UI** (Operations Console: pack browser, question browser, pack creation, bulk operations)
+- **Reading List** with file and URL import, markdown stripping, HTML article extraction (swift-readability/Mozilla Readability), Vision OCR for scanned PDFs, TTS-friendly text chunking
 
 ### In Progress
 - Android client (separate repository)
@@ -1139,6 +1145,7 @@ See [CODE_QUALITY_INITIATIVE.md](../quality/CODE_QUALITY_INITIATIVE.md) for comp
 | Persistence | Core Data (SQLite) |
 | Audio | AVFoundation, Audio Toolbox |
 | Networking | LiveKit (WebRTC), URLSession |
+| HTML/Content | SwiftSoup (HTML parsing), SwiftReadability (Mozilla Readability), Vision (OCR) |
 | Inference | llama.cpp, CoreML, Rust/Candle |
 | Testing | XCTest (real > mock philosophy) |
 
@@ -1220,6 +1227,11 @@ See [CODE_QUALITY_INITIATIVE.md](../quality/CODE_QUALITY_INITIATIVE.md) for comp
 | `server/usm-core/crates/usm-ffi/src/lib.rs` | C FFI bindings for Swift |
 | `server/usm-core/config/services.toml` | Service definitions |
 | `server/web-client/src/app/` | Web client application |
+| `UnaMentis/Core/ReadingList/ReadingListManager.swift` | Reading list import, dedup, Core Data management |
+| `UnaMentis/Core/ReadingList/ReadingTextChunker.swift` | Text chunking with Vision OCR fallback for scanned PDFs |
+| `UnaMentis/Core/ReadingList/HTMLArticleExtractor.swift` | Article extraction using swift-readability + SwiftSoup |
+| `UnaMentis/Core/ReadingList/WebArticleFetcher.swift` | Web page fetching with encoding detection |
+| `UnaMentis/Core/ReadingList/MarkdownStripper.swift` | Markdown-to-plaintext for TTS-ready content |
 | `server/management/kb_packs_api.py` | **Knowledge Bowl Pack Management API** |
 | `server/web/src/types/question-packs.ts` | KB pack TypeScript types |
 | `server/web/src/app/api/kb/` | KB Next.js API routes |
@@ -1370,7 +1382,7 @@ A separate commercial layer may offer:
 | Component | Language | Files | Purpose |
 |-----------|----------|-------|---------|
 | iOS App | Swift | 80+ | Voice tutoring client (primary) |
-| iOS Tests | Swift | 26 | Unit & integration tests |
+| iOS Tests | Swift | 29 | Unit & integration tests |
 | **USM Core** | Rust | 22 | Cross-platform service manager |
 | **USM-FFI** | Swift | 15+ | macOS menu bar app |
 | Web Client | TypeScript/React | 50+ | Voice tutoring for browsers |
